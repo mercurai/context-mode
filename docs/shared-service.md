@@ -1,6 +1,6 @@
 ---
 owner: svere
-last-reviewed: 2026-10-27
+last-reviewed: 2026-10-29
 stability: draft
 ---
 
@@ -21,6 +21,22 @@ The loopback HTTP boundary checks Host/Origin, purpose-specific credentials, JSO
 body size and admission limits. Hook credentials are distinct from MCP credentials. Authentication is
 rechecked after body delivery and immediately before memory processing. Callers cannot select a database
 or supply an arbitrary resolved identity.
+
+The supervisor control channel uses inherited stdio on Unix. On Windows, the
+production service entry calls `runServiceEntry` from `context-mode/shared/control`
+to connect three host-created named pipes before accepting bootstrap input. The
+host supplies `HARNESS_SERVICE_PIPES` as three semicolon-separated local names:
+`\\.\pipe\harness-<nonce>-in`, `\\.\pipe\harness-<nonce>-out`, and
+`\\.\pipe\harness-<nonce>-err`, in that order, with one 32-character lowercase
+hexadecimal nonce. Mixed generations, remote names, reordered roles, and missing
+names refuse startup. Connections have a bounded startup timeout; partial startup
+and service failure close all three clients. CodeGraph uses this same public entry
+adapter without adding a process. The Windows client reads only `in` and writes
+only `out` and `err`, relying on libuv's simplex-pipe fallback. The supervisor's
+Job cleanup bounds a pending native pipe close. With no inherited Windows stderr,
+only the adapter's fixed diagnostic reaches the host's error pipe. Linux socket
+tests qualify channel separation and cleanup; native Windows proof requires the
+real Node entry launched by the harness against its simplex server pipes.
 
 ## Memory hook requests
 

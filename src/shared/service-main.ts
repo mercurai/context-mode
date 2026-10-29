@@ -1,7 +1,7 @@
 import type { Readable, Writable } from "node:stream";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { runServiceControl } from "./control.js";
+import { runServiceControl, runServiceEntry } from "./control.js";
 import type { SharedServiceOptions } from "./service.js";
 
 type BootstrapOptions = Omit<SharedServiceOptions, "now">;
@@ -35,5 +35,5 @@ export async function main(input: Readable = process.stdin, output: Writable = p
 }
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
-  void main().catch(() => { process.stderr.write("Shared service control failed\n"); process.exitCode = 1; });
+  void runServiceEntry((input, output) => main(input, output)).catch(() => { process.exitCode = 1; });
 }

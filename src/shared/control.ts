@@ -4,6 +4,7 @@ import type { AuthenticatedScope } from "./identity.js";
 import type { SharedLaunchGrant, SharedLaunchMetadata } from "./launch-authority.js";
 import type { SharedHttpHealth } from "./http.js";
 import { randomUUID } from "node:crypto";
+export { runServiceEntry } from "./service-entry.js";
 
 export interface ControlledService {
   issue(metadata: SharedLaunchMetadata): SharedLaunchGrant;
