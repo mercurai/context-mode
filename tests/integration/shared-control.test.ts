@@ -109,7 +109,7 @@ describe("private framed shared service control", () => {
       },
     };
   }
-  function start(output?: PassThrough) {
+  function start(output?: PassThrough, makeService: () => ControlledService = service) {
     const control = channel((input, writable) => runServiceControl({ kind: "context-mode", input, output: writable,
       now: () => new Date(clock), parseOptions(value) {
         const input = value as { ttlMs: number; maxLaunches: number };
@@ -117,7 +117,7 @@ describe("private framed shared service control", () => {
           throw new Error("Invalid bootstrap options");
         }
         return input;
-      }, async createService() { createStarted.resolve(); await createGate; return service(); },
+      }, async createService() { createStarted.resolve(); await createGate; return makeService(); },
     }), output);
     controls.push(control); return control;
   }
@@ -129,7 +129,7 @@ describe("private framed shared service control", () => {
     expect(message.value).toMatchObject({ v: 1, kind: "context-mode", mcpUrl: "http://127.0.0.1:23145/mcp",
       hooksUrl: "http://127.0.0.1:23145/hooks", healthUrl: "http://127.0.0.1:23145/health" });
     expect(message.value.generation).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-    return { control, generation: message.value.generation as string };
+    return { control, generation: message.value.generation as string, ready: message.value };
   }
   async function rpc(control: ReturnType<typeof channel>, generation: string, op: string, extra: Envelope = {}) {
     control.input.write(frame("R", { v: 1, id: "request", generation, op, ...extra }));
@@ -285,5 +285,170 @@ describe("private framed shared service control", () => {
     expect(hook.status).toBe(202);
     expect((await rpc(control, ready.generation as string, "shutdown")).ok).toBe(true);
     expect(await control.done).toBeUndefined();
+  });
+
+  describe("explicit control renewal", () => {
+    type Grant = { handle: string; mcpCapability: string; hookCapability: string };
+    const nativeCall = { name: "ctx_stats", _meta: { threadId: "root", sessionId: "root" } };
+    const readyKeys = ["v", "kind", "generation", "mcpUrl", "hooksUrl", "healthUrl"];
+    const renewableService = () => ({ ...service(), renew: (scope: Parameters<ControlledService["revoke"]>[0]) => authority.renew(scope) });
+
+    async function renewableReady(makeService: () => ControlledService = renewableService) {
+      const result = await ready(start(undefined, makeService));
+      expect(result.ready.renew).toBe(true);
+      expect(Object.keys(result.ready).sort()).toEqual([...readyKeys, "renew"].sort());
+      return result;
+    }
+    async function issue(control: ReturnType<typeof channel>, generation: string): Promise<Grant> {
+      const result = await rpc(control, generation, "issue", { metadata });
+      expect(result.ok).toBe(true);
+      return result.result as Grant;
+    }
+    function enroll(grant: Grant) {
+      authority.registerHook(request(grant.hookCapability), {
+        hook_event_name: "SessionStart", session_id: "root", cwd: metadata.workspace,
+      });
+      return authority.authenticate(request(grant.mcpCapability));
+    }
+
+    test("advertises renewal only for a callable service method", async () => {
+      const { control, generation } = await renewableReady();
+      expect((await rpc(control, generation, "shutdown")).result).toEqual({ closed: true });
+      expect(await control.done).toBeUndefined();
+    });
+
+    test.each([undefined, false, 1, "true", {}])("keeps legacy Ready exact for noncallable renewal %#", async (renew) => {
+      const makeService = () => ({ ...service(), renew }) as unknown as ControlledService;
+      const { control, generation, ready: value } = await ready(start(undefined, makeService));
+      expect(Object.keys(value).sort()).toEqual([...readyKeys].sort());
+      control.input.write(frame("R", { v: 1, id: "unsupported", generation, op: "renew", handle: "unknown" }));
+      expect(await control.done).toBeInstanceOf(Error);
+      expect(control.messages).toEqual([]);
+      expect(closed).toBe(1);
+    });
+
+    test("renews at the last live tick and revokes at the new control deadline", async () => {
+      const { control, generation } = await renewableReady();
+      const grant = await issue(control, generation);
+      const scope = enroll(grant);
+      clock = 999;
+      expect(await rpc(control, generation, "renew", { handle: grant.handle })).toEqual({
+        v: 1, id: "request", generation, ok: true, result: { renewed: true },
+      });
+      clock = 1000;
+      expect(authority.authenticate(request(grant.mcpCapability))).toBe(scope);
+      expect(authority.authenticateHook(request(grant.hookCapability))).toBe(scope);
+      expect(registry.resolve(scope, nativeCall).sessionId).toBe("root");
+      clock = 1998;
+      expect((await rpc(control, generation, "status")).ok).toBe(true);
+      expect(registry.resolve(scope, nativeCall).sessionId).toBe("root");
+      clock = 1999;
+      expect((await rpc(control, generation, "status")).ok).toBe(true);
+      expect(() => authority.authenticate(request(grant.mcpCapability))).toThrow();
+      expect(() => authority.authenticateHook(request(grant.hookCapability))).toThrow();
+      expect(() => registry.resolve(scope, nativeCall)).toThrow();
+      expect((await rpc(control, generation, "renew", { handle: grant.handle })).result).toEqual({ renewed: false });
+    });
+
+    test.each(["exact-expiry", "past-expiry", "revoked", "unknown"])("refuses a %s handle without retiring the generation", async (kind) => {
+      const { control, generation } = await renewableReady();
+      const grant = await issue(control, generation);
+      const scope = enroll(grant);
+      if (kind === "exact-expiry") clock = 1000;
+      else if (kind === "past-expiry") clock = 1001;
+      else if (kind === "revoked") await rpc(control, generation, "revoke", { handle: grant.handle });
+      expect(await rpc(control, generation, "renew", { handle: kind === "unknown" ? "unknown" : grant.handle })).toEqual({
+        v: 1, id: "request", generation, ok: true, result: { renewed: false },
+      });
+      expect((await rpc(control, generation, "status")).ok).toBe(true);
+      if (kind === "unknown") {
+        expect(authority.authenticate(request(grant.mcpCapability))).toBe(scope);
+        expect(registry.resolve(scope, nativeCall).sessionId).toBe("root");
+      } else {
+        expect(() => authority.authenticate(request(grant.mcpCapability))).toThrow();
+        expect(() => authority.authenticateHook(request(grant.hookCapability))).toThrow();
+        expect(() => registry.resolve(scope, nativeCall)).toThrow();
+      }
+    });
+
+    test("renewal failure revokes only its handle and frees bounded admission", async () => {
+      const { control, generation } = await renewableReady(() => ({ ...service(),
+        renew() { throw new Error("private renewal failure"); },
+      }));
+      const failed = await issue(control, generation);
+      const failedScope = enroll(failed);
+      const other = await issue(control, generation);
+      expect((await rpc(control, generation, "issue", { metadata })).ok).toBe(false);
+      clock = 500;
+      expect(await rpc(control, generation, "renew", { handle: failed.handle })).toEqual({
+        v: 1, id: "request", generation, ok: true, result: { renewed: false },
+      });
+      expect(() => authority.authenticate(request(failed.mcpCapability))).toThrow();
+      expect(() => registry.resolve(failedScope, nativeCall)).toThrow();
+      expect(authority.authenticate(request(other.mcpCapability)).launchId).toBe(other.handle);
+      expect((await rpc(control, generation, "renew", { handle: failed.handle })).result).toEqual({ renewed: false });
+      expect((await rpc(control, generation, "issue", { metadata })).ok).toBe(true);
+    });
+
+    test("failed revoke after renewal failure retires the generation without a renewed reply", async () => {
+      const { control, generation } = await renewableReady(() => ({ ...service(),
+        renew() { throw new Error("private renewal failure"); },
+        revoke() { throw new Error("private revoke failure"); },
+      }));
+      const grant = await issue(control, generation);
+      enroll(grant);
+      clock = 500;
+      control.input.write(frame("R", { v: 1, id: "renewal", generation, op: "renew", handle: grant.handle }));
+      const outcome = await Promise.race([
+        control.done.then((error) => ({ error, replied: false })),
+        control.next().then(() => ({ error: undefined, replied: true }), (error: unknown) => ({ error, replied: false })),
+      ]);
+      expect(outcome.replied).toBe(false);
+      expect(outcome.error).toBeInstanceOf(Error);
+      expect(await control.done).toBeInstanceOf(Error);
+      expect(closed).toBe(1);
+      expect(control.messages).toEqual([]);
+      expect(control.output.writableEnded).toBe(true);
+      expect(() => authority.authenticate(request(grant.mcpCapability))).toThrow();
+    });
+
+    test("pins control expiry before service work advances the shared clock", async () => {
+      const { control, generation } = await renewableReady(() => ({ ...service(),
+        renew(scope: Parameters<ControlledService["revoke"]>[0]) { clock += 10; authority.renew(scope); },
+      }));
+      const grant = await issue(control, generation);
+      const scope = enroll(grant);
+      clock = 500;
+      expect((await rpc(control, generation, "renew", { handle: grant.handle })).result).toEqual({ renewed: true });
+      clock = 1499;
+      expect((await rpc(control, generation, "status")).ok).toBe(true);
+      expect(authority.authenticate(request(grant.mcpCapability))).toBe(scope);
+      expect(registry.resolve(scope, nativeCall).sessionId).toBe("root");
+      clock = 1500;
+      // Authority alone remains live until 1510; control must revoke it now.
+      expect(authority.isActive(scope)).toBe(true);
+      expect((await rpc(control, generation, "status")).ok).toBe(true);
+      expect(authority.isActive(scope)).toBe(false);
+      expect(() => registry.resolve(scope, nativeCall)).toThrow();
+    });
+
+    test.each(["missing-handle", "extra-ttl", "empty-handle", "long-handle", "number-handle", "wrong-generation"])(
+      "rejects malformed renewal %s and retires its generation", async (kind) => {
+        const { control, generation } = await renewableReady();
+        const grant = await issue(control, generation);
+        const value: Envelope = { v: 1, id: "bad", generation, op: "renew", handle: grant.handle };
+        if (kind === "missing-handle") delete value.handle;
+        if (kind === "extra-ttl") value.ttlMs = 1000;
+        if (kind === "empty-handle") value.handle = "";
+        if (kind === "long-handle") value.handle = "x".repeat(257);
+        if (kind === "number-handle") value.handle = 1;
+        if (kind === "wrong-generation") value.generation = "previous-generation";
+        control.input.write(frame("R", value));
+        expect(await control.done).toBeInstanceOf(Error);
+        expect(control.messages).toEqual([]);
+        expect(closed).toBe(1);
+        expect(() => authority.authenticate(request(grant.mcpCapability))).toThrow();
+      },
+    );
   });
 });

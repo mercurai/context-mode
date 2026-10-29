@@ -19,6 +19,8 @@ export interface SharedServiceOptions {
 export interface SharedService extends SharedHttpService {
   /** Trusted in-process launcher only. No public HTTP or MCP issuance method. */
   issue(metadata: SharedLaunchMetadata): SharedLaunchGrant;
+  /** Trusted in-process control only; ordinary HTTP and hook traffic cannot renew. */
+  renew(scope: Readonly<AuthenticatedScope>): void;
   revoke(scope: Readonly<AuthenticatedScope>): void;
 }
 
@@ -89,6 +91,7 @@ export async function createSharedService(options: SharedServiceOptions): Promis
   let closePromise: Promise<void> | undefined;
   return Object.freeze({
     issue: (metadata: SharedLaunchMetadata) => launchAuthority.issue(metadata),
+    renew: (scope: Readonly<AuthenticatedScope>) => launchAuthority.renew(scope),
     revoke: (scope: Readonly<AuthenticatedScope>) => launchAuthority.revoke(scope),
     listen: () => transport.listen(),
     address: () => transport.address(),

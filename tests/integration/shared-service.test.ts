@@ -155,15 +155,47 @@ describe("shared service composition with real authority, runtime and SDK transp
     expect(await start(service, grant)).toBe(401);
   });
 
-  test("shared TTL closes admission without renewing via duplicate native registration", async () => {
-    const service = await create();
+  test("explicit control renewal: HTTP and hook traffic cannot extend the launch deadline", async () => {
+    const service = await create({ ttlMs: 1000 });
     const grant = service.issue(metadata);
     expect(await start(service, grant)).toBe(202);
-    clock = 59_999;
-    expect(await start(service, grant)).toBe(202);
-    clock = 60_000;
+    const connection = await connect(service, grant);
+    expect((await connection.client.listTools()).tools.some((tool) => /renew/i.test(tool.name))).toBe(false);
+    for (const path of ["/renew", "/control/renew"]) {
+      const response = await fetch(url(service, path), { method: "POST", headers: { authorization: `Bearer ${grant.mcpCapability}` } });
+      await response.text();
+      expect(response.status).toBe(404);
+    }
+    expect(await hook(service, grant, { hook_event_name: "Renew", session_id: "root", cwd: metadata.workspace })).toBe(400);
+    for (const tick of [100, 500, 999]) {
+      clock = tick;
+      expect(await start(service, grant)).toBe(202);
+      const result = await invoke(service, connection, "ctx_stats");
+      expect(result.isError).not.toBe(true);
+      expect(result.content).toEqual(expect.arrayContaining([expect.objectContaining({ type: "text" })]));
+    }
+    clock = 1000;
     expect(await start(service, grant)).toBe(401);
+    await expect(connection.client.listTools()).rejects.toThrow();
     await expect(connect(service, grant)).rejects.toThrow();
+  });
+
+  test.each(["codex", "claude-code"] as const)("explicit control renewal: service forwards %s renewal to real authority and storage", async (provider) => {
+    const service = await create({ ttlMs: 1000 });
+    const grant = service.issue({ ...metadata, provider });
+    if (provider === "codex") expect(await start(service, grant)).toBe(202);
+    const connection = await connect(service, grant, provider);
+    expect(text(await invoke(service, connection, "ctx_index", {
+      content: "Orchard renewalcompositionfruit persists for this launch.", source: "notes",
+    }))).toContain("Indexed");
+    clock = 500;
+    expect(service.renew).toBeTypeOf("function");
+    service.renew(grant.scope);
+    clock = 1000;
+    expect(text(await invoke(service, connection, "ctx_search", { queries: ["orchard"] }))).toContain("renewalcompositionfruit");
+    clock = 1500;
+    await expect(connection.client.listTools()).rejects.toThrow();
+    expect(await start(service, grant)).toBe(401);
   });
 
   test("HTTP and authority use explicit bounds without silently widening them", async () => {

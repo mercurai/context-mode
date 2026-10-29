@@ -250,6 +250,26 @@ export class SharedIdentityRegistry {
     return { ...entry.identity };
   }
 
+  /** Trusted launch owner only: validate every live binding before extending any deadline. */
+  extendLaunch(input: AuthenticatedScope, validUntil: number, deadline: number): void {
+    const { scopeKey, now } = this.context(input);
+    this.assertNotRevoked(scopeKey);
+    if (!Number.isSafeInteger(validUntil) || validUntil <= now ||
+        !Number.isSafeInteger(deadline) || deadline <= now) {
+      throw new Error("Invalid launch renewal bounds");
+    }
+    for (const entry of this.entries.values()) {
+      if (entry.scopeKey === scopeKey && entry.kind === "binding" && entry.expiresAt <= now) {
+        throw new Error("Identity registration expired");
+      }
+    }
+    for (const entry of this.entries.values()) {
+      if (entry.scopeKey === scopeKey && entry.kind === "binding") {
+        entry.expiresAt = Math.max(entry.expiresAt, deadline);
+      }
+    }
+  }
+
   /**
    * The auth owner must invalidate the target credential independently if this
    * throws: an unknown launch's revocation can exceed the bounded registry.

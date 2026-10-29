@@ -8,6 +8,8 @@ export { runServiceEntry } from "./service-entry.js";
 
 export interface ControlledService {
   issue(metadata: SharedLaunchMetadata): SharedLaunchGrant;
+  /** Optional private-control renewal; absence preserves the legacy Ready envelope. */
+  renew?(scope: Readonly<AuthenticatedScope>): void;
   revoke(scope: Readonly<AuthenticatedScope>): void;
   listen(): Promise<void>;
   address(): AddressInfo;
@@ -134,7 +136,8 @@ export async function runServiceControl<TOptions extends { ttlMs: number; maxLau
     if (!["127.0.0.1", "::1"].includes(address.address) || !Number.isInteger(address.port) || address.port < 1 || address.port > 65535) throw invalid();
     const base = `http://${address.address === "::1" ? "[::1]" : address.address}:${address.port}`;
     bootstrapped = true;
-    await write("Y", { v: 1, kind: options.kind, generation, mcpUrl: `${base}/mcp`, hooksUrl: `${base}/hooks`, healthUrl: `${base}/health` });
+    await write("Y", { v: 1, kind: options.kind, generation, mcpUrl: `${base}/mcp`, hooksUrl: `${base}/hooks`, healthUrl: `${base}/health`,
+      ...(typeof service.renew === "function" ? { renew: true } : {}) });
   }
 
   function expire(): void {
@@ -147,8 +150,8 @@ export async function runServiceControl<TOptions extends { ttlMs: number; maxLau
   async function request(value: Record<string, unknown>): Promise<void> {
     if (value.v !== 1 || value.generation !== generation || typeof value.id !== "string" || !/^[\x21-\x7e]{1,128}$/.test(value.id)) throw invalid();
     const op = value.op;
-    if (!["issue", "revoke", "status", "shutdown"].includes(String(op))) throw invalid();
-    exact(value, ["v", "id", "generation", "op", ...(op === "issue" ? ["metadata"] : op === "revoke" ? ["handle"] : [])]);
+    if (!["issue", "revoke", "renew", "status", "shutdown"].includes(String(op))) throw invalid();
+    exact(value, ["v", "id", "generation", "op", ...(op === "issue" ? ["metadata"] : (op === "revoke" || op === "renew") ? ["handle"] : [])]);
     const response = { v: 1, id: value.id, generation };
     expire();
     if (op === "shutdown") {
@@ -158,6 +161,27 @@ export async function runServiceControl<TOptions extends { ttlMs: number; maxLau
       finish(error ? invalid() : undefined); return;
     }
     if (op === "status") return write("S", { ...response, ok: true, result: health() });
+    if (op === "renew") {
+      const renew = service!.renew;
+      if (typeof renew !== "function" || typeof value.handle !== "string" ||
+          !value.handle || value.handle.length > 256) throw invalid();
+      const entry = handles.get(value.handle);
+      let renewed = false;
+      if (entry) {
+        try {
+          // Pin the control deadline before service work can advance its clock.
+          const expiresAt = now() + configuration!.ttlMs;
+          if (!Number.isSafeInteger(expiresAt)) throw invalid();
+          renew.call(service, entry.scope);
+          entry.expiresAt = expiresAt;
+          renewed = true;
+        } catch {
+          handles.delete(value.handle);
+          service!.revoke(entry.scope);
+        }
+      }
+      return write("S", { ...response, ok: true, result: { renewed } });
+    }
     if (op === "revoke") {
       if (typeof value.handle !== "string" || !value.handle || value.handle.length > 256) throw invalid();
       const entry = handles.get(value.handle); handles.delete(value.handle);

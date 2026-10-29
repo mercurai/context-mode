@@ -467,4 +467,95 @@ describe("production shared launch authority", () => {
     start(authority, worktree, "root", join(root, "worktree-b"));
     expect(output(await restored.call(worktree.scope, search))).not.toContain("authorityresumeapples");
   });
+
+  describe("explicit launch renewal", () => {
+    test.each(["codex", "claude-code"] as const)("preserves %s capabilities, metadata and existing bindings past the old TTL", async (provider) => {
+      const authority = create(1);
+      const grant = authority.issue({ ...metadata, provider });
+      const snapshot = authority.metadata(grant.scope);
+      if (provider === "codex") start(authority, grant);
+      else preTool(authority, grant);
+      const nativeCall = provider === "codex" ? call() : claudeCall();
+      const identity = registry.resolve(grant.scope, nativeCall);
+      clock = TTL / 2;
+      expect(authority.renew).toBeTypeOf("function");
+      authority.renew(grant.scope);
+      clock = TTL;
+      // Reusing the original credentials proves renewal did not issue replacements.
+      expect(await authority.authenticate(request(grant.mcpCapability))).toBe(grant.scope);
+      expect(authority.authenticateHook(request(grant.hookCapability))).toBe(grant.scope);
+      expect(authority.metadata(grant.scope)).toBe(snapshot);
+      expect(registry.resolve(grant.scope, nativeCall)).toEqual(identity);
+      expect(() => authority.issue({ ...metadata, provider })).toThrow(/capacity/i);
+      if (provider === "codex") {
+        authority.registerHook(request(grant.hookCapability), {
+          hook_event_name: "SubagentStart", session_id: "root", agent_id: "child", cwd: metadata.workspace,
+        });
+      } else {
+        preTool(authority, grant, { tool_use_id: "child-call", agent_id: "child" });
+      }
+      const childCall = provider === "codex" ? call("child") : claudeCall("child-call");
+      clock = TTL * 1.5 - 1;
+      expect(registry.resolve(grant.scope, nativeCall)).toEqual(identity);
+      expect(registry.resolve(grant.scope, childCall)).toMatchObject({ sessionId: "root" });
+      clock = TTL * 1.5;
+      expect(authority.isActive(grant.scope)).toBe(false);
+      expect(() => registry.resolve(grant.scope, nativeCall)).toThrow();
+      expect(() => registry.resolve(grant.scope, childCall)).toThrow();
+    });
+
+    test.each(["expired", "revoked", "closed"])("cannot revive a %s launch", async (kind) => {
+      const authority = create();
+      const grant = authority.issue(metadata);
+      start(authority, grant);
+      expect(authority.renew).toBeTypeOf("function");
+      if (kind === "expired") clock = TTL;
+      else if (kind === "revoked") authority.revoke(grant.scope);
+      else authority.close();
+      expect(() => authority.renew(grant.scope)).toThrow(/Invalid or inactive launch authority input/);
+      expect(authority.isActive(grant.scope)).toBe(false);
+      await expect(Promise.resolve().then(() => authority.authenticate(request(grant.mcpCapability)))).rejects.toThrow();
+      expect(() => authority.authenticateHook(request(grant.hookCapability))).toThrow();
+      expect(() => registry.resolve(grant.scope, call())).toThrow();
+    });
+
+    test("refuses expiry between authority and registry clock reads without partial renewal", () => {
+      let registryClock = 0;
+      registry = new SharedIdentityRegistry({ now: () => new Date(registryClock), ttlMs: TTL, maxEntries: 8 });
+      const authority = create();
+      const grant = authority.issue(metadata);
+      const snapshot = authority.metadata(grant.scope);
+      start(authority, grant);
+      clock = registryClock = 200;
+      start(authority, grant, "later");
+      clock = TTL - 1;
+      registryClock = TTL;
+      expect(authority.renew).toBeTypeOf("function");
+      expect(() => authority.renew(grant.scope)).toThrow();
+      expect(authority.metadata(grant.scope)).toBe(snapshot);
+      expect(() => registry.resolve(grant.scope, call())).toThrow(/expired/i);
+      expect(registry.resolve(grant.scope, call("later", "later")).sessionId).toBe("later");
+      registryClock = TTL + 200;
+      expect(() => registry.resolve(grant.scope, call("later", "later"))).toThrow(/expired/i);
+      clock = TTL;
+      expect(authority.isActive(grant.scope)).toBe(false);
+      expect(() => authority.authenticateHook(request(grant.hookCapability))).toThrow();
+    });
+
+    test.each(["provider", "home", "launchId"] as const)("a forged %s cannot renew another launch", (field) => {
+      const authority = create();
+      const grant = authority.issue(metadata);
+      start(authority, grant);
+      const forged = { ...grant.scope,
+        ...(field === "provider" ? { provider: "claude-code" as const } :
+          field === "home" ? { home: metadata.userHome } : { launchId: "unknown-launch" }) };
+      clock = TTL / 2;
+      expect(authority.renew).toBeTypeOf("function");
+      expect(() => authority.renew(forged)).toThrow(/Invalid or inactive launch authority input/);
+      expect(authority.isActive(grant.scope)).toBe(true);
+      clock = TTL;
+      expect(authority.isActive(grant.scope)).toBe(false);
+      expect(() => registry.resolve(grant.scope, call())).toThrow();
+    });
+  });
 });

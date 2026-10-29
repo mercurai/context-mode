@@ -598,3 +598,118 @@ describe("shared identity: input and state ownership", () => {
     expect(() => new SharedIdentityRegistry({ ...options, now: () => new Date(0) })).toThrow();
   });
 });
+
+// CM-1 contract: only the trusted launch owner may extend existing identity TTLs.
+describe("shared identity: explicit launch renewal", () => {
+  it("extends only the selected scope and never shortens a later binding", () => {
+    const { registry, advance } = fixture();
+    const other = { ...CODEX, launchId: "other-launch" };
+    registry.register(CODEX, codexRegistration());
+    registry.register(other, codexRegistration());
+    advance(500);
+    registry.register(CODEX, codexRegistration("later"));
+    expect(registry.extendLaunch).toBeTypeOf("function");
+    registry.extendLaunch(CODEX, TTL_MS, 1200);
+    advance(500);
+    expect(registry.resolve(CODEX, codexCall()).threadId).toBe("thread-a");
+    expect(() => registry.resolve(other, codexCall())).toThrow(/expired/i);
+    advance(200);
+    expect(() => registry.resolve(CODEX, codexCall())).toThrow(/expired/i);
+    expect(registry.resolve(CODEX, codexCall("later")).threadId).toBe("later");
+    advance(300);
+    expect(() => registry.resolve(CODEX, codexCall("later"))).toThrow(/expired/i);
+  });
+
+  it.each([CODEX, CLAUDE])("keeps $provider memory root, child and tool bindings together", (scope) => {
+    const { registry, advance } = fixture();
+    registry.registerMemoryOwner(scope, { kind: "root", sessionId: "root", workspace: WORKTREE_A });
+    registry.registerMemoryOwner(scope, { kind: "child", sessionId: "root", agentId: "child", workspace: WORKTREE_A });
+    registry.registerMemoryTool(scope, { owner: { sessionId: "root", agentId: "child" }, toolUseId: "memory-call", tool: "Bash" });
+    const root = registry.resolveMemoryOwner(scope, { sessionId: "root" });
+    const child = registry.resolveMemoryOwner(scope, { sessionId: "root", agentId: "child" });
+    advance(500);
+    expect(registry.extendLaunch).toBeTypeOf("function");
+    registry.extendLaunch(scope, TTL_MS, 1500);
+    advance(500);
+    expect(registry.resolveMemoryOwner(scope, { sessionId: "root" })).toEqual(root);
+    expect(registry.resolveMemoryOwner(scope, { sessionId: "root", agentId: "child" })).toEqual(child);
+    expect(registry.resolveMemoryTool(scope, { toolUseId: "memory-call", tool: "Bash" })).toEqual(child);
+    advance(500);
+    expect(() => registry.resolveMemoryOwner(scope, { sessionId: "root" })).toThrow(/expired/i);
+    expect(() => registry.resolveMemoryOwner(scope, { sessionId: "root", agentId: "child" })).toThrow(/expired/i);
+    expect(() => registry.resolveMemoryTool(scope, { toolUseId: "memory-call", tool: "Bash" })).toThrow(/expired/i);
+  });
+
+  it("renews at full capacity without reclaiming poisoned identifiers", () => {
+    const { registry, advance } = fixture(2);
+    registry.register(CLAUDE, claudeRegistration());
+    registry.register(CLAUDE, claudeRegistration("poisoned"));
+    expect(() => registry.register(CLAUDE, claudeRegistration("poisoned", "conflict"))).toThrow(/ambiguous/i);
+    advance(500);
+    expect(registry.extendLaunch).toBeTypeOf("function");
+    registry.extendLaunch(CLAUDE, TTL_MS, 1500);
+    advance(500);
+    expect(registry.resolve(CLAUDE, claudeCall()).sessionId).toBe("session-a");
+    expect(() => registry.resolve(CLAUDE, claudeCall("poisoned"))).toThrow(/ambiguous/i);
+    expect(() => registry.register(CLAUDE, claudeRegistration("new"))).toThrow(/capacity/i);
+    expect(() => registry.register(CLAUDE, claudeRegistration("poisoned"))).toThrow(/ambiguous/i);
+  });
+
+  it.each([
+    [500, 1500], [499, 1500], [NaN, 1500], [Infinity, 1500], [1000.5, 1500],
+    [Number.MAX_SAFE_INTEGER + 1, 1500], [1000, 500], [1000, 499], [1000, NaN],
+    [1000, Infinity], [1000, 1500.5], [1000, Number.MAX_SAFE_INTEGER + 1],
+  ])("rejects invalid validity/deadline pair %# without extending a binding", (validUntil, deadline) => {
+    const { registry, advance } = fixture();
+    registry.register(CODEX, codexRegistration());
+    advance(500);
+    // A missing API must fail this test, not masquerade as a valid refusal.
+    expect(registry.extendLaunch).toBeTypeOf("function");
+    expect(() => registry.extendLaunch(CODEX, validUntil, deadline)).toThrow();
+    expect(registry.resolve(CODEX, codexCall()).threadId).toBe("thread-a");
+    advance(500);
+    expect(() => registry.resolve(CODEX, codexCall())).toThrow(/expired/i);
+  });
+
+  it("validates every binding before extending any earlier live binding", () => {
+    const { registry, advance } = fixture();
+    registry.register(CODEX, codexRegistration("live"));
+    expect(registry.extendLaunch).toBeTypeOf("function");
+    registry.extendLaunch(CODEX, TTL_MS, 2000);
+    registry.register(CODEX, codexRegistration("dead"));
+    advance(TTL_MS);
+    expect(() => registry.extendLaunch(CODEX, 2000, 3000)).toThrow();
+    expect(registry.resolve(CODEX, codexCall("live")).threadId).toBe("live");
+    expect(() => registry.resolve(CODEX, codexCall("dead"))).toThrow(/expired/i);
+    advance(TTL_MS);
+    expect(() => registry.resolve(CODEX, codexCall("live"))).toThrow(/expired/i);
+  });
+
+  it("cannot renew a revoked launch or disturb another launch", () => {
+    const { registry, advance } = fixture();
+    registry.register(CODEX, codexRegistration());
+    registry.register(CLAUDE, claudeRegistration());
+    registry.revokeLaunch(CODEX);
+    advance(500);
+    expect(registry.extendLaunch).toBeTypeOf("function");
+    expect(() => registry.extendLaunch(CODEX, TTL_MS, 1500)).toThrow(/revoked/i);
+    expect(() => registry.register(CODEX, codexRegistration())).toThrow(/revoked/i);
+    expect(registry.resolve(CLAUDE, claudeCall()).sessionId).toBe("session-a");
+    advance(500);
+    expect(() => registry.resolve(CLAUDE, claudeCall())).toThrow(/expired/i);
+  });
+
+  it("refuses backwards time without extending the original deadline", () => {
+    const { registry, advance } = fixture();
+    registry.register(CODEX, codexRegistration());
+    advance(500);
+    registry.resolve(CODEX, codexCall());
+    advance(-1);
+    expect(registry.extendLaunch).toBeTypeOf("function");
+    expect(() => registry.extendLaunch(CODEX, TTL_MS, 1500)).toThrow(/backwards/i);
+    advance(1);
+    expect(registry.resolve(CODEX, codexCall()).threadId).toBe("thread-a");
+    advance(500);
+    expect(() => registry.resolve(CODEX, codexCall())).toThrow(/expired/i);
+  });
+});

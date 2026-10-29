@@ -38,6 +38,41 @@ only the adapter's fixed diagnostic reaches the host's error pipe. Linux socket
 tests qualify channel separation and cleanup; native Windows proof requires the
 real Node entry launched by the harness against its simplex server pipes.
 
+## Explicit launch renewal
+
+The trusted in-process [launch authority](../src/shared/launch-authority.ts) exposes `renew(scope)`.
+It checks ownership and the current launch deadline, then asks the [identity registry](
+../src/shared/identity.ts) to extend that launch's live bindings. The registry reads its own clock
+and validates both deadlines and every target binding before changing any expiry. Expired or revoked
+launches and bindings cannot be revived; ambiguous entries stay ambiguous. Bindings from other launches
+are unchanged. Renewal neither allocates identities nor shortens an existing binding deadline.
+
+The authority commits its new deadline only after registry extension succeeds. The launch scope,
+metadata, and both credential hashes remain unchanged. Ordinary hook and MCP traffic, including
+repeated registration, does not renew a launch. The service forwards explicit renewal to this authority;
+HTTP routes, MCP tools and hook events expose no renewal operation.
+
+The complete identity and launch-authority suite passed 200 tests, including the 28 new renewal cases,
+on 2026-10-29. Those source and test files are reused unchanged in this control candidate.
+
+### Private control renewal
+
+The inherited control channel advertises `renew: true` in Ready only when the service supplies a
+callable renewal method. Services without it retain the exact legacy Ready envelope. A renewal request
+contains exactly `v`, `id`, `generation`, `op: "renew"`, and `handle`; callers cannot supply a deadline.
+The successful response contains only `renewed: boolean` in its result, with no new capabilities.
+
+Control expires old handles before renewal, captures its next deadline before calling the service,
+and commits that deadline only after success. An unknown, revoked or expired handle returns false.
+A renewal failure removes and revokes only that handle; a revocation failure retires the generation
+without a renewed reply. Malformed requests and renewal against a legacy service also retire it.
+
+The 23 selected control/composition cases reached their expected RED result: 17 missing-feature
+failures and six baseline passes. The combined identity, launch-authority, control and service suite then
+passed all 266 tests on 2026-10-29, and source type checking passed with no diagnostics. Source identity
+and cleanup checks passed. Composed service-main renewal and native Windows remain unqualified. Deployment must
+update the Rust Ready parser before enabling this Node capability; this source change installs nothing.
+
 ## Memory hook requests
 
 POST ordinary native identity payloads to `/hooks` to retain the existing `202 {"registered":true}` contract.

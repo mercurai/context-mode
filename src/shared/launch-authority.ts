@@ -44,6 +44,8 @@ export interface SharedLaunchAuthority extends SharedHttpAuthority {
   registerMemoryHook(request: IncomingMessage, nativePayload: unknown): void;
   /** Resolve only enrolled native memory owners; never accept caller-built identities. */
   resolveMemoryHook(request: IncomingMessage, nativePayload: unknown): Readonly<ResolvedIdentity>;
+  /** Trusted in-process owner only; preserves credentials and cannot revive an expired launch. */
+  renew(scope: Readonly<AuthenticatedScope>): void;
   revoke(scope: Readonly<AuthenticatedScope>): void;
   close(): void;
 }
@@ -258,6 +260,13 @@ export function createSharedLaunchAuthority(options: SharedLaunchAuthorityOption
     registerHook,
     registerMemoryHook,
     resolveMemoryHook,
+    renew(scope: Readonly<AuthenticatedScope>): void {
+      const current = time();
+      const launch = active(owned(scope), current);
+      const deadline = current + ttlMs;
+      identityRegistry.extendLaunch(launch.scope, launch.expiresAt, deadline);
+      launch.expiresAt = deadline;
+    },
     revoke(scope: Readonly<AuthenticatedScope>): void {
       // Revocation must work even after a clock error; it does not admit work.
       const launch = owned(scope);
