@@ -28,8 +28,50 @@
  * users running off the npm tarball get the same code path the
  * developer ran during `pretest`.
  */
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from "node:fs";
+import { createRequire } from "node:module";
+import { dirname, join, relative, resolve, sep } from "node:path";
+
+// SDK 1.26.0 + the shipped patch; both formats passed the actual SDK cleanup
+// fixture on 2026-10-27. A version/patch change must requalify that behavior and
+// update these exact file hashes together. This verifies; patch-package edits.
+const SDK_PATCH_SHA256 = "0c721ca719612f02280c483564adef11c080267ad7ba533cf2124c39c21b5fb0";
+const SDK_PATCHED_FILES = Object.freeze({
+  esm: "6d4911e03e39819b732746bceac60c255599a2cbbba1632d3a76c016794a8429",
+  cjs: "411caf6352b64072882853396531a152cd09e2acdd8f258f9e1941fb669d4351",
+});
+
+/** Cheap readiness check, including after a previous process failed repair. */
+export function inspectManagedSdkPatch(pluginRoot) {
+  try {
+    const manifest = join(pluginRoot, "package.json");
+    if (!existsSync(manifest)) return "unmanaged";
+    const metadata = JSON.parse(readFileSync(manifest, "utf8"));
+    if (!Object.hasOwn(metadata.scripts ?? {}, "patch:dependencies")) return "unmanaged";
+    if (typeof metadata.scripts["patch:dependencies"] !== "string" ||
+        !existsSync(join(pluginRoot, "scripts", "patch-dependencies.mjs"))) return "invalid";
+    const hash = (file) => createHash("sha256").update(readFileSync(file)).digest("hex");
+    if (hash(join(pluginRoot, "patches", "@modelcontextprotocol+sdk+1.26.0.patch")) !== SDK_PATCH_SHA256) return "invalid";
+    const require = createRequire(resolve(pluginRoot, "package.json"));
+    // Reinspect Node's lookup locations: a cached filename may name the old
+    // hoisted copy after npm installed a nearer, unpatched dependency.
+    const sdkManifest = (require.resolve.paths("@modelcontextprotocol/sdk") ?? [])
+      .map((directory) => join(directory, "@modelcontextprotocol", "sdk", "package.json"))
+      .find((file) => existsSync(file));
+    if (!sdkManifest) return "invalid";
+    const sdkRoot = dirname(realpathSync(sdkManifest));
+    const sdk = JSON.parse(readFileSync(sdkManifest, "utf8"));
+    const route = sdk.exports?.["./*"];
+    if (sdk.name !== "@modelcontextprotocol/sdk" || sdk.version !== "1.26.0" ||
+        route?.import !== "./dist/esm/*" || route?.require !== "./dist/cjs/*" ||
+        Object.keys(route).sort().join(",") !== "import,require" ||
+        Object.keys(sdk.exports).some((key) => key !== "./*" &&
+          (key.includes("*") || key === "./server/webStandardStreamableHttp.js"))) return "invalid";
+    return Object.entries(SDK_PATCHED_FILES).every(([format, expected]) =>
+      hash(join(sdkRoot, "dist", format, "server", "webStandardStreamableHttp.js")) === expected) ? "current" : "needs-patch";
+  } catch { return "invalid"; }
+}
 
 /**
  * Walk a directory recursively, returning a flat list of relative file

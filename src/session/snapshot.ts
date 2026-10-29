@@ -28,8 +28,10 @@ export interface StoredEvent {
 
 export interface BuildSnapshotOpts {
   maxBytes?: number;      // KEPT for backward compat but IGNORED
+  maxChars?: number;      // Optional transport budget; full events remain searchable.
   compactCount?: number;
   searchTool?: string;    // platform-specific tool name, default "ctx_search"
+  now?: () => Date;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -460,6 +462,31 @@ function buildRecentMessagesSection(userPromptEvents: StoredEvent[]): string {
 
 // ── Main builder ─────────────────────────────────────────────────────────────
 
+/** Keep complete XML sections; replace oversized sections with search references. */
+function fitSections(sections: string[], budget: number, searchTool: string): string[] {
+  const categories: Record<string, string> = { session_goal: "goal", files: "file", errors: "error",
+    decisions: "decision", rules: "rule", git: "git", task_state: "task", environment: "env cwd",
+    subagents: "subagent", skills: "skill", roles: "role", intent: "intent", recent_user_messages: "user-prompt" };
+  const references = sections.map((section) => {
+    const name = /^\s*<([a-z_]+)/.exec(section)?.[1];
+    const category = name && categories[name];
+    if (!category) return section;
+    return `  <section_summary section="${name}">\n` +
+      `    Details are stored in session memory; search before continuing related work.` +
+      toolCall(searchTool, [category]) + "\n  </section_summary>";
+  });
+  // Reserve room for every reference before admitting a full section. A large
+  // error or rule history must not crowd out all later categories.
+  let reserved = references.reduce((sum, section) => sum + section.length, 0) + (sections.length - 1) * 2;
+  if (reserved > budget) throw new Error("Snapshot character budget too small");
+  return sections.map((section, index) => {
+    const extra = section.length - references[index].length;
+    if (reserved + extra > budget) return references[index];
+    reserved += extra;
+    return section;
+  });
+}
+
 /**
  * Build a reference-based resume snapshot XML string from stored session events.
  *
@@ -467,7 +494,7 @@ function buildRecentMessagesSection(userPromptEvents: StoredEvent[]): string {
  * 1. Group events by category
  * 2. For each non-empty category, build a summary section with a runnable
  *    search tool call containing exact queries for full details
- * 3. Assemble ALL non-empty sections — no priority dropping, no byte budget
+ * 3. Assemble every category, optionally replacing large sections with references
  */
 export function buildResumeSnapshot(
   events: StoredEvent[],
@@ -475,7 +502,7 @@ export function buildResumeSnapshot(
 ): string {
   const compactCount = opts?.compactCount ?? 1;
   const searchTool = opts?.searchTool ?? "ctx_search";
-  const now = new Date().toISOString();
+  const now = (opts?.now?.() ?? new Date()).toISOString();
 
   // ── Group events by category ──
   const fileEvents: StoredEvent[] = [];
@@ -569,7 +596,12 @@ export function buildResumeSnapshot(
   const header = `<session_resume events="${events.length}" compact_count="${compactCount}" generated_at="${now}">`;
   const footer = `</session_resume>`;
 
-  const body = sections.join("\n\n");
+  const budget = opts?.maxChars;
+  if (budget !== undefined && (!Number.isSafeInteger(budget) || budget < 2048)) {
+    throw new Error("Invalid snapshot character budget");
+  }
+  const body = (budget === undefined ? sections :
+    fitSections(sections, budget - header.length - footer.length - 4, searchTool)).join("\n\n");
   if (body) {
     return `${header}\n\n${body}\n\n${footer}`;
   }

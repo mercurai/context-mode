@@ -1,3 +1,4 @@
+import { SECRET_KEY_PATTERN } from "./secret-key.js";
 /**
  * Session event extraction — pure functions, zero side effects.
  * Extracts structured events from Claude Code tool calls and user messages.
@@ -990,8 +991,7 @@ function truncateToBytes(s: string, maxBytes: number): { value: string; truncate
  * `private_key`, etc. all redact. False-positive risk acceptable — we'd rather
  * over-redact than ship a Bearer token to SQLite.
  */
-const SECRET_KEY_PATTERN =
-  /(authorization|auth_token|access_token|refresh_token|bearer|token|secret|password|passwd|pwd|api[-_]?key|apikey|cookie|set-cookie|signature|private[-_]?key|client[-_]?secret|x[-_]?api[-_]?key)/i;
+export { SECRET_KEY_PATTERN } from "./secret-key.js";
 
 const REDACTED = "[REDACTED]";
 
@@ -2541,19 +2541,29 @@ function extractData(message: string): SessionEvent[] {
  * Detects when an error is followed by a successful fix (cross-event state).
  */
 
-let lastError: { tool: string; error: string; callsSince: number } | null = null;
+export interface EventExtractionState {
+  lastError: { tool: string; error: string; callsSince: number } | null;
+  callHistory: Array<{ tool: string; inputHash: string }>;
+}
 
-function extractErrorResolution(input: HookInput): SessionEvent[] {
+export function createEventExtractionState(): EventExtractionState {
+  return { lastError: null, callHistory: [] };
+}
+
+const legacyExtractionState = createEventExtractionState();
+
+function extractErrorResolution(input: HookInput, state: EventExtractionState): SessionEvent[] {
   const { tool_name, tool_response } = input;
   const response = String(tool_response ?? "");
 
   // If this call is an error, store it and return
   if (isToolError(input)) {
-    lastError = { tool: tool_name, error: response.slice(0, 200), callsSince: 0 };
+    state.lastError = { tool: tool_name, error: response.slice(0, 200), callsSince: 0 };
     return [];
   }
 
   // No pending error → nothing to resolve
+  const lastError = state.lastError;
   if (!lastError) return [];
 
   // Increment staleness counter
@@ -2561,7 +2571,7 @@ function extractErrorResolution(input: HookInput): SessionEvent[] {
 
   // Timeout: clear after 10 calls without resolution
   if (lastError.callsSince > 10) {
-    lastError = null;
+    state.lastError = null;
     return [];
   }
 
@@ -2581,7 +2591,7 @@ function extractErrorResolution(input: HookInput): SessionEvent[] {
       data: safeString(`Error in ${lastError.tool}: ${lastError.error} → Fixed`),
       priority: 2,
     };
-    lastError = null;
+    state.lastError = null;
     return [event];
   }
 
@@ -2590,7 +2600,7 @@ function extractErrorResolution(input: HookInput): SessionEvent[] {
 
 /** Reset error-resolution state (for testing). */
 export function resetErrorResolutionState(): void {
-  lastError = null;
+  legacyExtractionState.lastError = null;
 }
 
 /**
@@ -2598,14 +2608,13 @@ export function resetErrorResolutionState(): void {
  * Detects when the same tool is called repeatedly with similar input (stuck loop).
  */
 
-const callHistory: Array<{ tool: string; inputHash: string }> = [];
-
 function simpleHash(str: string): string {
   return `${str.length}:${str.slice(0, 20)}`;
 }
 
-function extractIterationLoop(input: HookInput): SessionEvent[] {
+function extractIterationLoop(input: HookInput, state: EventExtractionState): SessionEvent[] {
   const { tool_name, tool_input } = input;
+  const { callHistory } = state;
   const inputHash = simpleHash(JSON.stringify(tool_input).slice(0, 200));
 
   callHistory.push({ tool: tool_name, inputHash });
@@ -2643,7 +2652,7 @@ function extractIterationLoop(input: HookInput): SessionEvent[] {
 
 /** Reset iteration-loop state (for testing). */
 export function resetIterationLoopState(): void {
-  callHistory.length = 0;
+  legacyExtractionState.callHistory.length = 0;
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────
@@ -2707,7 +2716,7 @@ function normalizeHookInput(input: HookInput): HookInput {
  * Accepts the raw hook JSON shape (snake_case keys) as received from stdin.
  * Returns an array of zero or more SessionEvents. Never throws.
  */
-export function extractEvents(rawInput: HookInput): SessionEvent[] {
+export function extractEvents(rawInput: HookInput, state = legacyExtractionState): SessionEvent[] {
   try {
     const input = normalizeHookInput(rawInput);
     const events: SessionEvent[] = [];
@@ -2739,8 +2748,8 @@ export function extractEvents(rawInput: HookInput): SessionEvent[] {
     events.push(...extractExternalRef(input));
 
     // Cross-event stateful extractors
-    events.push(...extractErrorResolution(input));
-    events.push(...extractIterationLoop(input));
+    events.push(...extractErrorResolution(input, state));
+    events.push(...extractIterationLoop(input, state));
 
     return events;
   } catch {

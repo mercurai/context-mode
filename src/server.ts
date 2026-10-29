@@ -2,13 +2,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createRequire } from "node:module";
-import { existsSync, unlinkSync, readdirSync, readFileSync, writeFileSync, writeSync, renameSync, rmSync, mkdirSync, cpSync, statSync, symlinkSync, lstatSync, realpathSync } from "node:fs";
+import { existsSync, unlinkSync, readdirSync, readFileSync, writeFileSync, writeSync, renameSync, rmSync, mkdirSync, mkdtempSync, cpSync, statSync, symlinkSync, lstatSync, realpathSync } from "node:fs";
 import { spawnSync, type SpawnSyncOptions, type SpawnSyncReturns } from "node:child_process";
 import { join, dirname, resolve, sep, isAbsolute } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir, tmpdir, cpus, platform } from "node:os";
 import { request as httpsRequest } from "node:https";
 import { AsyncLocalStorage } from "node:async_hooks";
+import { getSharedToolContext, type SharedSessionStats, type SharedExecutor } from "./shared/runtime-context.js";
 import { z } from "zod";
 import { PolyglotExecutor } from "./executor.js";
 import { runPool, type PoolJob } from "./runPool.js";
@@ -125,7 +126,7 @@ function getRuntimeAwarePackageRoot(platformId?: PlatformId): string {
 // process-wide OpenCode/Kilo host handlers. In Node, adding an
 // `uncaughtException` listener changes default crash behavior, so only the
 // standalone MCP process may install them.
-if (process.env.CONTEXT_MODE_EMBEDDED_PLUGIN_TOOLS !== "1") {
+function installStandaloneErrorHandlers(): void {
   process.on("unhandledRejection", (err) => {
     process.stderr.write(`[context-mode] unhandledRejection: ${err}\n`);
   });
@@ -148,7 +149,7 @@ export const server = new McpServer({
 export interface RegisteredCtxTool {
   name: string;
   config: Record<string, unknown>;
-  handler: (args: Record<string, unknown>) => Promise<unknown> | unknown;
+  handler: (args: Record<string, unknown>, extra?: unknown) => Promise<unknown> | unknown;
 }
 
 export const REGISTERED_CTX_TOOLS: RegisteredCtxTool[] = [];
@@ -281,27 +282,27 @@ const originalRegisterTool = server.registerTool.bind(server);
     Record<string, unknown>,
     (toolArgs: Record<string, unknown>) => Promise<unknown> | unknown,
   ];
+  const wrappedHandler = wrapToolHandler(name, handler);
+  REGISTERED_CTX_TOOLS.push({ name, config, handler: wrappedHandler });
   if (suppressMcpToolsForNativePluginHost) {
     emitSuppressionDiagnostic();
     return undefined;
   }
-  const wrappedHandler = wrapToolHandler(name, handler);
-  REGISTERED_CTX_TOOLS.push({ name, config, handler: wrappedHandler });
   args[2] = wrappedHandler;
   return (originalRegisterTool as unknown as (...callArgs: unknown[]) => unknown)(...args);
 };
 
 function wrapToolHandler(
   name: string,
-  handler: (toolArgs: Record<string, unknown>) => Promise<unknown> | unknown,
-): (toolArgs: Record<string, unknown>) => Promise<unknown> {
-  return async (toolArgs: Record<string, unknown>) => {
+  handler: (toolArgs: Record<string, unknown>, extra?: unknown) => Promise<unknown> | unknown,
+): (toolArgs: Record<string, unknown>, extra?: unknown) => Promise<unknown> {
+  return async (toolArgs: Record<string, unknown>, extra?: unknown) => {
     // #854: mark a tool call in-flight so the bridge-child idle reaper never
     // shuts the server down mid-execution during a long ctx_execute/batch that
     // emits no further inbound messages. Symmetric end in finally (success+error).
-    noteRequestStart();
+    if (!getSharedToolContext()) noteRequestStart();
     try {
-      return await handler(toolArgs);
+      return await handler(toolArgs, extra);
     } catch (err) {
       const result = storageErrorResult(err);
       if (result) {
@@ -314,7 +315,7 @@ function wrapToolHandler(
       }
       throw err;
     } finally {
-      noteRequestEnd();
+      if (!getSharedToolContext()) noteRequestEnd();
     }
   };
 }
@@ -417,6 +418,18 @@ const executor = new PolyglotExecutor({
   projectRoot: () => getProjectDir(),
 });
 
+function executionContext(cwd?: string): { executor: SharedExecutor; cwd?: string; signal?: AbortSignal } {
+  const shared = getSharedToolContext();
+  if (!shared) return { executor, cwd };
+  const execution = shared.execution;
+  if (!execution) throw new Error("Shared execution requires trusted execution authority");
+  execution.signal.throwIfAborted();
+  if (cwd !== undefined && resolve(execution.cwd, cwd) !== execution.cwd) {
+    throw new Error("Shared execution cwd does not match trusted execution authority");
+  }
+  return { executor: execution.executor, cwd: execution.cwd, signal: execution.signal };
+}
+
 // ─────────────────────────────────────────────────────────
 // FS read tracking preload for ctx_batch_execute
 // ─────────────────────────────────────────────────────────
@@ -424,15 +437,19 @@ const executor = new PolyglotExecutor({
 // Instead, we inject it as an inline shell env prefix in each batch command.
 // This temp file is loaded via --require when batch commands spawn Node processes.
 const CM_FS_PRELOAD = join(tmpdir(), `cm-fs-preload-${process.pid}.js`);
-writeFileSync(
-  CM_FS_PRELOAD,
-  `(function(){var __cm_fs=0;process.on('exit',function(){if(__cm_fs>0)try{process.stderr.write('__CM_FS__:'+__cm_fs+'\\n')}catch(e){}});try{var f=require('fs');var ors=f.readFileSync;f.readFileSync=function(){var r=ors.apply(this,arguments);if(Buffer.isBuffer(r))__cm_fs+=r.length;else if(typeof r==='string')__cm_fs+=Buffer.byteLength(r);return r;};}catch(e){}})();\n`,
-);
-// In the stdio MCP path, main() also removes this file during graceful
-// shutdown. Plugin-native OpenCode/Kilo imports skip main() (#574), so
-// register a top-level best-effort cleanup too to avoid leaking preload
-// snippets under /tmp when the host process exits.
-process.on("exit", () => { try { unlinkSync(CM_FS_PRELOAD); } catch { /* best effort */ } });
+const FS_PRELOAD_CODE = `(function(){var __cm_fs=0;process.on('exit',function(){if(__cm_fs>0)try{process.stderr.write('__CM_FS__:'+__cm_fs+'\\n')}catch(e){}});try{var f=require('fs');var ors=f.readFileSync;f.readFileSync=function(){var r=ors.apply(this,arguments);if(Buffer.isBuffer(r))__cm_fs+=r.length;else if(typeof r==='string')__cm_fs+=Buffer.byteLength(r);return r;};}catch(e){}})();\n`;
+let fsPreloadReady = false;
+function ensureFsPreload(): string {
+  if (fsPreloadReady) return CM_FS_PRELOAD;
+  writeFileSync(
+    CM_FS_PRELOAD,
+    FS_PRELOAD_CODE,
+  );
+  // Install cleanup only after this process actually creates its preload.
+  process.on("exit", () => { try { unlinkSync(CM_FS_PRELOAD); } catch { /* best effort */ } });
+  fsPreloadReady = true;
+  return CM_FS_PRELOAD;
+}
 
 // Lazy singleton — no DB overhead unless index/search is used
 let _store: ContentStore | null = null;
@@ -446,6 +463,8 @@ let _store: ContentStore | null = null;
  * legacy unattributed rows readable.
  */
 export function currentAttribution(): { sessionId?: string } | undefined {
+  const shared = getSharedToolContext();
+  if (shared) return { sessionId: shared.ownerId };
   const override = projectDirOverride.getStore();
   if (override?.sessionId) return { sessionId: override.sessionId };
 
@@ -580,6 +599,8 @@ function configDirEnvForSessionSegments(segments: string[]): string | undefined 
 }
 
 function getSessionDir(): string {
+  const shared = getSharedToolContext();
+  if (shared) return shared.sessionsDir;
   return ensureWritableStorageDir(resolveSessionStorageDir(getDefaultSessionDir));
 }
 
@@ -595,6 +616,8 @@ function getSessionDir(): string {
  * that don't set their own env var (Cursor, OpenClaw, Codex, Kiro, Zed).
  */
 export function getProjectDir(): string {
+  const shared = getSharedToolContext();
+  if (shared) return shared.identity.workspace;
   const override = projectDirOverride.getStore();
   if (override) return override.projectDir;
 
@@ -672,6 +695,8 @@ function resolveProjectPath(filePath: string): string {
  * resolve. Linux is a no-op.
  */
 function getSessionDbPath(): string {
+  const shared = getSharedToolContext();
+  if (shared) return shared.sessionDbPath;
   return resolveSessionDbPath({
     projectDir: getProjectDir(),
     sessionsDir: getSessionDir(),
@@ -688,6 +713,8 @@ function getSessionDbPath(): string {
  *         ~/.cursor/context-mode/content/87c28c41ddb64d38.db
  */
 function getStorePath(): string {
+  const shared = getSharedToolContext();
+  if (shared) return shared.storePath;
   const dir = ensureWritableStorageDir(resolveContentStorageDir(getDefaultSessionDir));
   // Delegate to resolveContentStorePath: same case-fold + one-shot legacy
   // rename behavior as resolveSessionDbPath. On macOS / Windows, an
@@ -697,6 +724,8 @@ function getStorePath(): string {
 }
 
 function getStore(): ContentStore {
+  const shared = getSharedToolContext();
+  if (shared) return shared.store;
   if (!_store) {
     // Content DB cleanup on fresh start is handled by SessionStart hook.
     // Server just opens whatever DB exists (or creates new if hook deleted it).
@@ -744,7 +773,7 @@ function getStore(): ContentStore {
 // Session stats — track context consumption per tool
 // ─────────────────────────────────────────────────────────
 
-const sessionStats = {
+const legacySessionStats: SharedSessionStats = {
   calls: {} as Record<string, number>,
   bytesReturned: {} as Record<string, number>,
   bytesIndexed: 0,
@@ -754,6 +783,10 @@ const sessionStats = {
   cacheBytesSaved: 0, // bytes avoided by TTL cache hits
   sessionStart: Date.now(),
 };
+
+function getSessionStats(): SharedSessionStats {
+  return getSharedToolContext()?.stats ?? legacySessionStats;
+}
 
 type ToolResult = {
   content: Array<{ type: "text"; text: string }>;
@@ -883,13 +916,14 @@ function healCacheMidSession(): void {
 }
 
 function trackResponse(toolName: string, response: ToolResult): ToolResult {
+  const shared = getSharedToolContext();
   // #854: a response is activity too — refresh the bridge-child idle clock so a
   // chatty/streaming call keeps its server alive even between inbound frames.
-  noteMcpActivity();
+  if (!shared) noteMcpActivity();
   // Mid-session cache heal — one-shot, first tool call
-  healCacheMidSession();
+  if (!shared) healCacheMidSession();
   // Prepend version outdated warning if needed
-  if (shouldShowVersionWarning() && response.content.length > 0) {
+  if (!shared && shouldShowVersionWarning() && response.content.length > 0) {
     const hint = getUpgradeHint();
     response.content[0].text =
       `⚠️ context-mode v${VERSION} outdated → v${_latestVersion} available. Upgrade: ${hint}\n\n` +
@@ -900,9 +934,9 @@ function trackResponse(toolName: string, response: ToolResult): ToolResult {
     (sum, c) => sum + Buffer.byteLength(c.text),
     0,
   );
-  sessionStats.calls[toolName] = (sessionStats.calls[toolName] || 0) + 1;
-  sessionStats.bytesReturned[toolName] =
-    (sessionStats.bytesReturned[toolName] || 0) + bytes;
+  getSessionStats().calls[toolName] = (getSessionStats().calls[toolName] || 0) + 1;
+  getSessionStats().bytesReturned[toolName] =
+    (getSessionStats().bytesReturned[toolName] || 0) + bytes;
 
   // Persist a sidecar JSON snapshot for the statusline — read at ~3-5 Hz by
   // bin/statusline.mjs (and any external dashboard) so they don't have to
@@ -914,7 +948,7 @@ function trackResponse(toolName: string, response: ToolResult): ToolResult {
   // upgrade. Re-introduces the write path 4742160 added and b392c2f dropped.
   // setImmediate keeps this off the response hot path; the helper itself
   // is best-effort (never throws).
-  setImmediate(() => persistToolCallCounter(getSessionDbPath(), toolName, bytes));
+  scheduleSessionWrite(() => persistToolCallCounter(getSessionDbPath(), toolName, bytes, shared?.attribution));
 
   // D2 Phase 5/7 — sandbox-execute event emission. Tracks the bytes the
   // user actually saw from sandboxed runs so getRealBytesStats() can
@@ -925,9 +959,10 @@ function trackResponse(toolName: string, response: ToolResult): ToolResult {
     || toolName === "ctx_execute_file"
     || toolName === "ctx_batch_execute"
   ) {
-    setImmediate(() =>
+    scheduleSessionWrite(() =>
       emitSandboxExecuteEvent({
         sessionDbPath: getSessionDbPath(),
+        context: shared?.attribution,
         toolName,
         bytesReturned: bytes,
       })
@@ -942,22 +977,31 @@ function trackResponse(toolName: string, response: ToolResult): ToolResult {
   // DB; the next ordinary-tool PostToolUse consumes it and emits a forwardable
   // bytes_retrieved event. Off the hot path; never throws.
   if (toolName === "ctx_search" || toolName === "ctx_fetch_and_index") {
-    setImmediate(() => appendRetrievalBytes(getSessionDbPath(), bytes));
+    scheduleSessionWrite(() => appendRetrievalBytes(getSessionDbPath(), bytes,
+      shared?.sessionsDir, shared?.attribution));
   }
 
   return response;
 }
 
+function scheduleSessionWrite(write: () => void): void {
+  // The service owns this DB lease until the request returns. Do not leave an
+  // untracked callback that can outlive runtime.close() and use a closed DB.
+  if (getSharedToolContext()) write();
+  else setImmediate(write);
+}
+
 function trackIndexed(bytes: number, source: string = "unknown"): void {
-  sessionStats.bytesIndexed += bytes;
+  getSessionStats().bytesIndexed += bytes;
   persistStats();
   // D2 Phase 5/7 — index-write event emission. `bytes_avoided` because
   // these are bytes that would have flooded context if the user had
   // Read'd the source instead of indexing.
   if (bytes > 0) {
-    setImmediate(() =>
+    scheduleSessionWrite(() =>
       emitIndexWriteEvent({
         sessionDbPath: getSessionDbPath(),
+        context: getSharedToolContext()?.attribution,
         source,
         bytesAvoided: bytes,
       })
@@ -1009,30 +1053,35 @@ function sanitizeSessionId(raw: string): string {
 }
 
 function getStatsFilePath(): string {
+  const shared = getSharedToolContext();
+  if (shared) return shared.statsPath;
   const raw = process.env.CLAUDE_SESSION_ID || `pid-${process.ppid}`;
   const sessionId = sanitizeSessionId(raw);
   const statsDir = ensureWritableStorageDir(resolveStatsStorageDir(getDefaultSessionDir));
   return join(statsDir, `stats-${sessionId}.json`);
 }
 
-function persistStats(): void {
-  const now = Date.now();
-  if (now - _lastStatsPersist < STATS_PERSIST_THROTTLE_MS) return;
-  _lastStatsPersist = now;
+function persistStats(force = false): void {
+  const shared = getSharedToolContext();
+  const now = shared?.now() ?? Date.now();
+  const lastWrite = shared?.persistence.lastWrite ?? _lastStatsPersist;
+  if (!force && now - lastWrite < STATS_PERSIST_THROTTLE_MS) return;
+  if (shared) shared.persistence.lastWrite = now;
+  else _lastStatsPersist = now;
 
   try {
-    const totalReturned = Object.values(sessionStats.bytesReturned).reduce(
+    const totalReturned = Object.values(getSessionStats().bytesReturned).reduce(
       (a, b) => a + b,
       0,
     );
-    const totalCalls = Object.values(sessionStats.calls).reduce(
+    const totalCalls = Object.values(getSessionStats().calls).reduce(
       (a, b) => a + b,
       0,
     );
     const keptOut =
-      sessionStats.bytesIndexed +
-      sessionStats.bytesSandboxed +
-      sessionStats.cacheBytesSaved;
+      getSessionStats().bytesIndexed +
+      getSessionStats().bytesSandboxed +
+      getSessionStats().cacheBytesSaved;
     const totalProcessed = keptOut + totalReturned;
     const reductionPct =
       totalProcessed > 0
@@ -1044,8 +1093,8 @@ function persistStats(): void {
     // disk (per-project SessionDBs + auto-memory dirs) and is too expensive
     // for the 500ms persist throttle. Refresh every 30s; the statusline
     // doesn't need second-by-second lifetime accuracy.
-    let lifetimeTokens = _lifetimeCache?.tokens ?? 0;
-    if (!_lifetimeCache || now - _lifetimeCache.computedAt > LIFETIME_REFRESH_MS) {
+    let lifetimeTokens = shared ? 0 : _lifetimeCache?.tokens ?? 0;
+    if (!shared && (!_lifetimeCache || now - _lifetimeCache.computedAt > LIFETIME_REFRESH_MS)) {
       try {
         const life = getLifetimeStats({ sessionsDir: getSessionDir() });
         lifetimeTokens = (life?.totalEvents ?? 0) * TOKENS_PER_EVENT;
@@ -1059,14 +1108,14 @@ function persistStats(): void {
       schemaVersion: STATS_SCHEMA_VERSION,
       version: VERSION,
       updated_at: now,
-      session_start: sessionStats.sessionStart,
-      uptime_ms: now - sessionStats.sessionStart,
+      session_start: getSessionStats().sessionStart,
+      uptime_ms: now - getSessionStats().sessionStart,
       total_calls: totalCalls,
       bytes_returned: totalReturned,
-      bytes_indexed: sessionStats.bytesIndexed,
-      bytes_sandboxed: sessionStats.bytesSandboxed,
-      cache_hits: sessionStats.cacheHits,
-      cache_bytes_saved: sessionStats.cacheBytesSaved,
+      bytes_indexed: getSessionStats().bytesIndexed,
+      bytes_sandboxed: getSessionStats().bytesSandboxed,
+      cache_hits: getSessionStats().cacheHits,
+      cache_bytes_saved: getSessionStats().cacheBytesSaved,
       kept_out: keptOut,
       total_processed: totalProcessed,
       reduction_pct: reductionPct,
@@ -1079,12 +1128,12 @@ function persistStats(): void {
       tokens_saved_lifetime: lifetimeTokens,
       dollars_saved_lifetime: +(lifetimeTokens * pricePerToken()).toFixed(2),
       by_tool: Object.fromEntries(
-        Object.keys({ ...sessionStats.calls, ...sessionStats.bytesReturned }).map(
+        Object.keys({ ...getSessionStats().calls, ...getSessionStats().bytesReturned }).map(
           (t) => [
             t,
             {
-              calls: sessionStats.calls[t] || 0,
-              bytes: sessionStats.bytesReturned[t] || 0,
+              calls: getSessionStats().calls[t] || 0,
+              bytes: getSessionStats().bytesReturned[t] || 0,
             },
           ],
         ),
@@ -1100,6 +1149,11 @@ function persistStats(): void {
   }
 }
 
+export function flushSharedRuntimeStats(): void {
+  if (!getSharedToolContext()) throw new Error("Shared statistics require an explicit context");
+  persistStats(true);
+}
+
 // ==============================================================================
 // Security: server-side deny firewall
 // ==============================================================================
@@ -1112,6 +1166,9 @@ function checkDenyPolicy(
   command: string,
   toolName: string,
 ): ToolResult | null {
+  // Shared execution is admitted by its trusted policy-bound adapter. Never
+  // substitute the service process's legacy Claude settings for that authority.
+  if (getSharedToolContext()) { executionContext(); return null; }
   try {
     const policies = readBashPolicies(process.env.CLAUDE_PROJECT_DIR);
     const result = evaluateCommandDenyOnly(command, policies);
@@ -1139,6 +1196,7 @@ function checkNonShellDenyPolicy(
   language: string,
   toolName: string,
 ): ToolResult | null {
+  if (getSharedToolContext()) { executionContext(); return null; }
   try {
     const commands = extractShellCommands(code, language);
     if (commands.length === 0) return null;
@@ -1185,6 +1243,8 @@ function checkProjectBoundary(
   filePath: string,
   toolName: string,
 ): ToolResult | null {
+  const shared = getSharedToolContext();
+  if (shared) return checkSharedFileAccess(shared.denyFile(filePath), toolName);
   try {
     const projectDir = getProjectDir();
     const allowGlobs = readToolPermissionPatterns("Read", "allow", projectDir);
@@ -1216,6 +1276,8 @@ function checkFilePathDenyPolicy(
   filePath: string,
   toolName: string,
 ): ToolResult | null {
+  const shared = getSharedToolContext();
+  if (shared) return checkSharedFileAccess(shared.denyFile(filePath), toolName);
   try {
     const projectDir = getProjectDir();
     const denyGlobs = readToolDenyPatterns("Read", projectDir);
@@ -1238,6 +1300,13 @@ function checkFilePathDenyPolicy(
     // Fail-open
   }
   return null;
+}
+
+function checkSharedFileAccess(denied: boolean, toolName: string): ToolResult | null {
+  return denied ? trackResponse(toolName, {
+    content: [{ type: "text", text: "File access blocked by shared workspace security policy." }],
+    isError: true,
+  }) : null;
 }
 
 // Build description dynamically based on detected runtimes
@@ -1390,7 +1459,10 @@ export function formatBatchQueryResults(
       continue;
     }
 
-    const results = store.searchWithFallback(query, 3, searchSource, undefined, "exact");
+    const shared = getSharedToolContext();
+    const results = store.searchWithFallback(query, 3, searchSource, undefined, "exact",
+      shared ? new Set([shared.ownerId]) : undefined,
+      shared ? { includeUnattributed: false, denyChecker: shared.denyFile } : undefined);
     sections.push(`## ${query}`);
     sections.push("");
     if (results.length > 0) {
@@ -1438,11 +1510,12 @@ export interface BatchRunOptions {
   concurrency: number;
   nodeOptsPrefix: string;
   cwd?: string;
+  signal?: AbortSignal;
   onFsBytes?: (bytes: number) => void;
 }
 
 interface BatchExecutor {
-  execute(input: { language: "shell"; code: string; timeout: number | undefined; cwd?: string }): Promise<{ stdout: string; timedOut?: boolean }>;
+  execute(input: { language: "shell"; code: string; timeout: number | undefined; cwd?: string; signal?: AbortSignal }): Promise<{ stdout: string; timedOut?: boolean }>;
 }
 
 function quotePosixSingle(value: string): string {
@@ -1492,6 +1565,7 @@ function truncateCommandForEcho(command: string): string {
  */
 export const AGY_DEFAULT_EXEC_TIMEOUT_MS = 120_000;
 export function resolveExecTimeout(timeout: number | undefined): number | undefined {
+  if (getSharedToolContext()) return timeout;
   if (timeout !== undefined) return timeout;
   // Only agy gets a default — every other host enforces its own RPC timeout, so
   // keep the unbounded behavior there. Detected via the env the agy bundle pins
@@ -1562,7 +1636,8 @@ export async function runBatchCommands(
   opts: BatchRunOptions,
   executor: BatchExecutor,
 ): Promise<BatchRunResult> {
-  const { timeout, concurrency, nodeOptsPrefix, cwd, onFsBytes } = opts;
+  const { timeout, concurrency, nodeOptsPrefix, cwd, signal, onFsBytes } = opts;
+  signal?.throwIfAborted();
 
   if (concurrency <= 1) {
     // Serial path — shared timeout budget, cascading skip on timeout.
@@ -1572,6 +1647,7 @@ export async function runBatchCommands(
     const startTime = Date.now();
     let timedOut = false;
     for (let i = 0; i < commands.length; i++) {
+      signal?.throwIfAborted();
       const cmd = commands[i];
       let perCmdTimeout: number | undefined;
       if (timeout !== undefined) {
@@ -1589,7 +1665,9 @@ export async function runBatchCommands(
         code: `${nodeOptsPrefix}${cmd.command}`,
         timeout: perCmdTimeout,
         cwd,
+        ...(signal ? { signal } : {}),
       });
+      signal?.throwIfAborted();
       outputs.push(formatCommandOutput(cmd.label, cmd.command, combineExecOutput(result), onFsBytes));
       if (result.timedOut) {
         timedOut = true;
@@ -1607,12 +1685,15 @@ export async function runBatchCommands(
   // throw isolation (Promise.allSettled semantics), and order preservation.
   const jobs: PoolJob<{ output: string; timedOut: boolean }>[] = commands.map((cmd) => ({
     run: async () => {
+      signal?.throwIfAborted();
       const result = await executor.execute({
         language: "shell",
         code: `${nodeOptsPrefix}${cmd.command}`,
         timeout,
         cwd,
+        ...(signal ? { signal } : {}),
       });
+      signal?.throwIfAborted();
       // Always route partial output through formatCommandOutput so __CM_FS__
       // markers are stripped + counted, even when the command timed out.
       const formatted = formatCommandOutput(cmd.label, cmd.command, combineExecOutput(result), onFsBytes);
@@ -1624,6 +1705,7 @@ export async function runBatchCommands(
   }));
 
   const { settled } = await runPool(jobs, { concurrency });
+  signal?.throwIfAborted();
   const outputs: string[] = new Array(commands.length);
   let timedOut = false;
   for (let i = 0; i < settled.length; i++) {
@@ -1741,6 +1823,7 @@ EXAMPLE: ctx_execute(language: "javascript", code: "const out = require('child_p
     }),
   },
   async ({ language, code, timeout, background, cwd, intent }) => {
+    const execution = executionContext(cwd);
     // Security: deny-only firewall
     if (language === "shell") {
       const denied = checkDenyPolicy(code, "execute");
@@ -1819,7 +1902,9 @@ __cm_main().catch(e=>{console.error(e);process.exitCode=1});${background ? '\nse
 })(typeof require!=='undefined'?require:null);`;
       }
       const effTimeout = resolveExecTimeout(timeout);
-      const result = await executor.execute({ language, code: instrumentedCode, timeout: effTimeout, background, cwd });
+      const result = await execution.executor.execute({ language, code: instrumentedCode, timeout: effTimeout, background,
+        cwd: execution.cwd, ...(execution.signal ? { signal: execution.signal } : {}) });
+      execution.signal?.throwIfAborted();
 
       // Echo the executed source code before stdout so users can audit
       // and tooling can block command patterns (Issues #717 + #736).
@@ -1829,7 +1914,7 @@ __cm_main().catch(e=>{console.error(e);process.exitCode=1});${background ? '\nse
       // Parse sandbox network metrics from stderr
       const netMatch = result.stderr?.match(/__CM_NET__:(\d+)/);
       if (netMatch) {
-        sessionStats.bytesSandboxed += parseInt(netMatch[1]);
+        getSessionStats().bytesSandboxed += parseInt(netMatch[1]);
         // Clean the metric line from stderr
         result.stderr = result.stderr.replace(/\n?__CM_NET__:\d+\n?/g, "");
       }
@@ -1837,7 +1922,7 @@ __cm_main().catch(e=>{console.error(e);process.exitCode=1});${background ? '\nse
       // Parse sandbox FS read metrics from stderr
       const fsMatch = result.stderr?.match(/__CM_FS__:(\d+)/);
       if (fsMatch) {
-        sessionStats.bytesSandboxed += parseInt(fsMatch[1]);
+        getSessionStats().bytesSandboxed += parseInt(fsMatch[1]);
         result.stderr = result.stderr.replace(/\n?__CM_FS__:\d+\n?/g, "");
       }
 
@@ -1993,7 +2078,10 @@ function intentSearch(
   const indexed = persistent.indexPlainText(stdout, source, undefined, currentAttribution());
 
   // Search the persistent store directly (porter → trigram → fuzzy)
-  let results = persistent.searchWithFallback(intent, maxResults, source);
+  const shared = getSharedToolContext();
+  let results = persistent.searchWithFallback(intent, maxResults, source, undefined, "like",
+    shared ? new Set([shared.ownerId]) : undefined,
+    shared ? { includeUnattributed: false, denyChecker: shared.denyFile } : undefined);
 
   // Extract distinctive terms as vocabulary hints for the LLM
   const distinctiveTerms = persistent.getDistinctiveTerms(indexed.sourceId);
@@ -2112,6 +2200,7 @@ EXAMPLE: ctx_execute_file(path: "data.csv", language: "javascript", code: "const
     }),
   },
   async ({ path, language, code, timeout, intent }) => {
+    const execution = executionContext();
     // Security (#852): confine the processed file to the project root so
     // ctx_execute_file cannot be used to escape the host's sandbox/permission
     // controls. Runs before the deny-glob check — boundary first, then policy.
@@ -2133,12 +2222,14 @@ EXAMPLE: ctx_execute_file(path: "data.csv", language: "javascript", code: "const
 
     try {
       const effTimeout = resolveExecTimeout(timeout);
-      const result = await executor.executeFile({
+      const result = await execution.executor.executeFile({
         path,
         language,
         code,
         timeout: effTimeout,
+        ...(execution.signal ? { cwd: execution.cwd, signal: execution.signal } : {}),
       });
+      execution.signal?.throwIfAborted();
 
       // Echo path + executed source code before stdout for audit/debug
       // (Issues #717 + #736).
@@ -2365,9 +2456,11 @@ EXAMPLE: ctx_index(path: "/path/to/large-spec.md", source: "openapi-v2-spec")`,
       if (resolvedPath && existsSync(resolvedPath) && statSync(resolvedPath).isDirectory()) {
         const store = getStore();
         const projectDir = getProjectDir();
-        const denyGlobs = readToolDenyPatterns("Read", projectDir);
+        const shared = getSharedToolContext();
+        const denyGlobs = shared ? [] : readToolDenyPatterns("Read", projectDir);
         const isWin32 = process.platform === "win32";
         const perFileDeny = (absPath: string): boolean => {
+          if (shared) return shared.denyFile(absPath);
           try {
             return evaluateFilePath(absPath, denyGlobs, isWin32, projectDir).denied;
           } catch {
@@ -2596,7 +2689,7 @@ EXAMPLE: ctx_search(queries: ["last user prompt", "active skills", "open blocker
 
       // Guard: redirect when the index is empty — ctx_search is a follow-up
       // tool that requires prior indexing. Skip for timeline mode (SessionDB/auto-memory may have data).
-      if (sort !== "timeline" && store.getStats().chunks === 0) {
+      if (!getSharedToolContext() && sort !== "timeline" && store.getStats().chunks === 0) {
         return trackResponse("ctx_search", {
           content: [{
             type: "text" as const,
@@ -2647,8 +2740,9 @@ EXAMPLE: ctx_search(queries: ["last user prompt", "active skills", "open blocker
       );
 
       // Progressive throttling: track calls per agent-context window (#769).
-      const now = Date.now();
-      const flood = searchFloodGuard.record(searchFloodGuardKey(), now);
+      const shared = getSharedToolContext();
+      const now = shared?.now() ?? Date.now();
+      const flood = (shared?.floodGuard ?? searchFloodGuard).record(searchFloodGuardKey(), now);
       const searchCallCount = flood.count;
 
       // After SEARCH_BLOCK_AFTER calls (for THIS agent): refuse
@@ -2678,7 +2772,7 @@ EXAMPLE: ctx_search(queries: ["last user prompt", "active skills", "open blocker
       // is in play — the 2-step IN-clause needs SessionDB to translate
       // `project_dir` → allow-set of session ids for the ContentStore filter.
       let timelineDB: InstanceType<typeof SessionDB> | null = null;
-      const needsSessionDB = sort === "timeline" || typeof projectScope === "string";
+      const needsSessionDB = !shared && (sort === "timeline" || typeof projectScope === "string");
       if (needsSessionDB) {
         try {
           const sessionsDir = getSessionDir();
@@ -2694,14 +2788,14 @@ EXAMPLE: ctx_search(queries: ["last user prompt", "active skills", "open blocker
       // searchAllSources resolves its own copy for timeline mode. Empty set
       // is preserved (means "no events for this project"), which surfaces
       // only legacy `session_id=''` chunks via the post-filter.
-      let relevanceAllowSet: Set<string> | undefined;
+      let relevanceAllowSet: Set<string> | undefined = shared ? new Set([shared.ownerId]) : undefined;
       if (typeof projectScope === "string" && timelineDB) {
         try {
           relevanceAllowSet = new Set(timelineDB.getSessionIdsForProject(projectScope));
         } catch { /* best-effort */ }
       }
 
-      const configDir = _detectedAdapter?.getConfigDir() ?? resolveClaudeConfigDir();
+      const configDir = shared?.identity.home ?? _detectedAdapter?.getConfigDir() ?? resolveClaudeConfigDir();
 
       try {
       for (const q of queryList) {
@@ -2733,6 +2827,7 @@ EXAMPLE: ctx_search(queries: ["last user prompt", "active skills", "open blocker
             contentType,
             "like",
             relevanceAllowSet,
+            shared ? { includeUnattributed: false, denyChecker: shared.denyFile } : undefined,
           );
         }
 
@@ -2783,7 +2878,7 @@ EXAMPLE: ctx_search(queries: ["last user prompt", "active skills", "open blocker
       }
 
       if (output.trim().length === 0) {
-        const sources = store.listSources();
+        const sources = shared ? [] : store.listSources();
         const sourceList = sources.length > 0
           ? `\nIndexed sources: ${sources.map((s) => `"${s.label}" (${s.chunkCount} sections)`).join(", ")}`
           : "";
@@ -3286,10 +3381,12 @@ export function classifyIp(rawIp: string): "block" | "private" | "public" {
 }
 
 async function fetchOneUrl(url: string, source: string | undefined, force: boolean | undefined, ttl: number | undefined): Promise<FetchOneResult> {
+  const execution = executionContext();
   // SSRF guard — reject file://, javascript:, loopback, RFC1918, IMDS, link-local
   // BEFORE any cache lookup or subprocess spawn. Even cached entries shouldn't
   // serve a previously-poisoned source label.
   const ssrfBlock = await ssrfGuard(url);
+  execution.signal?.throwIfAborted();
   if (ssrfBlock) return ssrfBlock;
 
   if (!force && ttl !== 0) {
@@ -3298,7 +3395,8 @@ async function fetchOneUrl(url: string, source: string | undefined, force: boole
     // `source` label do not collide — they each get their own cache slot
     // (commit 1f1243e regression test enforced).
     const cacheKey = composeFetchCacheKey(source, url);
-    const meta = store.getSourceMeta(cacheKey);
+    const shared = getSharedToolContext();
+    const meta = store.getSourceMeta(cacheKey, shared ? { sessionId: shared.ownerId } : undefined);
     if (meta) {
       const indexedAt = new Date(meta.indexedAt + "Z"); // SQLite datetime is UTC without Z
       const ageMs = Date.now() - indexedAt.getTime();
@@ -3317,11 +3415,13 @@ async function fetchOneUrl(url: string, source: string | undefined, force: boole
   const outputPath = join(tmpdir(), `ctx-fetch-${Date.now()}-${Math.random().toString(36).slice(2)}.dat`);
   try {
     const fetchCode = buildFetchCode(url, outputPath);
-    const result = await executor.execute({
+    const result = await execution.executor.execute({
       language: "javascript",
       code: fetchCode,
       timeout: 30_000,
+      ...(execution.signal ? { cwd: execution.cwd, signal: execution.signal } : {}),
     });
+    execution.signal?.throwIfAborted();
     if (result.exitCode !== 0) {
       // Subprocess fetch failure — undici / fetch can surface EAI_AGAIN /
       // ETIMEDOUT / ENETUNREACH in stderr when the resolver is overloaded
@@ -3493,6 +3593,7 @@ EXAMPLE: ctx_fetch_and_index(
     }),
   },
   async ({ url, source, requests, concurrency, force, ttl }) => {
+    const execution = executionContext();
     // Normalize input: legacy {url} or new {requests: [...]}.
     // requests wins when both are provided (explicit batch intent).
     const batch: { url: string; source?: string }[] = requests
@@ -3523,6 +3624,7 @@ EXAMPLE: ctx_fetch_and_index(
       concurrency: requestedConcurrency,
       capByCpuCount: !isLegacySingle && requestedConcurrency > 1,
     });
+    execution.signal?.throwIfAborted();
 
     // Serial index drain — workers race on fetch, but store.index* runs one at a time.
     type Finalized =
@@ -3541,18 +3643,19 @@ EXAMPLE: ctx_fetch_and_index(
       }
       const v = r.value;
       if (v.kind === "cached") {
-        sessionStats.cacheHits++;
-        sessionStats.cacheBytesSaved += v.estimatedBytes;
+        getSessionStats().cacheHits++;
+        getSessionStats().cacheBytesSaved += v.estimatedBytes;
         // D2 Phase 5/7 — cache-hit event emission. `bytes_avoided` is the
         // size of the cached payload that would have re-entered context
         // had the TTL window missed. Best-effort, off the hot path.
         const cachedBytes = v.estimatedBytes;
         const cachedLabel = v.label;
-        setImmediate(() =>
+        scheduleSessionWrite(() =>
           emitCacheHitEvent({
             sessionDbPath: getSessionDbPath(),
             source: cachedLabel,
             bytesAvoided: cachedBytes,
+            context: getSharedToolContext()?.attribution,
           })
         );
         finalized.push({ kind: "cached", label: v.label, chunkCount: v.chunkCount, ageStr: v.ageStr, ttlStr: v.ttlStr });
@@ -3563,7 +3666,7 @@ EXAMPLE: ctx_fetch_and_index(
         // Cache miss: the URL was not in the TTL window so we paid the
         // network round-trip + re-indexed. Counted here so ctx_stats can
         // report nominal cache_hit_rate alongside the existing hit metrics.
-        sessionStats.cacheMisses++;
+        getSessionStats().cacheMisses++;
         finalized.push({ kind: "fetched", indexed: indexFetched(v) });
       }
     }
@@ -3776,6 +3879,8 @@ EXAMPLE: ctx_batch_execute(
     }),
   },
   async ({ commands, queries, timeout, concurrency, cwd, query_scope }) => {
+    const execution = executionContext(cwd);
+    let sharedPreloadDir: string | undefined;
     // Security: check each command against deny patterns
     for (const cmd of commands) {
       const denied = checkDenyPolicy(cmd.command, "batch_execute");
@@ -3786,7 +3891,15 @@ EXAMPLE: ctx_batch_execute(
       // Inject NODE_OPTIONS for FS read tracking in spawned Node processes.
       // The executor denies NODE_OPTIONS in its env (security), so we set it
       // as an inline shell prefix. This only affects child `node` invocations.
-      const nodeOptsPrefix = buildBatchNodeOptionsPrefix(runtimes.shell, CM_FS_PRELOAD);
+      let preloadPath: string;
+      if (getSharedToolContext()) {
+        sharedPreloadDir = mkdtempSync(join(tmpdir(), "ctx-batch-"));
+        preloadPath = join(sharedPreloadDir, "fs-preload.js");
+        writeFileSync(preloadPath, FS_PRELOAD_CODE);
+      } else {
+        preloadPath = ensureFsPreload();
+      }
+      const nodeOptsPrefix = buildBatchNodeOptionsPrefix(runtimes.shell, preloadPath);
 
       // Full stdout is preserved per-command and indexed into FTS5 (Issue #61, #197).
       // Concurrency>1 switches to a worker pool with per-command timeouts.
@@ -3797,10 +3910,11 @@ EXAMPLE: ctx_batch_execute(
           timeout: effTimeout,
           concurrency,
           nodeOptsPrefix,
-          cwd,
-          onFsBytes: (bytes) => { sessionStats.bytesSandboxed += bytes; },
+          cwd: execution.cwd,
+          ...(execution.signal ? { signal: execution.signal } : {}),
+          onFsBytes: (bytes) => { getSessionStats().bytesSandboxed += bytes; },
         },
-        executor,
+        execution.executor,
       );
 
       const stdout = perCommandOutputs.join("\n");
@@ -3888,6 +4002,8 @@ EXAMPLE: ctx_batch_execute(
         ],
         isError: true,
       });
+    } finally {
+      if (sharedPreloadDir) rmSync(sharedPreloadDir, { recursive: true, force: true });
     }
   },
 );
@@ -3952,6 +4068,15 @@ server.registerTool(
   },
   async () => {
     // ONE call, ONE source — AnalyticsEngine.queryAll()
+    const shared = getSharedToolContext();
+    if (shared) {
+      // The shared service must not scan other conversations or provider homes.
+      // Reuse the same analytics renderer with only this owner's runtime totals.
+      const report = new AnalyticsEngine(createMinimalDb()).queryAll(getSessionStats());
+      return trackResponse("ctx_stats", {
+        content: [{ type: "text", text: formatReport(report, VERSION, null, { cwd: shared.identity.workspace }) }],
+      });
+    }
     let text: string;
     try {
       const projectDir = getProjectDir();
@@ -3970,7 +4095,7 @@ server.registerTool(
         const sdb = new Database(sessionDbPath, { readonly: true });
         try {
           const engine = new AnalyticsEngine(sdb);
-          const report = engine.queryAll(sessionStats);
+          const report = engine.queryAll(getSessionStats());
           // MCP usage is read-only and cheap; only available when DB exists.
           const mcpUsage = engine.getMcpToolUsage();
           // Lifetime stats span every project's SessionDB + auto-memory dir
@@ -4104,7 +4229,7 @@ server.registerTool(
         // No session DB — build a minimal report from runtime stats only.
         // Lifetime still meaningful (other projects, auto-memory) so include it.
         const engine = new AnalyticsEngine(createMinimalDb());
-        const report = engine.queryAll(sessionStats);
+        const report = engine.queryAll(getSessionStats());
         const lifetime = getLifetimeStats({ sessionsDir: getSessionDir() });
         if (_detectedAdapter?.name === "Pi") {
           patchPiLifetimeFromStatsFiles(lifetime, getSessionDir());
@@ -4118,7 +4243,7 @@ server.registerTool(
     } catch {
       // Session DB not available or incompatible — build minimal report from runtime stats
       const engine = new AnalyticsEngine(createMinimalDb());
-      const report = engine.queryAll(sessionStats);
+      const report = engine.queryAll(getSessionStats());
       let lifetime;
       try { lifetime = getLifetimeStats({ sessionsDir: getSessionDir() }); } catch { /* never block ctx_stats */ }
       if (_detectedAdapter?.name === "Pi" && lifetime) {
@@ -4581,13 +4706,13 @@ EXAMPLE: ctx_purge(confirm: true, scope: "project")`,
     // happens ONLY when scope === "project".
     if (effectiveScope === "project") {
       // Reset in-memory session stats
-      sessionStats.calls = {};
-      sessionStats.bytesReturned = {};
-      sessionStats.bytesIndexed = 0;
-      sessionStats.bytesSandboxed = 0;
-      sessionStats.cacheHits = 0;
-      sessionStats.cacheBytesSaved = 0;
-      sessionStats.sessionStart = Date.now();
+      getSessionStats().calls = {};
+      getSessionStats().bytesReturned = {};
+      getSessionStats().bytesIndexed = 0;
+      getSessionStats().bytesSandboxed = 0;
+      getSessionStats().cacheHits = 0;
+      getSessionStats().cacheBytesSaved = 0;
+      getSessionStats().sessionStart = Date.now();
       deleted.push("session stats");
 
       // Also drop the persisted stats file so external readers see a fresh state
@@ -4849,6 +4974,8 @@ server.registerTool(
 // ─────────────────────────────────────────────────────────
 
 async function main() {
+  installStandaloneErrorHandlers();
+  ensureFsPreload();
   // Clean up stale DB files from previous sessions
   const cleaned = cleanupStaleDBs();
   if (cleaned > 0) {
@@ -4935,15 +5062,15 @@ async function main() {
     const restored = restoreSessionStats(getSessionDbPath());
     if (restored) {
       for (const [tool, count] of Object.entries(restored.calls)) {
-        sessionStats.calls[tool] = count;
+        getSessionStats().calls[tool] = count;
       }
       for (const [tool, bytes] of Object.entries(restored.bytesReturned)) {
-        sessionStats.bytesReturned[tool] = bytes;
+        getSessionStats().bytesReturned[tool] = bytes;
       }
       // Anchor uptime_ms to the original session start so `/ctx-upgrade`
       // doesn't reset the "session age" the statusline shows.
       if (restored.sessionStart > 0) {
-        sessionStats.sessionStart = restored.sessionStart;
+        getSessionStats().sessionStart = restored.sessionStart;
       }
     }
   } catch { /* best effort — never block startup on a stats restore failure */ }
@@ -4983,7 +5110,15 @@ async function main() {
 // function-calling) clients like Antigravity CLI (`agy`) / Gemini CLI.
 installStrictClientSchemaCompat();
 
-if (process.env.CONTEXT_MODE_EMBEDDED_PLUGIN_TOOLS !== "1") {
+// Imports expose the tool registry without assuming ownership of the host's
+// stdin or process lifecycle. Preserve both direct server and start.mjs entry.
+function isStandaloneEntry(): boolean {
+  if (!process.argv[1]) return false;
+  const entry = resolve(process.argv[1]);
+  return entry === fileURLToPath(import.meta.url) || entry === resolve(getPackageRoot(), "start.mjs");
+}
+
+if (process.env.CONTEXT_MODE_EMBEDDED_PLUGIN_TOOLS !== "1" && isStandaloneEntry()) {
   main().catch((err) => {
     console.error("Fatal:", err);
     process.exit(1);

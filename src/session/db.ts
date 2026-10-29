@@ -579,6 +579,16 @@ export interface EventBytes {
   bytesReturned?: number;
 }
 
+interface PreparedEventRow {
+  event: SessionEvent;
+  dataHash: string;
+  projectDir: string;
+  attributionSource: string;
+  attributionConfidence: number;
+  bytesAvoided: number;
+  bytesReturned: number;
+}
+
 /** Session metadata row from the session_meta table. */
 export interface SessionMeta {
   session_id: string;
@@ -874,6 +884,19 @@ export class SessionDB extends SQLiteBase {
       );
 
       CREATE INDEX IF NOT EXISTS idx_tool_calls_session ON tool_calls(session_id);
+
+      CREATE TABLE IF NOT EXISTS shared_memory_deliveries (
+        session_id TEXT NOT NULL,
+        delivery_id TEXT NOT NULL,
+        fingerprint TEXT NOT NULL,
+        event_count INTEGER NOT NULL,
+        PRIMARY KEY (session_id, delivery_id)
+      );
+
+      CREATE TABLE IF NOT EXISTS shared_memory_extraction (
+        session_id TEXT PRIMARY KEY,
+        state_json TEXT NOT NULL
+      );
     `);
 
     // Migration: add per-event attribution columns for existing DBs.
@@ -1229,9 +1252,19 @@ export class SessionDB extends SQLiteBase {
       return;
     }
 
-    // Pre-compute hashes + normalized attribution outside the transaction
-    // so the SQL transaction holds only DB work (shorter lock window).
-    const prepared = events.map((event, i) => {
+    const prepared = this.prepareEventRows(sessionId, events, attributions, bytesList);
+    const transaction = this.db.transaction(() => this.insertPreparedEvents(sessionId, prepared, sourceHook));
+    this.withRetry(() => transaction());
+  }
+
+  /** Pre-compute hashes and normalized attribution before acquiring the write transaction. */
+  private prepareEventRows(
+    sessionId: string,
+    events: SessionEvent[],
+    attributions?: Array<Partial<ProjectAttribution> | undefined>,
+    bytesList?: Array<EventBytes | undefined>,
+  ): PreparedEventRow[] {
+    return events.map((event, i) => {
       const dataHash = createHash("sha256")
         .update(event.data)
         .digest("hex")
@@ -1269,37 +1302,89 @@ export class SessionDB extends SQLiteBase {
       };
     });
 
-    const transaction = this.db.transaction(() => {
-      let cnt = (this.stmt(S.getEventCount).get(sessionId) as { cnt: number }).cnt;
-      for (const row of prepared) {
-        const dup = this.stmt(S.checkDuplicate).get(
-          sessionId, DEDUP_WINDOW, row.event.type, row.dataHash,
-        );
-        if (dup) continue;
-        if (cnt >= MAX_EVENTS_PER_SESSION) {
-          this.stmt(S.evictLowestPriority).run(sessionId);
-        } else {
-          cnt++;
-        }
-        this.stmt(S.insertEvent).run(
-          sessionId,
-          row.event.type,
-          row.event.category,
-          row.event.priority,
-          row.event.data,
-          row.projectDir,
-          row.attributionSource,
-          row.attributionConfidence,
-          row.bytesAvoided,
-          row.bytesReturned,
-          sourceHook,
-          row.dataHash,
-        );
-      }
-      this.stmt(S.updateMetaLastEvent).run(sessionId);
-    });
+  }
 
-    this.withRetry(() => transaction());
+  /** Caller owns the transaction, including any delivery receipt written alongside these rows. */
+  private insertPreparedEvents(
+    sessionId: string, prepared: PreparedEventRow[], sourceHook: string, deduplicate = true,
+  ): number {
+    if (prepared.length === 0) return 0;
+    let inserted = 0;
+    let cnt = (this.stmt(S.getEventCount).get(sessionId) as { cnt: number }).cnt;
+    for (const row of prepared) {
+      const dup = deduplicate && this.stmt(S.checkDuplicate).get(
+        sessionId, DEDUP_WINDOW, row.event.type, row.dataHash,
+      );
+      if (dup) continue;
+      if (cnt >= MAX_EVENTS_PER_SESSION) {
+        this.stmt(S.evictLowestPriority).run(sessionId);
+      } else {
+        cnt++;
+      }
+      inserted += this.stmt(S.insertEvent).run(
+        sessionId,
+        row.event.type,
+        row.event.category,
+        row.event.priority,
+        row.event.data,
+        row.projectDir,
+        row.attributionSource,
+        row.attributionConfidence,
+        row.bytesAvoided,
+        row.bytesReturned,
+        sourceHook,
+        row.dataHash,
+      ).changes;
+    }
+    this.stmt(S.updateMetaLastEvent).run(sessionId);
+    return inserted;
+  }
+
+  getSharedMemoryExtractionState(sessionId: string): string | null {
+    const row = this.db.prepare("SELECT state_json FROM shared_memory_extraction WHERE session_id = ?")
+      .get(sessionId) as { state_json: string } | undefined;
+    return row?.state_json ?? null;
+  }
+
+  /** Receipt, events and owner state commit together; receipts are never evicted for new IDs. */
+  applySharedMemoryDelivery(options: {
+    sessionId: string; deliveryId: string; fingerprint: string; maxDeliveries: number;
+    events: Array<Omit<SessionEvent, "data_hash">>; sourceHook: string; workspaceDir: string;
+    previousExtractionState: string | null; extractionState: string;
+  }): { duplicate: boolean; events: number } {
+    const { sessionId, deliveryId, fingerprint, maxDeliveries, events, sourceHook, workspaceDir,
+      previousExtractionState, extractionState } = options;
+    if (!sessionId || !deliveryId || deliveryId.length > 256 || !/^[a-f0-9]{64}$/.test(fingerprint) ||
+        !Number.isSafeInteger(maxDeliveries) || maxDeliveries < 1 || maxDeliveries > 100_000 ||
+        typeof extractionState !== "string" || Buffer.byteLength(extractionState) > 32 * 1024) {
+      throw new Error("Invalid shared memory delivery");
+    }
+    const prepared = this.prepareEventRows(sessionId, events.map((event) => ({ ...event, data_hash: "" })),
+      events.map(() => ({ projectDir: workspaceDir, source: "session_origin", confidence: 1 })));
+    const transaction = this.db.transaction(() => {
+      if (this.getSessionStats(sessionId)?.project_dir !== workspaceDir) throw new Error("Invalid shared memory owner");
+      const previous = this.db.prepare("SELECT fingerprint, event_count FROM shared_memory_deliveries WHERE session_id = ? AND delivery_id = ?")
+        .get(sessionId, deliveryId) as { fingerprint: string; event_count: number } | undefined;
+      if (previous) {
+        if (previous.fingerprint !== fingerprint) throw new Error("Conflicting shared memory delivery");
+        return { duplicate: true, events: previous.event_count };
+      }
+      const count = this.db.prepare("SELECT COUNT(*) AS count FROM shared_memory_deliveries WHERE session_id = ?")
+        .get(sessionId) as { count: number };
+      if (count.count >= maxDeliveries) throw new Error("Shared memory delivery capacity exceeded");
+      if (this.getSharedMemoryExtractionState(sessionId) !== previousExtractionState) {
+        throw new Error("Shared memory state changed; retry delivery");
+      }
+      // Distinct native occurrences may carry identical content. Only the
+      // delivery receipt deduplicates shared events; legacy callers keep theirs.
+      const inserted = this.insertPreparedEvents(sessionId, prepared, sourceHook, false);
+      this.db.prepare("INSERT INTO shared_memory_extraction (session_id, state_json) VALUES (?, ?) ON CONFLICT(session_id) DO UPDATE SET state_json = excluded.state_json")
+        .run(sessionId, extractionState);
+      this.db.prepare("INSERT INTO shared_memory_deliveries (session_id, delivery_id, fingerprint, event_count) VALUES (?, ?, ?, ?)")
+        .run(sessionId, deliveryId, fingerprint, inserted);
+      return { duplicate: false, events: inserted };
+    });
+    return this.withRetry(() => transaction());
   }
 
   /**
@@ -1686,6 +1771,8 @@ export class SessionDB extends SQLiteBase {
     this.db.transaction(() => {
       this.stmt(S.deleteEvents).run(sessionId);
       this.stmt(S.deleteResume).run(sessionId);
+      this.db.prepare("DELETE FROM shared_memory_deliveries WHERE session_id = ?").run(sessionId);
+      this.db.prepare("DELETE FROM shared_memory_extraction WHERE session_id = ?").run(sessionId);
       this.stmt(S.deleteMeta).run(sessionId);
     })();
   }

@@ -53,7 +53,27 @@
     ".": "./build/adapters/opencode/plugin.js",
     "./plugin": "./build/adapters/opencode/plugin.js",
     "./openclaw": "./build/adapters/openclaw/plugin.js",
-    "./cli": "./cli.bundle.mjs"
+    "./cli": "./cli.bundle.mjs",
+    "./shared/identity": {
+      "types": "./build/shared/identity.d.ts",
+      "import": "./build/shared/identity.js",
+      "default": "./build/shared/identity.js"
+    },
+    "./shared/launch-authority": {
+      "types": "./build/shared/launch-authority.d.ts",
+      "import": "./build/shared/launch-authority.js",
+      "default": "./build/shared/launch-authority.js"
+    },
+    "./shared/service": {
+      "types": "./build/shared/service.d.ts",
+      "import": "./build/shared/service.js",
+      "default": "./build/shared/service.js"
+    },
+    "./shared/control": {
+      "types": "./build/shared/control.d.ts",
+      "import": "./build/shared/control.js",
+      "default": "./build/shared/control.js"
+    }
   },
   "bin": {
     "context-mode": "./cli.bundle.mjs"
@@ -71,15 +91,18 @@
     ".openclaw-plugin",
     "openclaw.plugin.json",
     "start.mjs",
+    "scripts/patch-dependencies.mjs",
     "scripts/postinstall.mjs",
     "scripts/heal-better-sqlite3.mjs",
     "scripts/heal-installed-plugins.mjs",
     "scripts/plugin-cache-integrity.mjs",
+    "patches",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc && node -e \"if(process.platform!=='win32'){require('fs').chmodSync('build/cli.js',0o755)}\" && npm run bundle && npm run assert-bundle && npm run assert-asymmetric-drift",
+    "build": "npm run patch:dependencies && tsc && node -e \"if(process.platform!=='win32'){require('fs').chmodSync('build/cli.js',0o755)}\" && npm run bundle && npm run assert-bundle && npm run assert-asymmetric-drift",
+    "patch:dependencies": "node scripts/patch-dependencies.mjs",
     "assert-bundle": "node scripts/assert-bundle.mjs server.bundle.mjs cli.bundle.mjs hooks/session-extract.bundle.mjs hooks/session-snapshot.bundle.mjs hooks/session-db.bundle.mjs hooks/security.bundle.mjs",
     "assert-asymmetric-drift": "node scripts/assert-asymmetric-drift.mjs",
     "bundle": "esbuild src/server.ts --bundle --platform=node --target=node18 --format=esm --outfile=server.bundle.mjs --external:better-sqlite3 --external:turndown --external:turndown-plugin-gfm --external:@mixmark-io/domino --minify && esbuild src/cli.ts --bundle --platform=node --target=node18 --format=esm --outfile=cli.bundle.mjs --external:better-sqlite3 --minify && esbuild src/session/extract.ts --bundle --platform=node --target=node18 --format=esm --outfile=hooks/session-extract.bundle.mjs --minify && esbuild src/session/snapshot.ts --bundle --platform=node --target=node18 --format=esm --outfile=hooks/session-snapshot.bundle.mjs --minify && esbuild src/session/db.ts --bundle --platform=node --target=node18 --format=esm --outfile=hooks/session-db.bundle.mjs --external:better-sqlite3 --minify && esbuild src/security.ts --bundle --platform=node --target=node18 --format=esm --outfile=hooks/security.bundle.mjs --minify",
@@ -98,14 +121,15 @@
     "test:compare": "npx tsx tests/context-comparison.ts",
     "test:ecosystem": "npx tsx tests/ecosystem-benchmark.ts",
     "install:openclaw": "node -e \"if(process.platform==='win32'){console.error('OpenClaw install requires bash (Git Bash or WSL)');process.exit(1)}else{require('child_process').execSync('bash scripts/install-openclaw-plugin.sh',{stdio:'inherit'})}\"",
-    "postinstall": "node scripts/postinstall.mjs"
+    "postinstall": "node scripts/postinstall.mjs && npm run patch:dependencies"
   },
   "dependencies": {
     "@clack/prompts": "^1.0.1",
     "@mixmark-io/domino": "^2.2.0",
-    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@modelcontextprotocol/sdk": "1.26.0",
     "better-sqlite3": "^12.6.2",
     "picocolors": "^1.1.1",
+    "patch-package": "8.0.1",
     "turndown": "^7.2.0",
     "turndown-plugin-gfm": "^1.0.2",
     "zod": "^3.25.0"

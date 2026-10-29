@@ -14,37 +14,13 @@
  * - Best-effort error swallowing matches `persistToolCallCounter` in
  *   `persist-tool-calls.ts`. A stats-side failure must NEVER break the
  *   parent MCP tool call.
- * - Resolves the latest `session_id` from `session_meta` so the wiring
+ * - Accepts explicit session/workspace attribution for shared requests. Legacy
+ *   callers resolve the latest `session_id` from `session_meta` so the wiring
  *   in `server.ts` is `setImmediate(() => emit*({...}))` — no need to
  *   plumb session ids through every handler.
  */
 
-import { existsSync } from "node:fs";
-import { SessionDB } from "./db.js";
-
-/**
- * Open the SessionDB at `dbPath`, find the latest session_id, and run
- * `fn` with both. Wraps everything in try/catch so callers stay
- * fire-and-forget.
- */
-function withLatestSession(
-  dbPath: string,
-  fn: (db: SessionDB, sessionId: string) => void,
-): void {
-  try {
-    if (!existsSync(dbPath)) return;
-    const sdb = new SessionDB({ dbPath });
-    try {
-      const sid = sdb.getLatestSessionId();
-      if (!sid) return;
-      fn(sdb, sid);
-    } finally {
-      try { sdb.close(); } catch { /* ignore */ }
-    }
-  } catch {
-    // Best-effort: never break the parent MCP tool call.
-  }
-}
+import { withSessionAttribution, type SessionAttributionContext } from "./attribution-context.js";
 
 /**
  * Record a `ctx_execute` / `ctx_execute_file` / `ctx_batch_execute` run.
@@ -55,8 +31,9 @@ export function emitSandboxExecuteEvent(opts: {
   sessionDbPath: string;
   toolName: string;
   bytesReturned: number;
+  context?: SessionAttributionContext;
 }): void {
-  withLatestSession(opts.sessionDbPath, (sdb, sid) => {
+  withSessionAttribution(opts.sessionDbPath, opts.context, (sdb, sid, workspaceDir) => {
     sdb.insertEvent(
       sid,
       {
@@ -64,7 +41,7 @@ export function emitSandboxExecuteEvent(opts: {
         category: "sandbox",
         priority: 1,
         data: opts.toolName,
-        project_dir: "",
+        project_dir: workspaceDir ?? "",
         attribution_source: "server",
         attribution_confidence: 1,
       },
@@ -83,8 +60,9 @@ export function emitIndexWriteEvent(opts: {
   sessionDbPath: string;
   source: string;
   bytesAvoided: number;
+  context?: SessionAttributionContext;
 }): void {
-  withLatestSession(opts.sessionDbPath, (sdb, sid) => {
+  withSessionAttribution(opts.sessionDbPath, opts.context, (sdb, sid, workspaceDir) => {
     sdb.insertEvent(
       sid,
       {
@@ -92,7 +70,7 @@ export function emitIndexWriteEvent(opts: {
         category: "sandbox",
         priority: 1,
         data: opts.source,
-        project_dir: "",
+        project_dir: workspaceDir ?? "",
         attribution_source: "server",
         attribution_confidence: 1,
       },
@@ -111,8 +89,9 @@ export function emitCacheHitEvent(opts: {
   sessionDbPath: string;
   source: string;
   bytesAvoided: number;
+  context?: SessionAttributionContext;
 }): void {
-  withLatestSession(opts.sessionDbPath, (sdb, sid) => {
+  withSessionAttribution(opts.sessionDbPath, opts.context, (sdb, sid, workspaceDir) => {
     sdb.insertEvent(
       sid,
       {
@@ -120,7 +99,7 @@ export function emitCacheHitEvent(opts: {
         category: "cache",
         priority: 1,
         data: opts.source,
-        project_dir: "",
+        project_dir: workspaceDir ?? "",
         attribution_source: "server",
         attribution_confidence: 1,
       },

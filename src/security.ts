@@ -1,5 +1,5 @@
 import { readFileSync, realpathSync } from "node:fs";
-import { relative, resolve, sep } from "node:path";
+import { posix, relative, resolve, sep } from "node:path";
 
 import { resolveAdapterGlobalSettingsPaths } from "./util/claude-config.js";
 
@@ -411,6 +411,165 @@ export function readToolDenyPatterns(
   return readToolPermissionPatterns(toolName, "deny", projectDir, globalSettingsPath);
 }
 
+/** Extract tool globs from already parsed settings; strict callers reject malformed rules. */
+export function extractToolPermissionPatterns(
+  settings: unknown,
+  toolName: string,
+  kind: "deny" | "allow" | "ask",
+  options: { strict?: boolean } = {},
+): string[] {
+  if (!settings || typeof settings !== "object" || Array.isArray(settings)) {
+    if (options.strict) throw new Error("Invalid permission settings object");
+    return [];
+  }
+  const permissions = (settings as Record<string, unknown>).permissions;
+  if (permissions === undefined) return [];
+  if (!permissions || typeof permissions !== "object" || Array.isArray(permissions)) {
+    if (options.strict) throw new Error("Invalid permissions object");
+    return [];
+  }
+  const rules = permissions as Record<string, unknown>;
+  if (options.strict) {
+    for (const key of ["allow", "deny", "ask"]) {
+      const entries = rules[key];
+      if (entries !== undefined && (!Array.isArray(entries) || entries.some((entry) => typeof entry !== "string"))) {
+        throw new Error("Invalid permission rule list");
+      }
+    }
+  }
+  const entries = rules[kind];
+  if (!Array.isArray(entries)) return [];
+  const globs: string[] = [];
+  for (const entry of entries) {
+    if (typeof entry !== "string") continue;
+    if (options.strict) {
+      const separator = entry.indexOf("(");
+      const name = separator < 0 ? entry : entry.slice(0, separator);
+      if (!/^[\w*]+$/.test(name)) throw new Error("Unsupported permission tool pattern");
+      if (!globToRegex(name).test(toolName)) continue;
+      if (separator < 0) {
+        globs.push("**");
+        continue;
+      }
+      const match = entry.match(/^[\w*]+\((.+)\)$/);
+      if (!match) throw new Error("Invalid permission tool specifier");
+      globs.push(match[1]);
+      continue;
+    }
+    const pattern = parseToolPattern(entry);
+    if (pattern && pattern.tool === toolName) globs.push(pattern.glob);
+  }
+  return globs;
+}
+
+export interface SharedReadPolicyContext {
+  workspaceDir: string;
+  settingsDir: string;
+  userHome?: string;
+}
+
+/** Claude normalizes Windows drive paths to /c/... before matching rules. */
+function sharedPolicyPath(path: string): string {
+  const normalized = path.replace(/\\/g, "/");
+  return /^[A-Za-z]:\//.test(normalized)
+    ? `/${normalized[0].toLowerCase()}${normalized.slice(2)}` : normalized;
+}
+
+function sharedReadPattern(pattern: string, context: SharedReadPolicyContext): string {
+  // The existing matcher supports literal paths, ? and * / **. Never silently
+  // weaken an applicable rule whose gitignore syntax it cannot represent.
+  if (!pattern || /[\x00-\x1f\x7f!\[\]{}\\:]/.test(pattern) ||
+      pattern.split("/").includes("..") || pattern.startsWith("///")) {
+    throw new Error("Unsupported shared Read permission pattern");
+  }
+  let anchor: string;
+  let suffix: string;
+  if (pattern.startsWith("//")) {
+    anchor = "/";
+    suffix = pattern.slice(2);
+  } else if (pattern.startsWith("~/")) {
+    if (!context.userHome) throw new Error("Read policy requires an explicit user home");
+    anchor = sharedPolicyPath(context.userHome);
+    suffix = pattern.slice(2);
+  } else if (pattern.startsWith("/")) {
+    anchor = sharedPolicyPath(context.settingsDir);
+    suffix = pattern.slice(1);
+  } else {
+    if (pattern.startsWith("~")) throw new Error("Unsupported shared Read home pattern");
+    anchor = sharedPolicyPath(context.workspaceDir);
+    suffix = pattern.startsWith("./") ? pattern.slice(2) : pattern;
+    // Deny/ask rules use gitignore depth: bare names and a single directory
+    // followed by /** match at any depth beneath the current workspace.
+    if (!suffix.includes("/") || /^[^/]+\/\*\*$/.test(suffix)) suffix = `**/${suffix}`;
+  }
+  if (suffix.split("/").includes(".")) throw new Error("Unsupported shared Read path segment");
+  return `${anchor.replace(/\/$/, "")}/${suffix}`.replace(/\/$/, "");
+}
+
+/** Resolve the rule's literal prefix as well as the requested file's path. */
+function sharedReadPatternVariants(anchored: string): string[] {
+  const wildcard = anchored.search(/[?*]/);
+  let prefix = wildcard < 0 ? anchored : anchored.slice(0, anchored.lastIndexOf("/", wildcard)) || "/";
+  let suffix = anchored.slice(prefix === "/" ? 0 : prefix.length);
+  for (;;) {
+    // A drive-free Windows rule (//**/...) already matches normalized paths
+    // across drives. There is no single filesystem root to canonicalize.
+    if (process.platform === "win32" && prefix === "/") return [anchored];
+    const nativePrefix = process.platform === "win32" && /^\/[A-Za-z](\/|$)/.test(prefix)
+      ? `${prefix[1]}:${prefix.slice(2) || "/"}` : prefix;
+    try {
+      const canonical = sharedPolicyPath(realpathSync(nativePrefix));
+      return [...new Set([anchored, `${canonical.replace(/\/$/, "")}${suffix}`])];
+    } catch (error) {
+      // A missing suffix is safe to retain as a literal pattern. A permission
+      // error or symlink loop must not silently discard a deny rule.
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+      const parent = posix.dirname(prefix);
+      if (parent === prefix) throw error;
+      suffix = `${prefix.slice(parent === "/" ? 0 : parent.length)}${suffix}`;
+      prefix = parent;
+    }
+  }
+}
+
+function matchesSharedReadPattern(candidate: string, pattern: string): boolean {
+  const insensitive = process.platform === "win32" || process.platform === "darwin";
+  const regex = fileGlobToRegex(pattern, insensitive);
+  const directoryRoot = pattern.endsWith("/**") ? fileGlobToRegex(pattern.slice(0, -3), insensitive) : undefined;
+  // A rule matching a directory also guards every descendant of that directory.
+  for (let path = candidate; ; path = posix.dirname(path)) {
+    if (regex.test(path) || directoryRoot?.test(path)) return true;
+    if (path === posix.dirname(path)) return false;
+  }
+}
+
+/**
+ * Evaluate one explicit settings source without process-global home inference.
+ * Unsupported applicable rules deny access until a capable policy adapter is
+ * provided; the legacy evaluateFilePath contract remains unchanged.
+ */
+export function evaluateSharedReadPolicy(
+  filePath: string,
+  patterns: string[],
+  context: SharedReadPolicyContext,
+): { denied: boolean; matchedPattern?: string } {
+  try {
+    const lexical = resolve(context.workspaceDir, filePath);
+    const candidates = new Set([sharedPolicyPath(lexical), sharedPolicyPath(realpathSync(lexical))]);
+    for (const pattern of patterns) {
+      const anchored = sharedReadPattern(pattern, context);
+      for (const variant of sharedReadPatternVariants(anchored)) {
+        if ([...candidates].some((candidate) => matchesSharedReadPattern(candidate, variant))) {
+          return { denied: true, matchedPattern: pattern };
+        }
+      }
+    }
+    return { denied: false };
+  } catch {
+    return { denied: true };
+  }
+}
+
 /**
  * Read `permissions.{deny|allow}` globs for a tool from every settings file in
  * precedence order (project local → project shared → adapter globals).
@@ -439,25 +598,14 @@ export function readToolPermissionPatterns(
       return null;
     }
 
-    let parsed: any;
+    let parsed: unknown;
     try {
       parsed = JSON.parse(raw);
     } catch {
       return null;
     }
 
-    const entries = parsed?.permissions?.[kind];
-    if (!Array.isArray(entries)) return [];
-
-    const globs: string[] = [];
-    for (const entry of entries) {
-      if (typeof entry !== "string") continue;
-      const tp = parseToolPattern(entry);
-      if (tp && tp.tool === toolName) {
-        globs.push(tp.glob);
-      }
-    }
-    return globs;
+    return extractToolPermissionPatterns(parsed, toolName, kind);
   };
 
   if (projectDir) {

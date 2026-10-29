@@ -18,8 +18,7 @@
  * boot the MCP server.
  */
 
-import { existsSync } from "node:fs";
-import { SessionDB } from "./db.js";
+import { withSessionAttribution, type SessionAttributionContext } from "./attribution-context.js";
 
 /**
  * Shape returned by {@link restoreSessionStats}. Subset of the in-memory
@@ -41,7 +40,8 @@ export interface RestoredSessionStats {
 
 /**
  * Increment the persistent tool-call counter for `toolName` under whatever
- * session_id `session_meta` currently treats as the most recent. This is
+ * session_id `session_meta` currently treats as the most recent, or the explicit
+ * shared context's session when supplied. The context's DB remains caller-owned. This is
  * called from {@link trackResponse} on every tool response and must be
  * cheap, non-throwing, and best-effort — a stats failure must never break
  * the MCP tool call.
@@ -50,24 +50,15 @@ export function persistToolCallCounter(
   sessionDbPath: string,
   toolName: string,
   bytes: number,
+  context?: SessionAttributionContext,
 ): void {
-  try {
-    if (!existsSync(sessionDbPath)) return;
-    const sdb = new SessionDB({ dbPath: sessionDbPath });
-    try {
-      const sid = sdb.getLatestSessionId();
-      if (!sid) return;
-      sdb.incrementToolCall(sid, toolName, bytes);
-    } finally {
-      sdb.close();
-    }
-  } catch {
-    // Best-effort: counter must never throw and break the parent tool call.
-  }
+  withSessionAttribution(sessionDbPath, context, (sdb, sid) => {
+    sdb.incrementToolCall(sid, toolName, bytes);
+  });
 }
 
 /**
- * Read the latest session's tool-call totals back out of SessionDB so the
+ * Read the explicit session's totals, or the latest session for legacy callers, so the
  * MCP server can hydrate its in-memory `sessionStats` on startup. Returns
  * `null` when the DB is missing or empty so the caller can keep the
  * default zero-state without branching twice.
@@ -77,52 +68,30 @@ export function persistToolCallCounter(
  */
 export function restoreSessionStats(
   sessionDbPath: string,
+  context?: SessionAttributionContext,
 ): RestoredSessionStats | null {
-  try {
-    if (!existsSync(sessionDbPath)) return null;
-    const sdb = new SessionDB({ dbPath: sessionDbPath });
-    try {
-      const sid = sdb.getLatestSessionId();
-      if (!sid) return null;
-
-      const stats = sdb.getToolCallStats(sid);
-      const calls: Record<string, number> = {};
-      const bytesReturned: Record<string, number> = {};
-      for (const [tool, row] of Object.entries(stats.byTool)) {
-        calls[tool] = row.calls;
-        bytesReturned[tool] = row.bytesReturned;
-      }
-
-      // started_at is "YYYY-MM-DD HH:MM:SS" in UTC (SQLite datetime() default);
-      // append "Z" so Date.parse interprets it as UTC, matching how the
-      // session was actually persisted.
-      let sessionStart = Date.now();
-      try {
-        const meta = sdb.getSessionStats(sid);
-        if (meta?.started_at) {
-          const parsed = Date.parse(`${meta.started_at}Z`);
-          if (Number.isFinite(parsed) && parsed > 0) sessionStart = parsed;
-        }
-      } catch {
-        // best-effort — keep `Date.now()` fallback
-      }
-
-      // Skip empty restores so callers can `if (restored)` and not stomp
-      // their already-zero default with another zero.
-      if (
-        Object.keys(calls).length === 0 &&
-        Object.keys(bytesReturned).length === 0
-      ) {
-        // Still useful to return sessionStart so uptime_ms doesn't reset
-        // even when no tool calls were made — but only if we found a session.
-        return { calls, bytesReturned, sessionStart };
-      }
-
-      return { calls, bytesReturned, sessionStart };
-    } finally {
-      sdb.close();
+  return withSessionAttribution(sessionDbPath, context, (sdb, sid) => {
+    const stats = sdb.getToolCallStats(sid);
+    const calls: Record<string, number> = {};
+    const bytesReturned: Record<string, number> = {};
+    for (const [tool, row] of Object.entries(stats.byTool)) {
+      calls[tool] = row.calls;
+      bytesReturned[tool] = row.bytesReturned;
     }
-  } catch {
-    return null;
-  }
+
+    // SQLite's default timestamp is UTC, without a zone suffix.
+    let sessionStart = Date.now();
+    try {
+      const meta = sdb.getSessionStats(sid);
+      if (meta?.started_at) {
+        const parsed = Date.parse(`${meta.started_at}Z`);
+        if (Number.isFinite(parsed) && parsed > 0) sessionStart = parsed;
+      }
+    } catch {
+      // Best-effort: retain the legacy current-time fallback.
+    }
+
+    // An empty explicit session still has its own original start time.
+    return { calls, bytesReturned, sessionStart };
+  });
 }

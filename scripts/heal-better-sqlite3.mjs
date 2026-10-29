@@ -24,9 +24,9 @@
  *   C. Write actionable stderr message naming `npm install better-sqlite3`
  *      and the Windows / #408 context.
  *
- * Best-effort posture: every layer is wrapped in try/catch and the
- * function never throws. Caller will fail naturally on first DB open if
- * heal could not produce a working binding.
+ * Native repair stays best effort: callers fail naturally on first DB open
+ * when no working binding can be produced. Managed dependency patch contracts
+ * are finalized after npm repair and fail closed with a stable error code.
  *
  * @see https://github.com/mksglu/context-mode/issues/408
  * @see https://github.com/mksglu/context-mode/issues/533
@@ -41,10 +41,11 @@
  *   used — it returns the internal major ("18") on VS 2026, not the year.
  */
 
-import { existsSync as fsExistsSync } from "node:fs";
+import { existsSync as fsExistsSync, realpathSync } from "node:fs";
 import { execSync, execFileSync, spawnSync } from "node:child_process";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { createRequire } from "node:module";
+import { inspectManagedSdkPatch } from "./plugin-cache-integrity.mjs";
 
 /**
  * Conda installation path prefixes that must NEVER be selected as the
@@ -271,16 +272,45 @@ function buildSafeEnv(safePython, base = process.env) {
   return env;
 }
 
+function resolveSqlitePaths(pkgRoot) {
+  const require = createRequire(resolve(pkgRoot, "package.json"));
+  // Use Node's ordered lookup locations, but inspect their current contents.
+  // npm can add a nearer copy while this process is alive; require.resolve's
+  // cached filename can otherwise keep pointing at the old hoisted package.
+  const metadata = (require.resolve.paths("better-sqlite3") ?? [])
+    .map((directory) => resolve(directory, "better-sqlite3", "package.json"))
+    .find((file) => fsExistsSync(file));
+  const bsqRoot = metadata ? dirname(realpathSync(metadata)) : resolve(pkgRoot, "node_modules", "better-sqlite3");
+  return { bsqRoot, bindingPath: resolve(bsqRoot, "build", "Release", "better_sqlite3.node") };
+}
+
+/** Finalize a repaired managed package; standalone/legacy SQLite has no patch contract. */
+export function finalizeDependencyRepair(pkgRoot) {
+  const integrity = inspectManagedSdkPatch(pkgRoot);
+  if (integrity === "unmanaged" || integrity === "current") return;
+  try {
+    if (integrity !== "needs-patch") throw new Error("Invalid dependency patch contract");
+    const script = resolve(pkgRoot, "scripts", "patch-dependencies.mjs");
+    // Reuse the shipped CLI in a fresh process, resolving the final dependency
+    // tree. Capture its output so runtime hook JSON and errors stay clean.
+    execFileSync(process.execPath, [script], { cwd: pkgRoot, stdio: "pipe", timeout: 30000, maxBuffer: 256 * 1024 });
+    if (inspectManagedSdkPatch(pkgRoot) !== "current") throw new Error("Dependency patch verification failed");
+  } catch {
+    const error = new Error("Dependency patch finalization failed");
+    error.code = "CONTEXT_MODE_DEPENDENCY_PATCH_FAILED";
+    throw error;
+  }
+}
+
 /**
  * Self-heal a missing better_sqlite3.node binding.
  *
- * @param {string} pkgRoot - the directory containing node_modules/better-sqlite3
+ * @param {string} pkgRoot - the package directory requesting better-sqlite3
  * @returns {{ healed: boolean, reason?: string }}
  */
 export function healBetterSqlite3Binding(pkgRoot) {
   try {
-    const bsqRoot = resolve(pkgRoot, "node_modules", "better-sqlite3");
-    const bindingPath = resolve(bsqRoot, "build", "Release", "better_sqlite3.node");
+    let { bsqRoot, bindingPath } = resolveSqlitePaths(pkgRoot);
     const npmBin = process.platform === "win32" ? "npm.cmd" : "npm";
 
     // ── Conda defense (#533) ─────────────────────────────────────────
@@ -343,6 +373,7 @@ export function healBetterSqlite3Binding(pkgRoot) {
         // exit so the caller (cli.ts upgrade verifier) reports it.
         return { healed: false, reason: "package-missing" };
       }
+      ({ bsqRoot, bindingPath } = resolveSqlitePaths(pkgRoot));
       // Re-check after install. If npm wrote the package AND its
       // postinstall produced the binding, we're done. Otherwise fall
       // through into the binding-missing flow below.
@@ -401,6 +432,7 @@ export function healBetterSqlite3Binding(pkgRoot) {
         `${npmBin} install better-sqlite3 --no-package-lock --no-save --silent`,
         { cwd: pkgRoot, stdio: "pipe", timeout: 120000, shell: true, env: childEnv },
       );
+      ({ bsqRoot, bindingPath } = resolveSqlitePaths(pkgRoot));
       if (fsExistsSync(bindingPath)) {
         return { healed: true, reason: "npm-install" };
       }
@@ -424,7 +456,12 @@ export function healBetterSqlite3Binding(pkgRoot) {
     }
     return { healed: false, reason: "manual-required" };
   } catch {
-    // Outermost guard — never throw, never block the caller.
+    // Native repair remains best effort; managed finalization below is strict.
     return { healed: false, reason: "manual-required" };
+  } finally {
+    // A prior process or unsuccessful npm command may have left a changed
+    // tree with healthy SQLite. Verify outside native repair's best-effort
+    // catch every time; a verified SDK does not spawn the patch subprocess.
+    finalizeDependencyRepair(pkgRoot);
   }
 }

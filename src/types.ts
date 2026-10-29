@@ -62,6 +62,8 @@ export interface ExecResult {
   timedOut: boolean;
   /** Process was detached and continues running in the background. */
   backgrounded?: boolean;
+  /** The owning request or executor cancelled this execution. */
+  cancelled?: boolean;
 }
 
 // ─────────────────────────────────────────────────────────

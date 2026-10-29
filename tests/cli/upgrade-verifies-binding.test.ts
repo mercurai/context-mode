@@ -16,8 +16,11 @@
  * @see https://github.com/mksglu/context-mode/issues/514
  */
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
+import { spawnSync } from "node:child_process";
+import ts from "typescript";
 
 const CLI_SRC = readFileSync(
   resolve(import.meta.dirname, "../../src/cli.ts"),
@@ -34,6 +37,69 @@ function getUpgradeBody(): string {
   const altAfter = CLI_SRC.indexOf("\nfunction ", start + 10);
   const end = [after, altAfter].filter(i => i > -1).sort((a, b) => a - b)[0] ?? CLI_SRC.length;
   return CLI_SRC.slice(start, end);
+}
+
+// Execute the real upgrade native-verification block, without cloning repos,
+// touching user configuration or invoking global npm. AST selection is scoped
+// to upgrade(), and shape checks make a moved/removed boundary fail explicitly.
+function nativeUpgradeFixture(mode: "patch-failure" | "native-failure" | "missing") {
+  const source = ts.createSourceFile("cli.ts", CLI_SRC, ts.ScriptTarget.Latest, true);
+  const upgrade = source.statements.find((node): node is ts.FunctionDeclaration =>
+    ts.isFunctionDeclaration(node) && node.name?.text === "upgrade");
+  expect(upgrade?.body).toBeDefined();
+  const matches: ts.IfStatement[] = [];
+  function visit(node: ts.Node) {
+    if (ts.isIfStatement(node) &&
+        node.expression.getText(source) === "!isInProcessPluginPlatform(detection.platform)") matches.push(node);
+    ts.forEachChild(node, visit);
+  }
+  visit(upgrade!.body!);
+  expect(matches).toHaveLength(1);
+  const branch = matches[0].thenStatement;
+  expect(ts.isBlock(branch)).toBe(true);
+  const body = branch.getText(source);
+  expect(body).toContain("const bsqBindingPath");
+  expect(body).toContain('"ensure-deps.mjs"');
+  expect(body).toContain('["install", "-g", pluginRoot');
+  const compiled = ts.transpileModule(`async function verifyNativeUpgrade() ${body}`, {
+    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
+  }).outputText;
+  const root = mkdtempSync(join(tmpdir(), "ctx-upgrade-native-"));
+  const binding = join(root, "node_modules", "better-sqlite3", "build", "Release", "better_sqlite3.node");
+  mkdirSync(join(root, "hooks"), { recursive: true });
+  mkdirSync(resolve(binding, ".."), { recursive: true });
+  // Unique real module per case: the bootstrap restores a binding before
+  // rejecting, matching the already-observed packed runtime repair sequence.
+  writeFileSync(join(root, "hooks", "ensure-deps.mjs"),
+    (mode !== "missing" ? `import {writeFileSync} from 'node:fs'; writeFileSync(${JSON.stringify(binding)}, 'restored binding');\n` : "") +
+    `throw Object.assign(new Error('fixture native bootstrap'), {code:${JSON.stringify(mode === "patch-failure" ? "CONTEXT_MODE_DEPENDENCY_PATCH_FAILED" : "NATIVE_UNAVAILABLE")}});`);
+  const script = join(root, "verify-upgrade.mjs");
+  writeFileSync(script, `
+import realProcess from 'node:process';
+import {existsSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const pluginRoot=${JSON.stringify(root)};
+const process={exitCode:0,versions:realProcess.versions};
+const Date={now:()=>0}, npmCalls=[], messages=[], changes=[];
+const report=message=>messages.push(message), identity=message=>message;
+const s={start:report,stop:report},p={log:{warn:report,error:report,info:report}};
+const color={green:identity,dim:identity,yellow:identity,red:identity};
+const npmExecFile=args=>npmCalls.push(args);
+${compiled}
+let errorCode=null;
+try { await verifyNativeUpgrade(); } catch(error) { errorCode=error.code ?? 'UNCLASSIFIED'; }
+realProcess.stdout.write(JSON.stringify({errorCode,exitCode:process.exitCode,npmCalls,messages}));
+`);
+  const execute = () => {
+    const child = spawnSync(process.execPath, [script], { cwd: root, encoding: "utf8", timeout: 30_000,
+      env: { HOME: root, USERPROFILE: root, CODEX_HOME: join(root, ".codex"), CLAUDE_CONFIG_DIR: join(root, ".claude"),
+        ...(process.env.SystemRoot ? { SystemRoot: process.env.SystemRoot } : {}) } });
+    expect(child.error).toBeUndefined();
+    expect(child.status, child.stderr).toBe(0);
+    return JSON.parse(child.stdout) as { errorCode: string | null; exitCode: number; npmCalls: string[][]; messages: string[] };
+  };
+  return { execute, binding, cleanup: () => rmSync(root, { recursive: true, force: true }) };
 }
 
 describe("cli.ts upgrade() — better-sqlite3 binding verification (#514)", () => {
@@ -59,34 +125,38 @@ describe("cli.ts upgrade() — better-sqlite3 binding verification (#514)", () =
     expect(hasExistsCheck).toBe(true);
   });
 
-  it("upgrade() exits non-zero (or sets a failure flag) when the binding is missing", () => {
-    const body = getUpgradeBody();
-    // Anchor on the path-construction site since the implementation
-    // stores the binding path in a local variable rather than inlining
-    // the literal inside the existsSync call.
-    const anchor = body.indexOf('"better_sqlite3.node"');
-    expect(anchor).toBeGreaterThan(-1);
-    const block = body.slice(anchor, anchor + 1500);
-    // Key contract: ctx-upgrade must NOT declare success silently when
-    // the binding is absent. Accept any explicit failure signal.
-    const failsLoud =
-      /process\.exit\s*\(\s*[1-9]/.test(block) ||
-      /process\.exitCode\s*=\s*[1-9]/.test(block) ||
-      /throw\s+new\s+Error/.test(block) ||
-      /p\.log\.error\b/.test(block);
-    expect(failsLoud).toBe(true);
+  it("propagates SDK patch refusal after native repair without advancing to global npm", async () => {
+    const fixture = nativeUpgradeFixture("patch-failure");
+    try {
+      const result = fixture.execute();
+      expect(existsSync(fixture.binding), result.messages.join("\n")).toBe(true);
+      expect(result.errorCode).toBe("CONTEXT_MODE_DEPENDENCY_PATCH_FAILED");
+      expect(result.npmCalls).toEqual([]);
+    } finally { fixture.cleanup(); }
   });
 
-  it("upgrade() error message names better-sqlite3 and points at a recovery step", () => {
-    const body = getUpgradeBody();
-    const anchor = body.indexOf('"better_sqlite3.node"');
-    expect(anchor).toBeGreaterThan(-1);
-    const block = body.slice(anchor, anchor + 1500);
-    // The error message must give the user something actionable: name
-    // the package and surface a remedy (ctx-doctor, npm install, or
-    // similar command). We don't prescribe exact wording.
-    expect(block).toMatch(/better-sqlite3/);
-    expect(block).toMatch(/ctx-doctor|npm install better-sqlite3|npm rebuild/i);
+  it("preserves best-effort native bootstrap errors when the binding exists", async () => {
+    const fixture = nativeUpgradeFixture("native-failure");
+    try {
+      const result = fixture.execute();
+      expect(existsSync(fixture.binding), result.messages.join("\n")).toBe(true);
+      expect(result.errorCode).toBeNull();
+      expect(result.exitCode).toBe(0);
+      expect(result.npmCalls).toHaveLength(1);
+      expect(result.npmCalls[0].slice(0, 2)).toEqual(["install", "-g"]);
+    } finally { fixture.cleanup(); }
+  });
+
+  it("sets a failure exit code and actionable recovery when the binding remains missing", async () => {
+    const fixture = nativeUpgradeFixture("missing");
+    try {
+      const result = fixture.execute();
+      expect(existsSync(fixture.binding)).toBe(false);
+      expect(result.errorCode).toBeNull();
+      expect(result.exitCode).toBe(1);
+      expect(result.messages.join("\n")).toMatch(/better-sqlite3 native binding: MISSING/);
+      expect(result.messages.join("\n")).toMatch(/npm install better-sqlite3|ctx-doctor/);
+    } finally { fixture.cleanup(); }
   });
 
   // ─────────────────────────────────────────────────────────

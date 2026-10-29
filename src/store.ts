@@ -29,6 +29,18 @@ interface Chunk {
 
 type SourceMatchMode = "like" | "exact";
 
+export interface SourceAttribution {
+  sessionId?: string;
+  eventId?: string;
+}
+
+export interface SearchVisibilityOptions {
+  /** Keep the historical project-search behavior unless explicitly disabled. */
+  includeUnattributed?: boolean;
+  /** Request-local policy; never replaces the store's baseline policy. */
+  denyChecker?: (filePath: string, attribution: SourceAttribution) => boolean;
+}
+
 type SearchRow = {
   title: string;
   content: string;
@@ -370,7 +382,7 @@ export class ContentStore {
   #stmtInsertChunkTrigram!: PreparedStatement;
   #stmtInsertVocab!: PreparedStatement;
 
-  // Dedup path (delete previous source with same label before re-indexing)
+  // Dedup path (replace the same owner's source without touching siblings)
   #stmtDeleteChunksByLabel!: PreparedStatement;
   #stmtDeleteChunksTrigramByLabel!: PreparedStatement;
   #stmtDeleteSourcesByLabel!: PreparedStatement;
@@ -469,7 +481,9 @@ export class ContentStore {
         code_chunk_count INTEGER NOT NULL DEFAULT 0,
         indexed_at TEXT NOT NULL DEFAULT (datetime('now')),
         file_path TEXT,
-        content_hash TEXT
+        content_hash TEXT,
+        session_id TEXT NOT NULL DEFAULT '',
+        event_id TEXT NOT NULL DEFAULT ''
       );
 
       CREATE VIRTUAL TABLE IF NOT EXISTS chunks USING fts5(
@@ -549,15 +563,35 @@ export class ContentStore {
     // Stale detection columns — safe for existing DBs (ALTER is O(1) in SQLite)
     try { this.#db.exec("ALTER TABLE sources ADD COLUMN file_path TEXT"); } catch { /* already exists */ }
     try { this.#db.exec("ALTER TABLE sources ADD COLUMN content_hash TEXT"); } catch { /* already exists */ }
+    this.#migrateSourceOwnership();
+  }
+
+  #migrateSourceOwnership(): void {
+    // Existing stores record ownership on chunks. Copy it to sources so even
+    // empty sources can retain ownership and refresh need not guess a session.
+    this.#db.transaction(() => {
+      const columns = this.#db.prepare("PRAGMA table_info(sources)").all() as Array<{ name: string }>;
+      for (const column of ["session_id", "event_id"]) {
+        if (columns.some((entry) => entry.name === column)) continue;
+        this.#db.exec(`ALTER TABLE sources ADD COLUMN ${column} TEXT NOT NULL DEFAULT ''`);
+        const owners = this.#db.prepare(`
+          SELECT source_id, MIN(COALESCE(${column}, '')) AS owner FROM chunks
+          GROUP BY source_id HAVING COUNT(DISTINCT COALESCE(${column}, '')) = 1
+        `).all() as Array<{ source_id: number; owner: string }>;
+        const update = this.#db.prepare(`UPDATE sources SET ${column} = ? WHERE id = ?`);
+        for (const { source_id, owner } of owners) update.run(owner, source_id);
+      }
+      this.#db.exec("CREATE INDEX IF NOT EXISTS idx_sources_owner_label ON sources(session_id, label)");
+    })();
   }
 
   #prepareStatements(): void {
     // Write path
     this.#stmtInsertSourceEmpty = this.#db.prepare(
-      "INSERT INTO sources (label, chunk_count, code_chunk_count, file_path, content_hash) VALUES (?, 0, 0, ?, ?)",
+      "INSERT INTO sources (label, chunk_count, code_chunk_count, file_path, content_hash, session_id, event_id) VALUES (?, 0, 0, ?, ?, ?, ?)",
     );
     this.#stmtInsertSource = this.#db.prepare(
-      "INSERT INTO sources (label, chunk_count, code_chunk_count, file_path, content_hash) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO sources (label, chunk_count, code_chunk_count, file_path, content_hash, session_id, event_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
     );
     this.#stmtInsertChunk = this.#db.prepare(
       "INSERT INTO chunks (title, content, source_id, content_type, source_category, session_id, event_id, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -569,16 +603,16 @@ export class ContentStore {
       "INSERT OR IGNORE INTO vocabulary (word) VALUES (?)",
     );
 
-    // Dedup path: delete previous source with same label before re-indexing
+    // Dedup path: delete the same owner's previous source before re-indexing.
     // Prevents stale outputs from accumulating in iterative workflows (build-fix-build)
     this.#stmtDeleteChunksByLabel = this.#db.prepare(
-      "DELETE FROM chunks WHERE source_id IN (SELECT id FROM sources WHERE label = ?)",
+      "DELETE FROM chunks WHERE source_id IN (SELECT id FROM sources WHERE label = ? AND session_id = ?)",
     );
     this.#stmtDeleteChunksTrigramByLabel = this.#db.prepare(
-      "DELETE FROM chunks_trigram WHERE source_id IN (SELECT id FROM sources WHERE label = ?)",
+      "DELETE FROM chunks_trigram WHERE source_id IN (SELECT id FROM sources WHERE label = ? AND session_id = ?)",
     );
     this.#stmtDeleteSourcesByLabel = this.#db.prepare(
-      "DELETE FROM sources WHERE label = ?",
+      "DELETE FROM sources WHERE label = ? AND session_id = ?",
     );
 
     // Search path (hot)
@@ -800,7 +834,7 @@ export class ContentStore {
       "SELECT content FROM chunks WHERE source_id = ?",
     );
     this.#stmtSourceMeta = this.#db.prepare(
-      "SELECT label, chunk_count, code_chunk_count, indexed_at, file_path, content_hash FROM sources WHERE label = ?",
+      "SELECT label, chunk_count, code_chunk_count, indexed_at, file_path, content_hash FROM sources WHERE label = ? AND (? IS NULL OR session_id = ?) LIMIT 2",
     );
     this.#stmtStats = this.#db.prepare(`
       SELECT
@@ -844,7 +878,7 @@ export class ContentStore {
      * honest-savings stats can join chunks → session_events. When omitted,
      * chunks fall back to empty-string columns (legacy behaviour).
      */
-    attribution?: { sessionId?: string; eventId?: string };
+    attribution?: SourceAttribution;
   }): IndexResult {
     const { content, path, source, attribution } = options;
 
@@ -906,7 +940,7 @@ export class ContentStore {
   indexDirectory(opts: {
     path: string;
     source?: string;
-    attribution?: { sessionId?: string; eventId?: string };
+    attribution?: SourceAttribution;
     /** Optional per-file deny check — runs INSIDE the walk loop so a denied
      *  file does not even open a fd. Returns true to deny. */
     perFileDeny?: (absPath: string) => boolean;
@@ -967,7 +1001,7 @@ export class ContentStore {
     content: string,
     source: string,
     linesPerChunk: number = 20,
-    attribution?: { sessionId?: string; eventId?: string },
+    attribution?: SourceAttribution,
     maxChunkBytes: number = MAX_CHUNK_BYTES,
   ): IndexResult {
     if (!content || content.trim().length === 0) {
@@ -999,7 +1033,7 @@ export class ContentStore {
     content: string,
     source: string,
     maxChunkBytes: number = MAX_CHUNK_BYTES,
-    attribution?: { sessionId?: string; eventId?: string },
+    attribution?: SourceAttribution,
   ): IndexResult {
     if (!content || content.trim().length === 0) {
       return this.indexPlainText("", source, undefined, attribution, maxChunkBytes);
@@ -1035,7 +1069,7 @@ export class ContentStore {
     text: string,
     filePath?: string,
     contentHash?: string,
-    attribution?: { sessionId?: string; eventId?: string },
+    attribution?: SourceAttribution,
   ): IndexResult {
     const codeChunks = chunks.filter((c) => c.hasCode).length;
     // FK columns on chunks. Empty-string fallback preserves the FTS5-friendly
@@ -1043,20 +1077,20 @@ export class ContentStore {
     const sessionIdCol = attribution?.sessionId ?? "";
     const eventIdCol = attribution?.eventId ?? "";
 
-    // Atomic dedup + insert: delete previous source with same label,
+    // Atomic dedup + insert: replace the same owner's source with this label,
     // then insert new content — all within a single transaction.
     // Prevents stale results in iterative workflows. (See: GitHub issue #67)
     const transaction = this.#db.transaction(() => {
-      this.#stmtDeleteChunksByLabel.run(label);
-      this.#stmtDeleteChunksTrigramByLabel.run(label);
-      this.#stmtDeleteSourcesByLabel.run(label);
+      this.#stmtDeleteChunksByLabel.run(label, sessionIdCol);
+      this.#stmtDeleteChunksTrigramByLabel.run(label, sessionIdCol);
+      this.#stmtDeleteSourcesByLabel.run(label, sessionIdCol);
 
       if (chunks.length === 0) {
-        const info = this.#stmtInsertSourceEmpty.run(label, filePath ?? null, contentHash ?? null);
+        const info = this.#stmtInsertSourceEmpty.run(label, filePath ?? null, contentHash ?? null, sessionIdCol, eventIdCol);
         return Number(info.lastInsertRowid);
       }
 
-      const info = this.#stmtInsertSource.run(label, chunks.length, codeChunks, filePath ?? null, contentHash ?? null);
+      const info = this.#stmtInsertSource.run(label, chunks.length, codeChunks, filePath ?? null, contentHash ?? null, sessionIdCol, eventIdCol);
       const sourceId = Number(info.lastInsertRowid);
 
       const now = new Date().toISOString();
@@ -1241,21 +1275,62 @@ export class ContentStore {
 
   // ── Reciprocal Rank Fusion (Cormack et al. 2009) ──
 
+  #searchVisibleSources(
+    table: "chunks" | "chunks_trigram",
+    query: string,
+    options: {
+      limit: number; source?: string; contentType?: "code" | "prose";
+      sourceMatchMode: SourceMatchMode; sourceIds: string;
+    },
+  ): SearchResult[] {
+    const sanitized = table === "chunks"
+      ? sanitizeQuery(query, "OR") : sanitizeTrigramQuery(query, "OR");
+    if (!sanitized) return [];
+    const clauses = [`${table} MATCH ?`, "sources.id IN (SELECT value FROM json_each(?))"];
+    const params: unknown[] = [sanitized, options.sourceIds];
+    if (options.source) {
+      clauses.push(options.sourceMatchMode === "exact" ? "sources.label = ?" : "sources.label LIKE ? ESCAPE '\\'");
+      params.push(this.#sourceFilterParam(options.source, options.sourceMatchMode));
+    }
+    if (options.contentType) {
+      clauses.push(`${table}.content_type = ?`);
+      params.push(options.contentType);
+    }
+    params.push(options.limit);
+    // The table identifier is an internal fixed choice. All request values,
+    // including arbitrarily many source IDs, use bounded-count SQL parameters.
+    const statement = this.#db.prepare(`
+      SELECT ${table}.title, ${table}.content, ${table}.content_type,
+        ${table}.timestamp, sources.label, bm25(${table}, 5.0, 1.0) AS rank,
+        highlight(${table}, 1, char(2), char(3)) AS highlighted, ${table}.session_id
+      FROM ${table} JOIN sources ON sources.id = ${table}.source_id
+      WHERE ${clauses.join(" AND ")}
+      ORDER BY rank LIMIT ?
+    `);
+    return withRetry(() => this.#mapSearchRows(statement.all(...params) as SearchRow[]));
+  }
+
   #rrfSearch(
     query: string,
     limit: number,
     source?: string,
     contentType?: "code" | "prose",
     sourceMatchMode: SourceMatchMode = "like",
+    visibleSourceIds?: string,
   ): SearchResult[] {
     const K = 60; // Standard RRF constant
     const fetchLimit = Math.max(limit * 2, 10);
 
-    const porterResults = this.search(query, fetchLimit, source, "OR", contentType, sourceMatchMode);
-    const trigramResults = this.searchTrigram(query, fetchLimit, source, "OR", contentType, sourceMatchMode);
+    const scopedOptions = { limit: fetchLimit, source, contentType, sourceMatchMode, sourceIds: visibleSourceIds ?? "[]" };
+    const porterResults = visibleSourceIds === undefined
+      ? this.search(query, fetchLimit, source, "OR", contentType, sourceMatchMode)
+      : this.#searchVisibleSources("chunks", query, scopedOptions);
+    const trigramResults = visibleSourceIds === undefined
+      ? this.searchTrigram(query, fetchLimit, source, "OR", contentType, sourceMatchMode)
+      : this.#searchVisibleSources("chunks_trigram", query, scopedOptions);
 
     const scoreMap = new Map<string, { result: SearchResult; score: number }>();
-    const key = (r: SearchResult) => `${r.source}::${r.title}`;
+    const key = (r: SearchResult) => JSON.stringify([r.sessionId ?? "", r.source, r.title]);
 
     for (const [i, r] of porterResults.entries()) {
       const k = key(r);
@@ -1344,21 +1419,29 @@ export class ContentStore {
     contentType?: "code" | "prose",
     sourceMatchMode: SourceMatchMode = "like",
     sessionIdAllowSet?: Set<string>,
+    visibility: SearchVisibilityOptions = {},
   ): SearchResult[] {
-    // Step 0: Auto-refresh stale file-backed sources before searching
-    this.#refreshStaleSources();
+    // Shared requests authorize sources once, before refresh touches the
+    // filesystem or either FTS layer limits its candidates. Legacy callers
+    // that omit visibility retain their historical refresh/search behavior.
+    const scoped = visibility.includeUnattributed !== undefined || visibility.denyChecker !== undefined;
+    const visibleSources = scoped ? this.#visibleSourceIds(sessionIdAllowSet, visibility) : undefined;
+    this.#refreshStaleSources(visibleSources);
+    // Refresh replaces source rows, updating the same request-local ID set.
+    const visibleSourceIds = visibleSources && JSON.stringify([...visibleSources]);
 
     // When a session-id allow-set is in play (issue #737 project filter),
     // fetch a larger candidate pool from the FTS5 layers so the post-filter
     // can still deliver `limit` matches even if many candidates are excluded.
     // The cap is bounded — even at the largest installs the chunk count
     // dwarfs `limit * 8`, and the surplus is dropped on the post-filter.
-    const fetchLimit = sessionIdAllowSet ? Math.max(limit * 8, 40) : limit;
-    const sessionFilter = this.#makeSessionFilter(sessionIdAllowSet);
+    const fetchLimit = !scoped && sessionIdAllowSet ? Math.max(limit * 8, 40) : limit;
+    const sessionFilter = this.#makeSessionFilter(sessionIdAllowSet, visibility.includeUnattributed ?? true);
+    const isVisible = (result: SearchResult) => !sessionFilter || sessionFilter(result);
 
     // Step 1: RRF fusion (porter OR + trigram OR → merge)
-    const rrfResults = this.#rrfSearch(query, fetchLimit, source, contentType, sourceMatchMode);
-    const rrfFiltered = sessionFilter ? rrfResults.filter(sessionFilter) : rrfResults;
+    const rrfResults = this.#rrfSearch(query, fetchLimit, source, contentType, sourceMatchMode, visibleSourceIds);
+    const rrfFiltered = rrfResults.filter(isVisible);
     if (rrfFiltered.length > 0) {
       const reranked = this.#applyProximityReranking(rrfFiltered.slice(0, limit), query);
       return reranked.map((r) => ({ ...r, matchLayer: "rrf" as const }));
@@ -1377,8 +1460,8 @@ export class ContentStore {
     const correctedQuery = correctedWords.join(" ");
 
     if (correctedQuery !== original) {
-      const fuzzyResults = this.#rrfSearch(correctedQuery, fetchLimit, source, contentType, sourceMatchMode);
-      const fuzzyFiltered = sessionFilter ? fuzzyResults.filter(sessionFilter) : fuzzyResults;
+      const fuzzyResults = this.#rrfSearch(correctedQuery, fetchLimit, source, contentType, sourceMatchMode, visibleSourceIds);
+      const fuzzyFiltered = fuzzyResults.filter(isVisible);
       if (fuzzyFiltered.length > 0) {
         const reranked = this.#applyProximityReranking(fuzzyFiltered.slice(0, limit), correctedQuery);
         return reranked.map((r) => ({ ...r, matchLayer: "rrf-fuzzy" as const }));
@@ -1386,6 +1469,26 @@ export class ContentStore {
     }
 
     return [];
+  }
+
+  #visibleSourceIds(allowSet: Set<string> | undefined, visibility: SearchVisibilityOptions): Set<number> {
+    const sessionFilter = this.#makeSessionFilter(allowSet, visibility.includeUnattributed ?? true);
+    const sources = this.#db.prepare("SELECT id, file_path, session_id, event_id FROM sources").all() as Array<{
+      id: number; file_path: string | null; session_id: string; event_id: string;
+    }>;
+    const allowed = new Set<number>();
+    for (const source of sources) {
+      if (sessionFilter && !sessionFilter({ sessionId: source.session_id })) continue;
+      try {
+        const attribution = { sessionId: source.session_id, eventId: source.event_id };
+        if (source.file_path && (this.#denyChecker?.(source.file_path) ||
+          visibility.denyChecker?.(source.file_path, attribution))) continue;
+        allowed.add(source.id);
+      } catch {
+        // A policy read/error cannot authorize cached content or a refresh.
+      }
+    }
+    return allowed;
   }
 
   /**
@@ -1396,11 +1499,12 @@ export class ContentStore {
    */
   #makeSessionFilter(
     allowSet: Set<string> | undefined,
-  ): ((r: SearchResult) => boolean) | null {
-    if (!allowSet) return null;
-    return (r: SearchResult) => {
+    includeUnattributed: boolean,
+  ): ((r: Pick<SearchResult, "sessionId">) => boolean) | null {
+    if (!allowSet && includeUnattributed) return null;
+    return (r: Pick<SearchResult, "sessionId">) => {
       const sid = r.sessionId ?? "";
-      return sid === "" || allowSet.has(sid);
+      return sid === "" ? includeUnattributed : allowSet?.has(sid) ?? true;
     };
   }
 
@@ -1412,20 +1516,26 @@ export class ContentStore {
    * Uses mtime as a fast gate — only computes SHA-256 when mtime has advanced
    * past indexed_at. Gracefully skips deleted files and non-file sources.
    */
-  #refreshStaleSources(): void {
+  #refreshStaleSources(visibleSourceIds?: Set<number>): void {
     this.lastRefreshCount = 0;
     const sources = this.#db.prepare(
-      "SELECT label, file_path, content_hash, indexed_at FROM sources WHERE file_path IS NOT NULL",
-    ).all() as Array<{ label: string; file_path: string; content_hash: string; indexed_at: string }>;
+      "SELECT id, label, file_path, content_hash, indexed_at, session_id, event_id FROM sources WHERE file_path IS NOT NULL",
+    ).all() as Array<{
+      id: number; label: string; file_path: string; content_hash: string; indexed_at: string;
+      session_id: string; event_id: string;
+    }>;
 
     for (const src of sources) {
+      if (visibleSourceIds && !visibleSourceIds.has(src.id)) continue;
       try {
         if (!existsSync(src.file_path)) continue; // file deleted — keep cached results
         // Re-check deny policy before re-reading. The Read deny list may
         // have been edited after this source was originally indexed; a
         // file that was allowed then may now be denied. Without this
         // gate, refresh would happily re-read and re-expose it. #442 r3.
-        if (this.#denyChecker && this.#denyChecker(src.file_path)) continue;
+        // Scoped requests already checked policy once per source above.
+        if (!visibleSourceIds && this.#denyChecker?.(src.file_path)) continue;
+        const attribution = { sessionId: src.session_id, eventId: src.event_id };
         const mtime = statSync(src.file_path).mtime;
         const indexedAt = new Date(src.indexed_at + "Z");
         if (mtime <= indexedAt) continue; // file unchanged — fast path
@@ -1450,7 +1560,11 @@ export class ContentStore {
         // by going through index() which stores them. Since we pass
         // content, index() does NOT re-read; the bytes hashed above
         // are exactly the bytes indexed.
-        this.index({ content: newContent, path: src.file_path, source: src.label });
+        const refreshed = this.index({ content: newContent, path: src.file_path, source: src.label, attribution });
+        if (visibleSourceIds) {
+          visibleSourceIds.delete(src.id);
+          visibleSourceIds.add(refreshed.sourceId);
+        }
         this.lastRefreshCount++;
       } catch {
         // Graceful degradation — never break search for stale detection
@@ -1460,9 +1574,16 @@ export class ContentStore {
 
   // ── Sources ──
 
-  getSourceMeta(label: string): { label: string; chunkCount: number; codeChunkCount: number; indexedAt: string; filePath: string | null; contentHash: string | null } | null {
-    const row = this.#stmtSourceMeta.get(label) as { label: string; chunk_count: number; code_chunk_count: number; indexed_at: string; file_path: string | null; content_hash: string | null } | undefined;
-    if (!row) return null;
+  getSourceMeta(label: string, attribution?: SourceAttribution): { label: string; chunkCount: number; codeChunkCount: number; indexedAt: string; filePath: string | null; contentHash: string | null } | null {
+    const owner = attribution === undefined ? null : attribution.sessionId ?? "";
+    const rows = this.#stmtSourceMeta.all(label, owner, owner) as Array<{
+      label: string; chunk_count: number; code_chunk_count: number; indexed_at: string;
+      file_path: string | null; content_hash: string | null;
+    }>;
+    // A label alone no longer identifies a source in a shared store. An
+    // ambiguous lookup must miss the cache instead of returning another owner.
+    if (rows.length !== 1) return null;
+    const row = rows[0];
     return { label: row.label, chunkCount: row.chunk_count, codeChunkCount: row.code_chunk_count, indexedAt: row.indexed_at, filePath: row.file_path ?? null, contentHash: row.content_hash ?? null };
   }
 

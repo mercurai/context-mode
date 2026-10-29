@@ -19,7 +19,7 @@
  * @see https://github.com/mksglu/context-mode/issues/203
  */
 
-import { existsSync, copyFileSync, renameSync, unlinkSync } from "node:fs";
+import { existsSync, copyFileSync, readFileSync, renameSync, unlinkSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -34,15 +34,26 @@ const root = resolve(__dirname, "..");
 // `scripts/heal-better-sqlite3.mjs` — degrade to a no-op instead of
 // crashing the hook with ERR_MODULE_NOT_FOUND. Best-effort posture
 // matches the rest of this module.
-async function healBetterSqlite3Binding(pkgRoot) {
+async function loadNativeRepairHelper(pkgRoot) {
   try {
-    const helperPath = resolve(__dirname, "..", "scripts", "heal-better-sqlite3.mjs");
-    if (!existsSync(helperPath)) return { healed: false, reason: "helper-missing" };
-    const mod = await import(pathToFileURL(helperPath).href);
-    return mod.healBetterSqlite3Binding(pkgRoot);
-  } catch {
-    return { healed: false, reason: "helper-error" };
-  }
+    const helperPath = resolve(pkgRoot, "scripts", "heal-better-sqlite3.mjs");
+    if (existsSync(helperPath)) return await import(pathToFileURL(helperPath).href);
+  } catch { /* Older/partial installs may not include this helper. */ }
+}
+
+async function finalizeDependencyRepair(pkgRoot) {
+  const helper = await loadNativeRepairHelper(pkgRoot);
+  if (typeof helper?.finalizeDependencyRepair === "function") return helper.finalizeDependencyRepair(pkgRoot);
+  // Legacy installs without a declared patch contract remain best effort.
+  // A damaged managed install must not silently skip its missing finalizer.
+  try {
+    const manifest = resolve(pkgRoot, "package.json");
+    if (!existsSync(manifest)) return;
+    if (!Object.hasOwn(JSON.parse(readFileSync(manifest, "utf8")).scripts ?? {}, "patch:dependencies")) return;
+  } catch { /* Invalid managed metadata cannot establish a safe final tree. */ }
+  const error = new Error("Dependency patch finalization failed");
+  error.code = "CONTEXT_MODE_DEPENDENCY_PATCH_FAILED";
+  throw error;
 }
 
 const NATIVE_DEPS = ["better-sqlite3"];
@@ -65,10 +76,14 @@ function hasModernSqlite() {
 }
 
 export async function ensureDeps() {
-  // Bun ships bun:sqlite and never needs better-sqlite3
-  if (typeof globalThis.Bun !== "undefined") return;
+  // Bun skips native repair, but still honors a managed SDK patch contract.
+  if (typeof globalThis.Bun !== "undefined") { await finalizeDependencyRepair(root); return; }
   for (const pkg of NATIVE_DEPS) {
-    const pkgDir = resolve(root, "node_modules", pkg);
+    let pkgDir = resolve(root, "node_modules", pkg);
+    try {
+      const require = createRequire(resolve(root, "package.json"));
+      pkgDir = dirname(require.resolve(`${pkg}/package.json`));
+    } catch { /* Preserve installation of a genuinely missing package. */ }
     if (!existsSync(pkgDir)) {
       // Package not installed at all
       try {
@@ -79,14 +94,19 @@ export async function ensureDeps() {
           shell: true,
         });
       } catch { /* best effort — hook degrades gracefully without DB */ }
+      finally { await finalizeDependencyRepair(root); }
     } else if (!existsSync(resolve(pkgDir, ...NATIVE_BINARIES[pkg]))) {
       // Package installed but native binary missing (e.g., npm ignore-scripts=true,
       // or Windows where `npm rebuild` falls through to node-gyp without MSVC — #408).
       // Delegate to the shared 3-layer heal (single source of truth, also used by
       // scripts/postinstall.mjs).
-      try { await healBetterSqlite3Binding(root); } catch { /* helper already best-effort */ }
+      const helper = await loadNativeRepairHelper(root);
+      if (typeof helper?.healBetterSqlite3Binding === "function") helper.healBetterSqlite3Binding(root);
+      else await finalizeDependencyRepair(root);
     }
   }
+  // SQLite health alone does not prove a previous repair finalized its SDK.
+  await finalizeDependencyRepair(root);
 }
 
 /**

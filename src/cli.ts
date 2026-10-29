@@ -1706,6 +1706,7 @@ async function upgrade(opts?: { platform?: string }) {
             );
           }
         } catch (err: unknown) {
+          if ((err as { code?: unknown } | null)?.code === "CONTEXT_MODE_DEPENDENCY_PATCH_FAILED") throw err;
           const message = err instanceof Error ? err.message : String(err);
           s.stop(color.yellow("Native addon ABI bootstrap unavailable"));
           p.log.warn(
@@ -1744,7 +1745,10 @@ async function upgrade(opts?: { platform?: string }) {
                 mod.healBetterSqlite3Binding(pluginRoot);
               }
             }
-          } catch { /* best effort — verifier below will fail loud */ }
+          } catch (error) {
+            if ((error as { code?: unknown } | null)?.code === "CONTEXT_MODE_DEPENDENCY_PATCH_FAILED") throw error;
+            // Native repair remains best effort; the verifier below fails loud.
+          }
         }
         if (!existsSync(bsqBindingPath)) {
           // Mark the upgrade process for a non-zero exit at completion.

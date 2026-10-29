@@ -7,6 +7,29 @@ import {
 } from "../../src/session/snapshot.js";
 
 // ── Helpers ──
+
+describe("transport character budget", () => {
+  const now = () => new Date("2030-01-02T03:04:05Z");
+  test("ordinary snapshots are unchanged by a fitting budget", () => {
+    const events = [{ type: "file_read", category: "file", data: "/work/orchard.ts", priority: 1 }];
+    assert.equal(buildResumeSnapshot(events, { now, maxChars: 10_000 }), buildResumeSnapshot(events, { now }));
+  });
+  test("large goals, rules, errors and tasks retain separate search references", () => {
+    const events = [
+      { type: "session_goal", category: "goal", data: "goal ".repeat(3000), priority: 1 },
+      { type: "rule_content", category: "rule", data: "rule ".repeat(3000), priority: 1 },
+      { type: "error", category: "error", data: "Error: ".repeat(3000), priority: 1 },
+      { type: "task_create", category: "task", data: JSON.stringify({ subject: "task ".repeat(3000) }), priority: 1 },
+    ];
+    const result = buildResumeSnapshot(events, { now, maxChars: 10_000 });
+    assert.ok(result.length <= 10_000);
+    for (const section of ["session_goal", "rules", "errors", "task_state"]) {
+      assert.ok(result.includes(`<section_summary section="${section}">`), section);
+    }
+    assert.ok(result.endsWith("</session_resume>"));
+    assert.ok(!result.includes("[truncated]"));
+  });
+});
 function makeEvent(overrides: Partial<StoredEvent> & Pick<StoredEvent, "type" | "category">): StoredEvent {
   return {
     type: overrides.type,

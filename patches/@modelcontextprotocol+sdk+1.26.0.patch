@@ -1,0 +1,52 @@
+diff --git a/node_modules/@modelcontextprotocol/sdk/dist/esm/server/webStandardStreamableHttp.js b/node_modules/@modelcontextprotocol/sdk/dist/esm/server/webStandardStreamableHttp.js
+--- a/node_modules/@modelcontextprotocol/sdk/dist/esm/server/webStandardStreamableHttp.js
++++ b/node_modules/@modelcontextprotocol/sdk/dist/esm/server/webStandardStreamableHttp.js
+@@ -611,10 +611,12 @@
+     async close() {
+         // Close all SSE connections
+-        this._streamMapping.forEach(({ cleanup }) => {
++        this._streamMapping.forEach(({ cleanup, resolveJson }) => {
++            resolveJson?.(new Response(null, { status: 503 }));
+             cleanup();
+         });
+         this._streamMapping.clear();
+         // Clear any pending responses
+         this._requestResponseMap.clear();
++        this._requestToStreamMapping.clear();
+         this.onclose?.();
+     }
+@@ -715,7 +717,8 @@
+                     else {
+                         stream.resolveJson(new Response(JSON.stringify(responses), { status: 200, headers }));
+                     }
++                    stream.cleanup();
+                 }
+                 else {
+                     // End the SSE stream
+                     stream.cleanup();
+diff --git a/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/webStandardStreamableHttp.js b/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/webStandardStreamableHttp.js
+--- a/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/webStandardStreamableHttp.js
++++ b/node_modules/@modelcontextprotocol/sdk/dist/cjs/server/webStandardStreamableHttp.js
+@@ -614,10 +614,12 @@
+     async close() {
+         // Close all SSE connections
+-        this._streamMapping.forEach(({ cleanup }) => {
++        this._streamMapping.forEach(({ cleanup, resolveJson }) => {
++            resolveJson?.(new Response(null, { status: 503 }));
+             cleanup();
+         });
+         this._streamMapping.clear();
+         // Clear any pending responses
+         this._requestResponseMap.clear();
++        this._requestToStreamMapping.clear();
+         this.onclose?.();
+     }
+@@ -718,7 +720,8 @@
+                     else {
+                         stream.resolveJson(new Response(JSON.stringify(responses), { status: 200, headers }));
+                     }
++                    stream.cleanup();
+                 }
+                 else {
+                     // End the SSE stream
+                     stream.cleanup();

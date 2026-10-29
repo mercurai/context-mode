@@ -2363,28 +2363,8 @@ describe("ctx_purge is the sole reset/wipe mechanism", () => {
     expect(serverSrc).toMatch(/if \(!confirm\)/);
   });
 
-  test("ctx_purge wipes KB, session DB, events, and stats", () => {
-    const purgeMatch = serverSrc.match(
-      /server\.registerTool\(\s*"ctx_purge"[\s\S]*?^\);/m,
-    );
-    expect(purgeMatch).not.toBeNull();
-    const purgeBody = purgeMatch![0];
-    // 1. Closes the FTS5 knowledge base BEFORE wiping (releases Windows lock)
-    expect(purgeBody).toContain("_store.cleanup()");
-    expect(purgeBody).toContain("_store = null");
-    // 2. Delegates the on-disk wipe to the purgeSession deep module so all
-    //    file-kind sweeps (session DB, events.md, cleanup flag, FTS5 store,
-    //    legacy content) flow through ONE code path with uniform dual-hash.
-    expect(purgeBody).toContain("purgeSession({");
-    expect(purgeBody).toContain("projectDir: getProjectDir()");
-    expect(purgeBody).toContain("sessionsDir: getSessionDir()");
-    expect(purgeBody).toContain("storePath: storePathForPurge");
-    // 3. Resets in-memory stats
-    expect(purgeBody).toContain("sessionStats.calls = {}");
-    expect(purgeBody).toContain("sessionStats.sessionStart = Date.now()");
-    // 4. Confirms with list of deleted items
-    expect(purgeBody).toContain("Purged:");
-  });
+  // Real purge/storage/statistics behavior is covered by
+  // server-legacy-statistics.test.ts instead of implementation spelling.
 });
 
 // ─── Platform-aware session DB paths ─────────────────────────────────────────
@@ -2956,10 +2936,8 @@ describe("FS read instrumentation", () => {
     expect(serverSrc).toContain("__cm_fs+=d.length");
   });
 
-  test("parses __CM_FS__ from stderr and adds to bytesSandboxed", () => {
-    expect(serverSrc).toContain("__CM_FS__:(\\d+)");
-    expect(serverSrc).toContain("sessionStats.bytesSandboxed += parseInt(fsMatch[1])");
-  });
+  // Real instrumented file reads and persisted byte totals are covered by
+  // server-legacy-statistics.test.ts.
 
   test("cleans __CM_FS__ marker from stderr output", () => {
     expect(serverSrc).toContain('result.stderr.replace(/\\n?__CM_FS__:\\d+\\n?/g, "")');
@@ -2988,12 +2966,8 @@ describe("batch_execute FS read tracking", () => {
     expect(serverSrc).toContain("nodeOptsPrefix");
   });
 
-  test("parses __CM_FS__ from batch output and updates bytesSandboxed", () => {
-    expect(serverSrc).toContain("/__CM_FS__:(\\d+)/g");
-    // Handler wires the FS-bytes callback to sessionStats; the runner strips/parses.
-    expect(serverSrc).toContain("sessionStats.bytesSandboxed += bytes");
-    expect(serverSrc).toContain("onFsBytes?.(cmdFsBytes)");
-  });
+  // The handler's actual batch subprocess and persisted FS-byte total are
+  // exercised in server-legacy-statistics.test.ts.
 
   test("strips __CM_FS__ markers from batch command output", () => {
     expect(serverSrc).toContain('output.replace(/__CM_FS__:\\d+\\n?/g, "")');

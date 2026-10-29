@@ -40,6 +40,11 @@ beforeAll(() => {
   // Copy package.json (needed for module resolution)
   cpSync(join(PROJECT_ROOT, "package.json"), join(fakePluginDir, "package.json"));
 
+  // This manifest declares managed dependency patches. Stage the shipped
+  // contract as a real marketplace package does, without build/session/.
+  cpSync(join(PROJECT_ROOT, "scripts"), join(fakePluginDir, "scripts"), { recursive: true });
+  cpSync(join(PROJECT_ROOT, "patches"), join(fakePluginDir, "patches"), { recursive: true });
+
   // DO NOT copy build/session/ — this simulates marketplace install
   // Verify build/session/ does NOT exist in our fake install
   expect(existsSync(join(fakePluginDir, "build", "session"))).toBe(false);
@@ -70,9 +75,15 @@ function runHook(hookFile: string, input: Record<string, unknown>, env?: Record<
       CLAUDE_PROJECT_DIR: fakeProjectDir,
       CLAUDE_SESSION_ID: "test-session-117",
       CONTEXT_MODE_PLATFORM: "claude-code",
-      // Isolate DB writes to fake HOME
+      // Provider homes override HOME. A remote compatibility run inherited
+      // operational CODEX_HOME; pin all routes to the fixture explicitly.
       HOME: fakeHomeDir,
       USERPROFILE: fakeHomeDir,
+      CODEX_HOME: join(fakeHomeDir, ".codex"),
+      CLAUDE_CONFIG_DIR: join(fakeHomeDir, ".claude"),
+      CONTEXT_MODE_DIR: "", // Disable an inherited shared storage override.
+      XDG_CONFIG_HOME: join(fakeHomeDir, ".config"),
+      APPDATA: join(fakeHomeDir, "AppData", "Roaming"),
       ...env,
     },
   });
@@ -134,7 +145,7 @@ describe("Issue #117 — Session hooks without build/session/", () => {
 
     expect(result.exitCode).toBe(0);
     const dbFiles = getCodexDBFiles();
-    expect(dbFiles.length).toBeGreaterThan(0);
+    expect(dbFiles.length, result.stderr).toBeGreaterThan(0);
 
     const db = new SessionDB({ dbPath: join(codexSessionDBDir, dbFiles[0]!) });
     const events = db.getEvents(sessionId);

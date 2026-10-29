@@ -1,4 +1,4 @@
-import { spawn, execSync, execFileSync } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
@@ -195,9 +195,14 @@ function cleanupTmpDir(tmpDir: string): void {
 
 /** Kill process tree — on Windows uses taskkill /T; on Unix kills the process group. */
 function killTree(proc: ReturnType<typeof spawn>): void {
+  // POSIX descendants can retain the owned group and pipes after their leader
+  // exits. Callers retire that ownership on close, not on the leader's exit.
+  // Windows taskkill cannot recover a tree after its leader exits; shared
+  // Windows execution requires the harness JobObject runner for that case.
+  if (isWin && (proc.exitCode !== null || proc.signalCode !== null)) return;
   if (isWin && proc.pid) {
     try {
-      execSync(`taskkill /F /T /PID ${proc.pid}`, { stdio: "pipe" });
+      execFileSync("taskkill", ["/F", "/T", "/PID", String(proc.pid)], { stdio: "pipe", windowsHide: true });
     } catch { /* already dead */ }
   } else if (proc.pid) {
     try {
@@ -213,19 +218,34 @@ interface ExecuteOptions {
   timeout?: number;
   /** Keep process running after timeout instead of killing it. */
   background?: boolean;
+  /** Cancels only this execution, including a job already returned as backgrounded. */
+  signal?: AbortSignal;
   /**
-   * Issue #45 — per-call cwd override for the shell language. When set,
-   * the shell script runs in this directory instead of `#projectRoot`.
-   * Non-shell languages keep their tmpDir sandbox cwd regardless (the
-   * script file lives there). Used by Codex MCP handlers to pin shell
-   * commands to a resolved project root when the spawning host inherited
-   * a non-project cwd (e.g. $HOME).
+   * Per-call working directory. The script itself stays in a private temporary
+   * directory; execution and relative executeFile paths use this workspace.
    */
   cwd?: string;
 }
 
 interface ExecuteFileOptions extends ExecuteOptions {
   path: string;
+}
+
+interface SpawnContext {
+  environment: Readonly<NodeJS.ProcessEnv>;
+  timeout?: number;
+  background?: boolean;
+  signal?: AbortSignal;
+}
+
+interface OwnedJob {
+  backgrounded: boolean;
+  cancel: () => void;
+  closed: Promise<void>;
+}
+
+function cancelledResult(): ExecResult {
+  return { stdout: "", stderr: "Execution cancelled", exitCode: 1, timedOut: false, cancelled: true };
 }
 
 export class PolyglotExecutor {
@@ -239,14 +259,16 @@ export class PolyglotExecutor {
    */
   #projectRootResolver: () => string;
   #runtimes: RuntimeMap;
-
-  /** PIDs of backgrounded processes — killed on cleanup to prevent zombies. */
-  #backgroundedPids = new Set<number>();
+  #environment?: Readonly<NodeJS.ProcessEnv>;
+  #jobs = new Set<OwnedJob>();
+  #closed = false;
 
   constructor(opts?: {
     hardCapBytes?: number;
     projectRoot?: string | (() => string);
     runtimes?: RuntimeMap;
+    /** Explicit owner environment. Omitted preserves legacy per-call inheritance. */
+    environment?: Readonly<NodeJS.ProcessEnv>;
   }) {
     this.#hardCapBytes = opts?.hardCapBytes ?? 100 * 1024 * 1024; // 100MB
     const pr = opts?.projectRoot;
@@ -257,7 +279,8 @@ export class PolyglotExecutor {
     } else {
       this.#projectRootResolver = () => process.cwd();
     }
-    this.#runtimes = opts?.runtimes ?? detectRuntimes();
+    this.#runtimes = { ...(opts?.runtimes ?? detectRuntimes()) };
+    if (opts?.environment !== undefined) this.#environment = Object.freeze({ ...opts.environment });
   }
 
   get #projectRoot(): string {
@@ -270,27 +293,29 @@ export class PolyglotExecutor {
 
   /** Kill all backgrounded processes to prevent zombie/port-conflict issues. */
   cleanupBackgrounded(): void {
-    for (const pid of this.#backgroundedPids) {
-      try {
-        // Kill process group on Unix to catch all children
-        process.kill(isWin ? pid : -pid, "SIGTERM");
-      } catch { /* already dead */ }
+    for (const job of this.#jobs) {
+      if (job.backgrounded) job.cancel();
     }
-    this.#backgroundedPids.clear();
+  }
+
+  /** Stop this owner's jobs and wait for their process handles to close. */
+  async close(): Promise<void> {
+    this.#closed = true;
+    const jobs = [...this.#jobs];
+    for (const job of jobs) job.cancel();
+    await Promise.all(jobs.map(job => job.closed));
   }
 
   async execute(opts: ExecuteOptions): Promise<ExecResult> {
-    const { language, code, timeout, background = false, cwd: cwdOverride } = opts;
+    const { language, code, timeout, background = false, signal, cwd: cwdOverride } = opts;
+    if (this.#closed || signal?.aborted) return cancelledResult();
+    const cwd = cwdOverride ?? this.#projectRoot;
+    const environment = this.#environment ?? { ...process.env };
     const tmpDir = mkdtempSync(join(OS_TMPDIR, ".ctx-mode-"));
 
     try {
-      const filePath = this.#writeScript(tmpDir, code, language);
+      const filePath = this.#writeScript(tmpDir, code, language, { cwd, environment });
       const cmd = buildCommand(this.#runtimes, language, filePath);
-
-      // Rust: compile then run
-      if (cmd[0] === "__rust_compile_run__") {
-        return await this.#compileAndRun(filePath, tmpDir, timeout);
-      }
 
       // Every language runs in the project directory so git, relative paths,
       // and other project-aware tools resolve naturally. The script FILE lives
@@ -303,8 +328,10 @@ export class PolyglotExecutor {
       // the chosen language. Unifying cwd removes that surprise.
       // Issue #45 — `cwdOverride` lets per-call sites (Codex MCP handlers) pin
       // cwd without mutating process-wide state.
-      const cwd = cwdOverride ?? this.#projectRoot;
-      const result = await this.#spawn(cmd, cwd, tmpDir, timeout, background);
+      const context = { timeout, background, signal, environment };
+      const result = cmd[0] === "__rust_compile_run__"
+        ? await this.#compileAndRun(filePath, cwd, tmpDir, context)
+        : await this.#spawn(cmd, cwd, tmpDir, context);
 
       // Skip tmpDir cleanup if process was backgrounded — it may still need files
       if (!result.backgrounded) {
@@ -319,17 +346,18 @@ export class PolyglotExecutor {
   }
 
   async executeFile(opts: ExecuteFileOptions): Promise<ExecResult> {
-    const { path: filePath, language, code, timeout } = opts;
-    const absolutePath = resolve(this.#projectRoot, filePath);
+    const { path: filePath, language, code, cwd = this.#projectRoot, ...execution } = opts;
+    if (this.#closed || execution.signal?.aborted) return cancelledResult();
+    const absolutePath = resolve(cwd, filePath);
     const wrappedCode = this.#wrapWithFileContent(
       absolutePath,
       language,
       code,
     );
-    return this.execute({ language, code: wrappedCode, timeout });
+    return this.execute({ ...execution, language, code: wrappedCode, cwd });
   }
 
-  #writeScript(tmpDir: string, code: string, language: Language): string {
+  #writeScript(tmpDir: string, code: string, language: Language, context: { cwd: string; environment: Readonly<NodeJS.ProcessEnv> }): string {
     // Go needs a main package wrapper if not present
     if (language === "go" && !code.includes("package ")) {
       code = `package main\n\nimport "fmt"\n\nfunc main() {\n${code}\n}\n`;
@@ -341,8 +369,8 @@ export class PolyglotExecutor {
     }
 
     // Elixir: prepend compiled BEAM paths when inside a Mix project
-    if (language === "elixir" && existsSync(join(this.#projectRoot, "mix.exs"))) {
-      const escaped = JSON.stringify(join(this.#projectRoot, "_build/dev/lib"));
+    if (language === "elixir" && existsSync(join(context.cwd, "mix.exs"))) {
+      const escaped = JSON.stringify(join(context.cwd, "_build/dev/lib"));
       code = `Path.wildcard(Path.join(${escaped}, "*/ebin"))\n|> Enum.each(&Code.prepend_path/1)\n\n${code}`;
     }
 
@@ -365,7 +393,7 @@ export class PolyglotExecutor {
         : rewritten;
       writeFileSync(
         fp,
-        buildShellScriptContent(shellCode, process.env.PATH, process.platform),
+        buildShellScriptContent(shellCode, context.environment.PATH, process.platform),
         { encoding: "utf-8", mode: 0o700 },
       );
     } else {
@@ -377,7 +405,8 @@ export class PolyglotExecutor {
   async #compileAndRun(
     srcPath: string,
     cwd: string,
-    timeout: number | undefined,
+    tmpDir: string,
+    context: SpawnContext,
   ): Promise<ExecResult> {
     const binSuffix = isWin ? ".exe" : "";
     const binPath = srcPath.replace(/\.rs$/, "") + binSuffix;
@@ -385,34 +414,30 @@ export class PolyglotExecutor {
     // Compile — cap rustc invocation at 60s when caller didn't bound the
     // overall timeout (a hung compile shouldn't run forever even if the
     // caller is fine with a long-running binary afterwards).
-    try {
-      execFileSync("rustc", [srcPath, "-o", binPath], {
-        cwd,
-        timeout: timeout === undefined ? 60_000 : Math.min(timeout, 60_000),
-        encoding: "utf-8",
-        stdio: ["pipe", "pipe", "pipe"],
-      });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? (err as any).stderr || err.message : String(err);
-      return {
-        stdout: "",
-        stderr: `Compilation failed:\n${message}`,
-        exitCode: 1,
-        timedOut: false,
-      };
+    const compiler = this.#runtimes.rust;
+    if (!compiler) throw new Error("Rust runtime is unavailable");
+    const compiled = await this.#spawn([compiler, srcPath, "-o", binPath], cwd, tmpDir, {
+      ...context,
+      background: false,
+      timeout: context.timeout === undefined ? 60_000 : Math.min(context.timeout, 60_000),
+    });
+    if (compiled.cancelled) return compiled;
+    if (compiled.exitCode !== 0) {
+      return { ...compiled, stderr: `Compilation failed:\n${compiled.stderr}` };
     }
 
     // Run
-    return this.#spawn([binPath], cwd, cwd, timeout);
+    return this.#spawn([binPath], cwd, tmpDir, context);
   }
 
   async #spawn(
     cmd: string[],
     cwd: string,
     sandboxTmpDir: string,
-    timeout: number | undefined,
-    background = false,
+    context: SpawnContext,
   ): Promise<ExecResult> {
+    const { timeout, background = false, signal } = context;
+    if (this.#closed || signal?.aborted) return cancelledResult();
     return new Promise((res) => {
       // Only .cmd/.bat shims need shell on Windows; real executables don't.
       // Using shell: true globally causes process-tree kill issues with MSYS2/Git Bash.
@@ -440,7 +465,7 @@ export class PolyglotExecutor {
       const commonOpts = {
         cwd,
         stdio: ["ignore", "pipe", "pipe"] as ["ignore", "pipe", "pipe"],
-        env: this.#buildSafeEnv(sandboxTmpDir),
+        env: this.#buildSafeEnv(sandboxTmpDir, context.environment),
         // On Unix, create a new process group so killTree can kill all children
         detached: !isWin,
         // Hide the spawned-process console window on Windows. Without this,
@@ -467,17 +492,36 @@ export class PolyglotExecutor {
 
       let timedOut = false;
       let resolved = false;
+      let cancelled = false;
+      let closed = false;
+      let finishClosed!: () => void;
+      const job: OwnedJob = {
+        backgrounded: false,
+        closed: new Promise<void>(resolve => { finishClosed = resolve; }),
+        cancel: () => {
+          if (cancelled || closed || (isWin && (proc.exitCode !== null || proc.signalCode !== null))) return;
+          cancelled = true;
+          killTree(proc);
+        },
+      };
+      this.#jobs.add(job);
+      const abort = () => job.cancel();
+      signal?.addEventListener("abort", abort, { once: true });
+      // Registration and spawning are synchronous, but callers can provide a
+      // signal that became aborted while a subprocess was being created.
+      if (signal?.aborted) abort();
       // Issue #406 — if the caller didn't pass a timeout we don't fire one.
       // Timeout policy belongs to the MCP host/client (Claude Code, VSCode,
       // JetBrains all enforce their own RPC timeouts); imposing a second
       // policy here turned 30-minute Gradle/Maven/SBT builds into spurious
       // false negatives whenever the caller forgot the explicit value.
       const timer: NodeJS.Timeout | undefined = timeout === undefined ? undefined : setTimeout(() => {
+        if (cancelled || closed || (isWin && (proc.exitCode !== null || proc.signalCode !== null))) return;
         timedOut = true;
         if (background) {
           // Background mode: detach process, return partial output, keep running
           resolved = true;
-          if (proc.pid) this.#backgroundedPids.add(proc.pid);
+          job.backgrounded = true;
           proc.unref();
           // Do NOT destroy stdout/stderr — closing the read end of the pipe
           // sends SIGPIPE to the child on its next write, killing it.
@@ -537,8 +581,14 @@ export class PolyglotExecutor {
       });
 
       proc.on("close", (exitCode) => {
+        closed = true;
         clearTimeout(timer);
+        signal?.removeEventListener("abort", abort);
+        this.#jobs.delete(job);
+        if (job.backgrounded) cleanupTmpDir(sandboxTmpDir);
+        finishClosed();
         if (resolved) return; // Already resolved by background timeout
+        resolved = true;
         const rawStdout = Buffer.concat(stdoutChunks).toString("utf-8");
         let rawStderr = Buffer.concat(stderrChunks).toString("utf-8");
 
@@ -552,26 +602,29 @@ export class PolyglotExecutor {
         res({
           stdout,
           stderr,
-          exitCode: timedOut ? 1 : (exitCode ?? 1),
+          exitCode: timedOut || cancelled ? 1 : (exitCode ?? 1),
           timedOut,
+          ...(cancelled ? { cancelled: true } : {}),
         });
       });
 
       proc.on("error", (err) => {
         clearTimeout(timer);
         if (resolved) return; // Already resolved by background timeout
+        resolved = true;
         res({
           stdout: "",
           stderr: err.message,
           exitCode: 1,
           timedOut: false,
+          ...(cancelled ? { cancelled: true } : {}),
         });
       });
     });
   }
 
-  #buildSafeEnv(tmpDir: string): Record<string, string> {
-    const realHome = process.env.HOME ?? process.env.USERPROFILE ?? tmpDir;
+  #buildSafeEnv(tmpDir: string, source: Readonly<NodeJS.ProcessEnv>): Record<string, string> {
+    const realHome = source.HOME ?? source.USERPROFILE ?? tmpDir;
 
     // Denylist: env vars that corrupt sandbox stdout, inject code, or break
     // language runtimes. Each entry is backed by CVE, MITRE, or live testing.
@@ -677,7 +730,7 @@ export class PolyglotExecutor {
     // PR #546 follow-up: closes the alias bypass for the explicit denylist
     // entries above.
     const env: Record<string, string> = {};
-    for (const [key, val] of Object.entries(process.env)) {
+    for (const [key, val] of Object.entries(source)) {
       if (
         val !== undefined &&
         !DENIED.has(key) &&
