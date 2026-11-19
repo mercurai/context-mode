@@ -1,0 +1,39 @@
+{
+  "source_endpoint": "https://sql-clickhouse.clickhouse.com/",
+  "source_table": "github.github_events",
+  "repo_id": "1164477708",
+  "repo_name": "mksglu/context-mode",
+  "event_type": "PullRequestEvent",
+  "observed_window_utc": [
+    "2026-02-23T05:56:28Z",
+    "2026-11-20T00:00:00Z"
+  ],
+  "event_rows": 84,
+  "distinct_pr_numbers": 79,
+  "ref_only_in_this_comparison": 597,
+  "counts": {
+    "opened": 60,
+    "closed": 9,
+    "merged": 15
+  },
+  "first_observed_event_utc": "2026-03-05T20:45:51Z",
+  "last_observed_event_utc": "2026-10-12T13:02:54Z",
+  "public_pr_events_sha256": "e7a4e8040a55db9b80c709d1b195e382468df09cfdde9b018972c5a1b046f326",
+  "semantics": "Actor and timestamp describe the public event. This is partial historical activity and does not establish the PR creator, current state, original title or object-level dates.",
+  "review_event_types": {
+    "PullRequestReviewEvent": 10,
+    "PullRequestReviewCommentEvent": 9
+  },
+  "review_rows": 19,
+  "distinct_review_pr_numbers": 15,
+  "all_observed_pr_numbers": 89,
+  "all_observed_event_rows": 103,
+  "refs_without_any_of_these_events": 587,
+  "public_pr_review_events_sha256": "50c66d172c97f0091e468889095c7467ba2758ae56a1d3ad25437084ac2ebb69",
+  "review_semantics": "A review event can record an individual observed review decision; later state and final PR disposition remain unknown. Public comment IDs distinguish separate observations at the same time. No review text, comment text or diffs were selected.",
+  "observed_review_states": {
+    "commented": 5,
+    "changes_requested": 3,
+    "approved": 2
+  }
+}
