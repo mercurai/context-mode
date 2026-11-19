@@ -1,0 +1,14 @@
+{
+  "collected_utc": "2026-11-19T18:44:49Z",
+  "source": "https://github.com/mksglu/context-mode.git",
+  "source_refspec": "refs/pull/*",
+  "advertised_head_count": 676,
+  "advertised_merge_ref_count": 7,
+  "distinct_numbers": 676,
+  "metadata_file": "pull-refs.json",
+  "metadata_sha256": "4e9aa556b9a654602172452cf3cff2e4d451529a2c160270e1e4820ce7fa62d7",
+  "advertised_refs_sha256": "d91271d2a98a5fbc19a03255a04eebbb91e203c0a4df3693cb55477762c01f7d",
+  "advertised_refs_hash_encoding": "ASCII lines sorted lexicographically by whole line, each <object SHA-1> TAB <refname> LF.",
+  "parent_archive_commit": "5e724b0e4c14615a1031aea7a3cc2bb11214810d",
+  "meaning": "An observed head identifies the commit advertised for that numbered pull request. A merge ref is a generated integration ref and does not establish the request was merged. The count covers refs observable at collection time. Full historical PR count is unknown."
+}

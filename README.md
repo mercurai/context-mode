@@ -22,3 +22,6 @@ Status: unavailable: tracker disabled; REST and GraphQL returned no history; pul
 
 [Snapshot manifest](manifest.json)
 
+
+
+[2026-11-19 upstream PR refs](snapshots/2026-11-19-pr-refs/README.md) records 676 public pull-request heads and seven merge refs by Git object ID.
