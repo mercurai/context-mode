@@ -1,5 +1,9 @@
 # Upstream history metadata
 
+The [November 19 snapshot](snapshots/2026-11-19/README.md) preserves 698 upstream issues. Historical pull-request availability remains unverified.
+
+## November 1 capture
+
 Source: https://github.com/mksglu/context-mode
 Captured: 2026-11-01T19:14:32.288020+00:00
 

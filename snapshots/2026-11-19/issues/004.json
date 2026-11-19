@@ -1,0 +1,2002 @@
+[
+  {
+    "number": 665,
+    "title": "Pi crash on mixed-width CJK lines: rendered line exceeds terminal width",
+    "url": "https://github.com/mksglu/context-mode/issues/665",
+    "state": "CLOSED",
+    "createdAt": "2026-05-22T14:56:16Z",
+    "updatedAt": "2026-05-23T07:14:15Z",
+    "closedAt": "2026-05-23T07:14:15Z",
+    "author": {
+      "login": "ByronFinn"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 667,
+    "title": "[Bug]: ctx_fetch_and_index returns \"disk I/O error\" — ContentStore busy_timeout not applied on node:sqlite path + 90+ orphaned temp dirs",
+    "url": "https://github.com/mksglu/context-mode/issues/667",
+    "state": "CLOSED",
+    "createdAt": "2026-05-22T19:28:07Z",
+    "updatedAt": "2026-05-22T19:31:08Z",
+    "closedAt": "2026-05-22T19:31:08Z",
+    "author": {
+      "login": "sacrtap"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 668,
+    "title": "[Bug]: ctx_fetch_and_index returns \"disk I/O error\" — ContentStore busy_timeout not applied on node:sqlite path + 90+ orphaned temp dirs",
+    "url": "https://github.com/mksglu/context-mode/issues/668",
+    "state": "CLOSED",
+    "createdAt": "2026-05-22T19:34:22Z",
+    "updatedAt": "2026-05-23T23:02:29Z",
+    "closedAt": "2026-05-23T23:02:29Z",
+    "author": {
+      "login": "sacrtap"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 669,
+    "title": "ctx_search rate limiter uses hand-rolled sliding window (drift-prone)",
+    "url": "https://github.com/mksglu/context-mode/issues/669",
+    "state": "CLOSED",
+    "createdAt": "2026-05-23T00:20:18Z",
+    "updatedAt": "2026-05-23T00:32:51Z",
+    "closedAt": "2026-05-23T00:32:51Z",
+    "author": {
+      "login": "ofrik"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 670,
+    "title": "Runtime detection re-probes PATH on every ctx_execute call",
+    "url": "https://github.com/mksglu/context-mode/issues/670",
+    "state": "CLOSED",
+    "createdAt": "2026-05-23T00:20:29Z",
+    "updatedAt": "2026-05-23T00:32:57Z",
+    "closedAt": "2026-05-23T00:32:57Z",
+    "author": {
+      "login": "ofrik"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 671,
+    "title": "better-sqlite3 synchronous calls block the Node.js event loop",
+    "url": "https://github.com/mksglu/context-mode/issues/671",
+    "state": "CLOSED",
+    "createdAt": "2026-05-23T00:20:41Z",
+    "updatedAt": "2026-05-23T00:33:04Z",
+    "closedAt": "2026-05-23T00:33:04Z",
+    "author": {
+      "login": "ofrik"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 672,
+    "title": "Hook bundle footprint: ~500 KB of JS shipped per install",
+    "url": "https://github.com/mksglu/context-mode/issues/672",
+    "state": "CLOSED",
+    "createdAt": "2026-05-23T00:20:54Z",
+    "updatedAt": "2026-05-23T00:33:10Z",
+    "closedAt": "2026-05-23T00:33:10Z",
+    "author": {
+      "login": "ofrik"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 673,
+    "title": "ctx_upgrade requires npm, breaking for npx/bunx users",
+    "url": "https://github.com/mksglu/context-mode/issues/673",
+    "state": "CLOSED",
+    "createdAt": "2026-05-23T00:21:06Z",
+    "updatedAt": "2026-07-23T20:00:19Z",
+    "closedAt": "2026-05-23T00:33:22Z",
+    "author": {
+      "login": "ofrik"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 674,
+    "title": "Concurrent job limit (runPool) is hardcoded at 32, not configurable",
+    "url": "https://github.com/mksglu/context-mode/issues/674",
+    "state": "CLOSED",
+    "createdAt": "2026-05-23T00:21:17Z",
+    "updatedAt": "2026-05-23T00:33:17Z",
+    "closedAt": "2026-05-23T00:33:17Z",
+    "author": {
+      "login": "ofrik"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 675,
+    "title": "ctx_insight dashboard URL not printed to stderr, making it hard to find",
+    "url": "https://github.com/mksglu/context-mode/issues/675",
+    "state": "CLOSED",
+    "createdAt": "2026-05-23T00:21:27Z",
+    "updatedAt": "2026-05-23T00:33:14Z",
+    "closedAt": "2026-05-23T00:33:13Z",
+    "author": {
+      "login": "ofrik"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 677,
+    "title": "[Feature]: Oh My Pi agent installation working.",
+    "url": "https://github.com/mksglu/context-mode/issues/677",
+    "state": "CLOSED",
+    "createdAt": "2026-05-23T11:21:27Z",
+    "updatedAt": "2026-06-23T16:48:48Z",
+    "closedAt": "2026-05-24T11:10:24Z",
+    "author": {
+      "login": "gritsenko-konstantin"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 6
+    }
+  },
+  {
+    "number": 681,
+    "title": "[Feature]: Add Picoclaw as a Supported Platform",
+    "url": "https://github.com/mksglu/context-mode/issues/681",
+    "state": "CLOSED",
+    "createdAt": "2026-05-23T23:42:11Z",
+    "updatedAt": "2026-05-23T23:45:25Z",
+    "closedAt": "2026-05-23T23:44:52Z",
+    "author": {
+      "login": "milseg"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 684,
+    "title": "Gemini CLI transition to Antigravity CLI:",
+    "url": "https://github.com/mksglu/context-mode/issues/684",
+    "state": "CLOSED",
+    "createdAt": "2026-05-24T08:53:55Z",
+    "updatedAt": "2026-05-24T09:30:39Z",
+    "closedAt": "2026-05-24T09:17:30Z",
+    "author": {
+      "login": "benzntech"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 687,
+    "title": "[Bug]: ctx_index refuses directory paths, blocking project-wide indexing on all 4 tested clients",
+    "url": "https://github.com/mksglu/context-mode/issues/687",
+    "state": "CLOSED",
+    "createdAt": "2026-05-24T14:46:38Z",
+    "updatedAt": "2026-05-24T18:02:55Z",
+    "closedAt": "2026-05-24T16:27:37Z",
+    "author": {
+      "login": "matiasduartee"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 688,
+    "title": "ctx_upgrade can leave an incomplete plugin-cache install (missing start.mjs / server bundle); ctx_doctor masks it as \"integrity helper unavailable\"",
+    "url": "https://github.com/mksglu/context-mode/issues/688",
+    "state": "CLOSED",
+    "createdAt": "2026-05-24T15:29:48Z",
+    "updatedAt": "2026-05-24T16:31:41Z",
+    "closedAt": "2026-05-24T16:31:41Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 691,
+    "title": "💎 Hidden Gem — your repo was added to cue's \"core\" profile",
+    "url": "https://github.com/mksglu/context-mode/issues/691",
+    "state": "CLOSED",
+    "createdAt": "2026-05-24T16:48:06Z",
+    "updatedAt": "2026-05-24T17:20:56Z",
+    "closedAt": "2026-05-24T17:20:56Z",
+    "author": {
+      "login": "NagyVikt"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 694,
+    "title": "Persist /goal directives across compaction and resume (only a coarse intent mode is kept today)",
+    "url": "https://github.com/mksglu/context-mode/issues/694",
+    "state": "CLOSED",
+    "createdAt": "2026-05-24T17:40:53Z",
+    "updatedAt": "2026-05-24T18:49:41Z",
+    "closedAt": "2026-05-24T18:49:41Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 696,
+    "title": "[Bug]: ctx_batch_execute.queries silently searches only batch output, not global index — API parameter name misleads",
+    "url": "https://github.com/mksglu/context-mode/issues/696",
+    "state": "CLOSED",
+    "createdAt": "2026-05-24T18:05:33Z",
+    "updatedAt": "2026-05-31T11:28:45Z",
+    "closedAt": "2026-05-24T18:16:03Z",
+    "author": {
+      "login": "matiasduartee"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 697,
+    "title": "[Bug]: 3 remaining issues from cross-platform audit — ctx_insight Q&A, ctx_stats observability, ctx_search throttling (companion to #687)",
+    "url": "https://github.com/mksglu/context-mode/issues/697",
+    "state": "CLOSED",
+    "createdAt": "2026-05-24T18:10:12Z",
+    "updatedAt": "2026-05-31T11:28:47Z",
+    "closedAt": "2026-05-24T18:23:11Z",
+    "author": {
+      "login": "matiasduartee"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 703,
+    "title": "[Feature]: Claude Cowork marketplace compatibility",
+    "url": "https://github.com/mksglu/context-mode/issues/703",
+    "state": "CLOSED",
+    "createdAt": "2026-05-25T00:29:44Z",
+    "updatedAt": "2026-05-25T06:13:05Z",
+    "closedAt": "2026-05-25T06:13:05Z",
+    "author": {
+      "login": "tacianomm"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 707,
+    "title": "PreToolUse/PostToolUse Read hook errors shown to user on Windows",
+    "url": "https://github.com/mksglu/context-mode/issues/707",
+    "state": "CLOSED",
+    "createdAt": "2026-05-25T09:46:33Z",
+    "updatedAt": "2026-05-31T09:37:54Z",
+    "closedAt": "2026-05-31T09:37:54Z",
+    "author": {
+      "login": "lindsay245"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 710,
+    "title": "Shell snapshot's PATH hardcodes previous-version bin/ — bash commands break after /ctx-upgrade until session restart",
+    "url": "https://github.com/mksglu/context-mode/issues/710",
+    "state": "CLOSED",
+    "createdAt": "2026-05-25T14:22:02Z",
+    "updatedAt": "2026-05-31T14:45:28Z",
+    "closedAt": "2026-05-31T14:45:28Z",
+    "author": {
+      "login": "JRAVILES"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 711,
+    "title": "/ctx-upgrade bakes prior-version paths into new install's plugin.json and hooks.json",
+    "url": "https://github.com/mksglu/context-mode/issues/711",
+    "state": "CLOSED",
+    "createdAt": "2026-05-25T15:39:44Z",
+    "updatedAt": "2026-05-31T11:28:50Z",
+    "closedAt": "2026-05-31T11:28:50Z",
+    "author": {
+      "login": "MarshalCurrier"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 712,
+    "title": "[Bug]: `ctx doctor` reports missing Gemini CLI hooks due to hardcoded path mismatch in `cli.bundle.mjs`",
+    "url": "https://github.com/mksglu/context-mode/issues/712",
+    "state": "CLOSED",
+    "createdAt": "2026-05-25T16:11:03Z",
+    "updatedAt": "2026-05-31T14:31:05Z",
+    "closedAt": "2026-05-31T14:31:05Z",
+    "author": {
+      "login": "devcode4510-code"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 717,
+    "title": "[Feature]: `ctx_execute` etc should show the commands the agent runs in Pi",
+    "url": "https://github.com/mksglu/context-mode/issues/717",
+    "state": "CLOSED",
+    "createdAt": "2026-05-26T00:59:47Z",
+    "updatedAt": "2026-05-31T13:51:26Z",
+    "closedAt": "2026-05-31T13:51:26Z",
+    "author": {
+      "login": "finnvyrn"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 724,
+    "title": "Agent PreToolUse routing stalls read-only subagents: injected block omits the ToolSearch bootstrap for deferred ctx_* tools",
+    "url": "https://github.com/mksglu/context-mode/issues/724",
+    "state": "CLOSED",
+    "createdAt": "2026-05-26T23:16:39Z",
+    "updatedAt": "2026-05-31T11:28:53Z",
+    "closedAt": "2026-05-31T11:28:53Z",
+    "author": {
+      "login": "beastawakens"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 727,
+    "title": "Upgrade leaves stale version paths in hooks.json and plugin.json",
+    "url": "https://github.com/mksglu/context-mode/issues/727",
+    "state": "CLOSED",
+    "createdAt": "2026-05-27T20:29:17Z",
+    "updatedAt": "2026-05-31T11:28:55Z",
+    "closedAt": "2026-05-31T11:28:55Z",
+    "author": {
+      "login": "lbzepoqo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 731,
+    "title": "[Bug]: ctx_execute(language: \"javascript\") fails when OpenCode runs as self-contained binary (opencode.exe)",
+    "url": "https://github.com/mksglu/context-mode/issues/731",
+    "state": "CLOSED",
+    "createdAt": "2026-05-28T06:49:22Z",
+    "updatedAt": "2026-05-31T13:49:41Z",
+    "closedAt": "2026-05-31T13:49:41Z",
+    "author": {
+      "login": "haisto"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 732,
+    "title": "Error: ioctl(2) failed, EBADF in UnixTerminal.resize during PreCompress hook",
+    "url": "https://github.com/mksglu/context-mode/issues/732",
+    "state": "CLOSED",
+    "createdAt": "2026-05-28T08:23:16Z",
+    "updatedAt": "2026-05-28T14:49:02Z",
+    "closedAt": "2026-05-28T14:49:02Z",
+    "author": {
+      "login": "seaavey"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 735,
+    "title": "[Bug]: MCP server crashes mid-session under concurrent multi-session access to the shared per-project KB (better-sqlite3), leaving an unclean WAL",
+    "url": "https://github.com/mksglu/context-mode/issues/735",
+    "state": "CLOSED",
+    "createdAt": "2026-05-29T07:15:05Z",
+    "updatedAt": "2026-05-29T09:05:01Z",
+    "closedAt": "2026-05-29T09:05:01Z",
+    "author": {
+      "login": "AlexeySapsay"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 736,
+    "title": "[Improvement]: show ran commands in `ctx_batch_execute`",
+    "url": "https://github.com/mksglu/context-mode/issues/736",
+    "state": "CLOSED",
+    "createdAt": "2026-05-29T13:41:17Z",
+    "updatedAt": "2026-05-31T13:51:25Z",
+    "closedAt": "2026-05-31T13:51:25Z",
+    "author": {
+      "login": "dmitryrn"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 737,
+    "title": "[Feature]: ctx_search `project:` filter — scope FTS5 ContentStore to current project when using a global DB",
+    "url": "https://github.com/mksglu/context-mode/issues/737",
+    "state": "CLOSED",
+    "createdAt": "2026-05-29T15:23:19Z",
+    "updatedAt": "2026-06-01T11:41:19Z",
+    "closedAt": "2026-05-31T14:33:52Z",
+    "author": {
+      "login": "jetnet"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 5
+    }
+  },
+  {
+    "number": 738,
+    "title": "Hooks run under `node`; emitting the generated commands as `bun` cuts ~40–60ms cold-start per tool-call (no behavior change)",
+    "url": "https://github.com/mksglu/context-mode/issues/738",
+    "state": "CLOSED",
+    "createdAt": "2026-05-29T21:21:27Z",
+    "updatedAt": "2026-05-31T14:08:23Z",
+    "closedAt": "2026-05-31T14:08:23Z",
+    "author": {
+      "login": "Kirchlive"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 740,
+    "title": "[Bug]: skills/ directory missing from npm-published v1.0.151 tarball",
+    "url": "https://github.com/mksglu/context-mode/issues/740",
+    "state": "CLOSED",
+    "createdAt": "2026-05-30T09:18:10Z",
+    "updatedAt": "2026-05-31T14:14:11Z",
+    "closedAt": "2026-05-31T13:02:06Z",
+    "author": {
+      "login": "mabaeyens"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 742,
+    "title": "Feature: payload manifest/placeholders for host-side stale context eviction",
+    "url": "https://github.com/mksglu/context-mode/issues/742",
+    "state": "CLOSED",
+    "createdAt": "2026-05-30T17:53:23Z",
+    "updatedAt": "2026-05-31T12:42:20Z",
+    "closedAt": "2026-05-31T12:42:20Z",
+    "author": {
+      "login": "LuisanSuarez"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 744,
+    "title": "project_dir keys on raw session CWD — one project fragments across worktrees/subdirs, inflating stats & defeating the project: filter",
+    "url": "https://github.com/mksglu/context-mode/issues/744",
+    "state": "CLOSED",
+    "createdAt": "2026-05-31T22:16:57Z",
+    "updatedAt": "2026-09-08T15:42:47Z",
+    "closedAt": "2026-05-31T22:22:51Z",
+    "author": {
+      "login": "LukeSal88"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 745,
+    "title": "[Bug]: Codex doctor leaves duplicate plugin/user hooks and standalone npx MCP registration",
+    "url": "https://github.com/mksglu/context-mode/issues/745",
+    "state": "CLOSED",
+    "createdAt": "2026-06-01T02:20:46Z",
+    "updatedAt": "2026-06-01T06:14:56Z",
+    "closedAt": "2026-06-01T06:14:56Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 751,
+    "title": "Beta is Open: Free Enterprise Insights for 5 Teams",
+    "url": "https://github.com/mksglu/context-mode/issues/751",
+    "state": "CLOSED",
+    "createdAt": "2026-06-01T11:36:06Z",
+    "updatedAt": "2026-06-21T08:24:41Z",
+    "closedAt": "2026-06-21T08:24:41Z",
+    "author": {
+      "login": "mksglu"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 752,
+    "title": "[Feature]: Let Codex marketplace plugin use global npm runtime without symlinks",
+    "url": "https://github.com/mksglu/context-mode/issues/752",
+    "state": "CLOSED",
+    "createdAt": "2026-06-01T12:35:35Z",
+    "updatedAt": "2026-06-01T12:47:55Z",
+    "closedAt": "2026-06-01T12:47:55Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 754,
+    "title": "opencode/kilo setup forks a per-package plugin copy that \"npm i -g\" cannot update",
+    "url": "https://github.com/mksglu/context-mode/issues/754",
+    "state": "CLOSED",
+    "createdAt": "2026-06-01T12:47:37Z",
+    "updatedAt": "2026-06-02T07:08:55Z",
+    "closedAt": "2026-06-01T12:50:39Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 756,
+    "title": "[Bug]: ctx_execute runs in the MCP server's process cwd (main repo), not the session's git-worktree cwd — Claude Code, still repro on 1.0.161",
+    "url": "https://github.com/mksglu/context-mode/issues/756",
+    "state": "CLOSED",
+    "createdAt": "2026-06-01T15:41:15Z",
+    "updatedAt": "2026-06-13T16:44:27Z",
+    "closedAt": "2026-06-13T16:44:27Z",
+    "author": {
+      "login": "chrisjenx"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 760,
+    "title": "Pi: context-mode writes content under ~/.claude (platform misdetected as claude-code when ~/.claude exists)",
+    "url": "https://github.com/mksglu/context-mode/issues/760",
+    "state": "CLOSED",
+    "createdAt": "2026-06-01T17:40:40Z",
+    "updatedAt": "2026-06-04T11:25:30Z",
+    "closedAt": "2026-06-04T11:25:30Z",
+    "author": {
+      "login": "jetnet"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 761,
+    "title": "[Bug]: opencode not installing context-mode",
+    "url": "https://github.com/mksglu/context-mode/issues/761",
+    "state": "CLOSED",
+    "createdAt": "2026-06-01T17:53:15Z",
+    "updatedAt": "2026-07-03T14:27:26Z",
+    "closedAt": "2026-06-03T06:21:20Z",
+    "author": {
+      "login": "feakuru"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 5
+    }
+  },
+  {
+    "number": 768,
+    "title": "[v1.0.151] Three install-time manifests still bake stale prior version (1.0.25) — followup to #609",
+    "url": "https://github.com/mksglu/context-mode/issues/768",
+    "state": "CLOSED",
+    "createdAt": "2026-06-03T00:43:30Z",
+    "updatedAt": "2026-06-21T15:37:37Z",
+    "closedAt": "2026-06-21T15:37:37Z",
+    "author": {
+      "login": "jcortes0309"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 769,
+    "title": "[Bug]: ctx_search flood-guard counter is shared across concurrent subagents — parallel multi-agent workflows trip CONTEXT_MODE_SEARCH_BLOCK_AFTER on aggregate volume no single agent caused",
+    "url": "https://github.com/mksglu/context-mode/issues/769",
+    "state": "CLOSED",
+    "createdAt": "2026-06-03T00:52:16Z",
+    "updatedAt": "2026-06-21T15:31:26Z",
+    "closedAt": "2026-06-21T15:31:26Z",
+    "author": {
+      "login": "sdkkds"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 770,
+    "title": "[Bug]: Codex doctor checks a stale plugin root and reports plugin hooks missing",
+    "url": "https://github.com/mksglu/context-mode/issues/770",
+    "state": "CLOSED",
+    "createdAt": "2026-06-03T03:55:55Z",
+    "updatedAt": "2026-06-03T05:56:25Z",
+    "closedAt": "2026-06-03T05:56:24Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 774,
+    "title": "[Feature]: Antigravity-cli (agy) better integration",
+    "url": "https://github.com/mksglu/context-mode/issues/774",
+    "state": "CLOSED",
+    "createdAt": "2026-06-03T18:41:03Z",
+    "updatedAt": "2026-06-21T13:14:30Z",
+    "closedAt": "2026-06-21T13:14:30Z",
+    "author": {
+      "login": "kurokirasama"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 775,
+    "title": "[Feature]: Add official GitHub Copilot CLI support docs for Context Mode MCP and hooks",
+    "url": "https://github.com/mksglu/context-mode/issues/775",
+    "state": "CLOSED",
+    "createdAt": "2026-06-04T08:16:09Z",
+    "updatedAt": "2026-06-21T13:14:36Z",
+    "closedAt": "2026-06-21T13:14:36Z",
+    "author": {
+      "login": "nviraj"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 780,
+    "title": "Session resume re-injects stale events from previous legs as current (phantom tool calls, agents shown as completed while running)",
+    "url": "https://github.com/mksglu/context-mode/issues/780",
+    "state": "CLOSED",
+    "createdAt": "2026-06-04T20:41:58Z",
+    "updatedAt": "2026-06-21T15:24:26Z",
+    "closedAt": "2026-06-21T15:24:26Z",
+    "author": {
+      "login": "lucasnsaraujo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 781,
+    "title": "Plain-text chunker (#chunkPlainText) has no byte cap — large command output indexed as one chunk, bloats FTS5 content DB",
+    "url": "https://github.com/mksglu/context-mode/issues/781",
+    "state": "CLOSED",
+    "createdAt": "2026-06-05T12:54:04Z",
+    "updatedAt": "2026-06-13T14:58:11Z",
+    "closedAt": "2026-06-13T14:58:11Z",
+    "author": {
+      "login": "brandonwie"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 782,
+    "title": "Maven (mvn) fails on Windows in ctx_execute sandbox due to MinGW path conversion issue",
+    "url": "https://github.com/mksglu/context-mode/issues/782",
+    "state": "CLOSED",
+    "createdAt": "2026-06-05T15:41:12Z",
+    "updatedAt": "2026-06-21T15:36:51Z",
+    "closedAt": "2026-06-21T15:36:51Z",
+    "author": {
+      "login": "liyong-labs"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 784,
+    "title": "Insight dashboard undercounts commits: counts only 'git commit' without -m (git_commit type ignored)",
+    "url": "https://github.com/mksglu/context-mode/issues/784",
+    "state": "CLOSED",
+    "createdAt": "2026-06-05T23:10:15Z",
+    "updatedAt": "2026-06-13T17:00:55Z",
+    "closedAt": "2026-06-13T17:00:55Z",
+    "author": {
+      "login": "daniel-enqz"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 788,
+    "title": "[Bug]:  context-mode leaves `.ctx-mode-*` artifacts and non-shell `ctx_execute` runs outside project cwd in Pi subagents",
+    "url": "https://github.com/mksglu/context-mode/issues/788",
+    "state": "CLOSED",
+    "createdAt": "2026-06-06T08:51:33Z",
+    "updatedAt": "2026-10-12T15:09:28Z",
+    "closedAt": "2026-06-21T15:36:53Z",
+    "author": {
+      "login": "SkipXS"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 791,
+    "title": "[Bug]: Windows: filesystem writes from one child process are invisible to the next inside ctx_execute (git init succeeds, then ls/clone say the repo does not exist)",
+    "url": "https://github.com/mksglu/context-mode/issues/791",
+    "state": "CLOSED",
+    "createdAt": "2026-06-07T05:40:58Z",
+    "updatedAt": "2026-06-13T14:59:45Z",
+    "closedAt": "2026-06-13T14:59:45Z",
+    "author": {
+      "login": "pierrick-fonquerne"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 792,
+    "title": "Blocking `curl` completely is inefficient in some scenarios.",
+    "url": "https://github.com/mksglu/context-mode/issues/792",
+    "state": "CLOSED",
+    "createdAt": "2026-06-07T06:05:00Z",
+    "updatedAt": "2026-06-07T09:05:01Z",
+    "closedAt": "2026-06-07T09:05:01Z",
+    "author": {
+      "login": "finnvyrn"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 794,
+    "title": "PreToolUse WebFetch deny hard-blocks subagents that cannot access ctx_* MCP tools (isMCPReady is machine-global, tool availability is per-agent-context)",
+    "url": "https://github.com/mksglu/context-mode/issues/794",
+    "state": "CLOSED",
+    "createdAt": "2026-06-07T16:20:36Z",
+    "updatedAt": "2026-06-21T12:00:56Z",
+    "closedAt": "2026-06-21T12:00:56Z",
+    "author": {
+      "login": "wotjr1649"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 795,
+    "title": "SessionStart cache-heal hook skips itself when ~/.claude is a symlink (path.resolve vs realpath)",
+    "url": "https://github.com/mksglu/context-mode/issues/795",
+    "state": "CLOSED",
+    "createdAt": "2026-06-07T20:44:18Z",
+    "updatedAt": "2026-06-21T10:36:14Z",
+    "closedAt": "2026-06-21T10:36:14Z",
+    "author": {
+      "login": "grantschukow-stack"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 800,
+    "title": "Fetch worker spawns via version-pinned process.execPath — breaks ctx_fetch_and_index after a mid-session Homebrew Node upgrade",
+    "url": "https://github.com/mksglu/context-mode/issues/800",
+    "state": "CLOSED",
+    "createdAt": "2026-06-09T13:52:39Z",
+    "updatedAt": "2026-06-21T10:36:12Z",
+    "closedAt": "2026-06-21T10:36:12Z",
+    "author": {
+      "login": "rpickmans"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 801,
+    "title": "[Bug]: fails with `spawnSync npm ENOENT`",
+    "url": "https://github.com/mksglu/context-mode/issues/801",
+    "state": "CLOSED",
+    "createdAt": "2026-06-09T14:49:04Z",
+    "updatedAt": "2026-06-10T16:17:20Z",
+    "closedAt": "2026-06-09T16:47:27Z",
+    "author": {
+      "login": "Rodrigo54"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 806,
+    "title": "Incompatible with opencode.jsonc config",
+    "url": "https://github.com/mksglu/context-mode/issues/806",
+    "state": "CLOSED",
+    "createdAt": "2026-06-10T01:51:14Z",
+    "updatedAt": "2026-06-10T14:31:21Z",
+    "closedAt": "2026-06-10T14:31:21Z",
+    "author": {
+      "login": "squizzeak"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 807,
+    "title": "Cleanup never re-creates breadcrumbs for orphaned version dirs still referenced by long-lived sessions",
+    "url": "https://github.com/mksglu/context-mode/issues/807",
+    "state": "CLOSED",
+    "createdAt": "2026-06-10T11:45:05Z",
+    "updatedAt": "2026-06-13T09:32:13Z",
+    "closedAt": "2026-06-13T09:32:13Z",
+    "author": {
+      "login": "kouiso"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 809,
+    "title": "[Bug]: Pi: After installing terminal hangs when running any pi command like pi list",
+    "url": "https://github.com/mksglu/context-mode/issues/809",
+    "state": "CLOSED",
+    "createdAt": "2026-06-10T18:27:17Z",
+    "updatedAt": "2026-06-11T11:50:53Z",
+    "closedAt": "2026-06-11T11:50:53Z",
+    "author": {
+      "login": "carolitascl"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 814,
+    "title": "sessionstart.mjs cleanup deletes old version dir without junction — breaks active sessions mid-session",
+    "url": "https://github.com/mksglu/context-mode/issues/814",
+    "state": "CLOSED",
+    "createdAt": "2026-06-11T13:21:10Z",
+    "updatedAt": "2026-06-13T09:32:16Z",
+    "closedAt": "2026-06-13T09:32:16Z",
+    "author": {
+      "login": "elitribyn"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 816,
+    "title": "Add opt-in Codex quiet SessionStart mode",
+    "url": "https://github.com/mksglu/context-mode/issues/816",
+    "state": "CLOSED",
+    "createdAt": "2026-06-11T13:48:43Z",
+    "updatedAt": "2026-06-21T13:18:42Z",
+    "closedAt": "2026-06-21T13:18:42Z",
+    "author": {
+      "login": "RamJam824"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 817,
+    "title": "PreToolUse/PostToolUse hooks intercept small Bash/WebFetch calls without a size threshold (Claude Code) — unlike Gemini CLI's size-aware BeforeTool matcher",
+    "url": "https://github.com/mksglu/context-mode/issues/817",
+    "state": "CLOSED",
+    "createdAt": "2026-06-11T21:49:44Z",
+    "updatedAt": "2026-06-21T15:23:32Z",
+    "closedAt": "2026-06-21T15:23:32Z",
+    "author": {
+      "login": "monossido"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 824,
+    "title": "[Bug]: pi install hangs indefinitely — context-mode MCP server spawned but never cleaned up",
+    "url": "https://github.com/mksglu/context-mode/issues/824",
+    "state": "CLOSED",
+    "createdAt": "2026-06-13T01:23:33Z",
+    "updatedAt": "2026-06-21T10:36:12Z",
+    "closedAt": "2026-06-21T10:36:12Z",
+    "author": {
+      "login": "chagwood"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 825,
+    "title": "[Feature]:  The spawnSync npm ENOENT error is a Windows bug",
+    "url": "https://github.com/mksglu/context-mode/issues/825",
+    "state": "CLOSED",
+    "createdAt": "2026-06-13T09:29:17Z",
+    "updatedAt": "2026-06-13T09:36:36Z",
+    "closedAt": "2026-06-13T09:36:36Z",
+    "author": {
+      "login": "jonburton1972-ui"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 827,
+    "title": "Bug: ctx_search returns no results due to overly strict project filtering",
+    "url": "https://github.com/mksglu/context-mode/issues/827",
+    "state": "CLOSED",
+    "createdAt": "2026-06-14T04:51:05Z",
+    "updatedAt": "2026-06-21T15:31:24Z",
+    "closedAt": "2026-06-21T15:31:24Z",
+    "author": {
+      "login": "AlexDoratu"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 830,
+    "title": "Orphaned MCP server pegs 100% CPU for hours after client exits (uncaughtException handler logs instead of exiting)",
+    "url": "https://github.com/mksglu/context-mode/issues/830",
+    "state": "CLOSED",
+    "createdAt": "2026-06-15T04:09:53Z",
+    "updatedAt": "2026-06-16T07:51:16Z",
+    "closedAt": "2026-06-16T04:44:11Z",
+    "author": {
+      "login": "cansirin"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 832,
+    "title": "[Feature]: Env-var opt-out for subagent Agent-injection - foreground agents can hang on forced ctx_* calls",
+    "url": "https://github.com/mksglu/context-mode/issues/832",
+    "state": "CLOSED",
+    "createdAt": "2026-06-15T10:29:39Z",
+    "updatedAt": "2026-07-30T11:43:48Z",
+    "closedAt": "2026-06-21T12:00:56Z",
+    "author": {
+      "login": "tomerikjansen-crypto"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 835,
+    "title": "ctx_search default project scope cannot reach ctx_fetch_and_index content (must pass project: \"global\")",
+    "url": "https://github.com/mksglu/context-mode/issues/835",
+    "state": "CLOSED",
+    "createdAt": "2026-06-16T02:53:53Z",
+    "updatedAt": "2026-06-16T02:56:35Z",
+    "closedAt": "2026-06-16T02:56:35Z",
+    "author": {
+      "login": "Adriftnote"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 836,
+    "title": "[Feature]: Add Qoder support",
+    "url": "https://github.com/mksglu/context-mode/issues/836",
+    "state": "CLOSED",
+    "createdAt": "2026-06-16T05:00:18Z",
+    "updatedAt": "2026-06-21T13:12:28Z",
+    "closedAt": "2026-06-21T13:12:28Z",
+    "author": {
+      "login": "He-Pin"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 838,
+    "title": "insight/ depends on malicious @tanstack/* packages (CVE-2026-45321) and vulnerable vitest",
+    "url": "https://github.com/mksglu/context-mode/issues/838",
+    "state": "CLOSED",
+    "createdAt": "2026-06-16T18:27:03Z",
+    "updatedAt": "2026-06-21T13:19:19Z",
+    "closedAt": "2026-06-21T13:19:19Z",
+    "author": {
+      "login": "lonelyastronaut1223"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 840,
+    "title": "Session-resume `## Data References` inlines every captured tool-output into SessionStart context (~10K tok on long sessions)",
+    "url": "https://github.com/mksglu/context-mode/issues/840",
+    "state": "CLOSED",
+    "createdAt": "2026-06-17T15:38:46Z",
+    "updatedAt": "2026-06-21T15:24:28Z",
+    "closedAt": "2026-06-21T15:24:28Z",
+    "author": {
+      "login": "devotox"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 841,
+    "title": "Hooks break after a mise Node patch upgrade (pinned execPath points at a deleted version dir)",
+    "url": "https://github.com/mksglu/context-mode/issues/841",
+    "state": "CLOSED",
+    "createdAt": "2026-06-18T06:49:14Z",
+    "updatedAt": "2026-06-21T15:36:55Z",
+    "closedAt": "2026-06-21T15:36:55Z",
+    "author": {
+      "login": "syphernl"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 843,
+    "title": "[Feature]: Env-var opt-out for the main-session WebFetch deny (e.g. CONTEXT_MODE_ALLOW_WEBFETCH=1)",
+    "url": "https://github.com/mksglu/context-mode/issues/843",
+    "state": "CLOSED",
+    "createdAt": "2026-06-18T13:14:42Z",
+    "updatedAt": "2026-08-18T10:25:16Z",
+    "closedAt": "2026-06-21T13:21:03Z",
+    "author": {
+      "login": "rrva"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 844,
+    "title": "MCP readiness sentinel can be deleted across shared /tmp and isolated PID namespaces",
+    "url": "https://github.com/mksglu/context-mode/issues/844",
+    "state": "CLOSED",
+    "createdAt": "2026-06-19T01:50:36Z",
+    "updatedAt": "2026-06-21T16:20:54Z",
+    "closedAt": "2026-06-21T13:21:39Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 845,
+    "title": "Codex PreToolUse formatter drops modify/context despite current updatedInput support",
+    "url": "https://github.com/mksglu/context-mode/issues/845",
+    "state": "CLOSED",
+    "createdAt": "2026-06-19T01:50:42Z",
+    "updatedAt": "2026-06-21T16:20:53Z",
+    "closedAt": "2026-06-21T13:22:09Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 846,
+    "title": "Codex cancels context-mode MCP tool calls because ctx_* descriptors lack annotations",
+    "url": "https://github.com/mksglu/context-mode/issues/846",
+    "state": "CLOSED",
+    "createdAt": "2026-06-19T01:50:52Z",
+    "updatedAt": "2026-06-21T16:20:52Z",
+    "closedAt": "2026-06-21T13:22:21Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 847,
+    "title": "[Bug]: Seems to be suggesting claude related recommendations when installed in pi.dev",
+    "url": "https://github.com/mksglu/context-mode/issues/847",
+    "state": "CLOSED",
+    "createdAt": "2026-06-19T11:45:36Z",
+    "updatedAt": "2026-06-19T12:44:03Z",
+    "closedAt": "2026-06-19T12:44:03Z",
+    "author": {
+      "login": "jesperordrup"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 849,
+    "title": "writeSettings creates shadowing opencode.json when opencode.jsonc has the real config",
+    "url": "https://github.com/mksglu/context-mode/issues/849",
+    "state": "CLOSED",
+    "createdAt": "2026-06-19T12:52:27Z",
+    "updatedAt": "2026-06-21T15:24:33Z",
+    "closedAt": "2026-06-21T15:24:33Z",
+    "author": {
+      "login": "HaleTom"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 850,
+    "title": "statusline falls back to lifetime stats when no active session stats are available",
+    "url": "https://github.com/mksglu/context-mode/issues/850",
+    "state": "CLOSED",
+    "createdAt": "2026-06-20T09:20:02Z",
+    "updatedAt": "2026-06-21T12:03:34Z",
+    "closedAt": "2026-06-21T12:00:56Z",
+    "author": {
+      "login": "electroheadfx"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 6
+    }
+  },
+  {
+    "number": 852,
+    "title": "[Bug]: Agents immediatly learn and than love to use context_mode:ctx_execute* to escape from harness sandbox and premission controls.",
+    "url": "https://github.com/mksglu/context-mode/issues/852",
+    "state": "CLOSED",
+    "createdAt": "2026-06-21T17:39:57Z",
+    "updatedAt": "2026-06-22T08:13:25Z",
+    "closedAt": "2026-06-22T08:13:25Z",
+    "author": {
+      "login": "Project579"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 854,
+    "title": "Pi host: MCP servers accumulate under a long-lived parent — self-shutdown gated entirely on parent-death (same class as #565, still present in 1.0.163)",
+    "url": "https://github.com/mksglu/context-mode/issues/854",
+    "state": "CLOSED",
+    "createdAt": "2026-06-21T19:14:51Z",
+    "updatedAt": "2026-06-22T02:44:44Z",
+    "closedAt": "2026-06-22T02:44:44Z",
+    "author": {
+      "login": "riddlex-beep"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 856,
+    "title": "Pi host: a casual user phrase gets frozen as behavioral_directive and re-injected every turn → do-nothing loop (1.0.163 & next)",
+    "url": "https://github.com/mksglu/context-mode/issues/856",
+    "state": "CLOSED",
+    "createdAt": "2026-06-22T05:52:06Z",
+    "updatedAt": "2026-06-22T08:02:26Z",
+    "closedAt": "2026-06-22T08:02:26Z",
+    "author": {
+      "login": "riddlex-beep"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 857,
+    "title": "Security: ctx_execute / ctx_batch_execute can run arbitrary code outside the host sandbox (OS-level confinement)",
+    "url": "https://github.com/mksglu/context-mode/issues/857",
+    "state": "CLOSED",
+    "createdAt": "2026-06-22T08:13:22Z",
+    "updatedAt": "2026-07-10T11:31:48Z",
+    "closedAt": "2026-06-22T09:38:54Z",
+    "author": {
+      "login": "mksglu"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 861,
+    "title": "Windows: boot-time turndown/better-sqlite3 npm install fails EPERM (C:\\Windows\\node_modules) every session — shell:true drops cwd",
+    "url": "https://github.com/mksglu/context-mode/issues/861",
+    "state": "CLOSED",
+    "createdAt": "2026-06-22T13:00:46Z",
+    "updatedAt": "2026-06-22T14:06:36Z",
+    "closedAt": "2026-06-22T14:06:36Z",
+    "author": {
+      "login": "lravizzoni"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 862,
+    "title": "MCP server orphans busy-spin at ~100% CPU after parent Claude session exits (no exit-on-stdin-EOF)",
+    "url": "https://github.com/mksglu/context-mode/issues/862",
+    "state": "CLOSED",
+    "createdAt": "2026-06-22T13:22:33Z",
+    "updatedAt": "2026-06-22T14:07:00Z",
+    "closedAt": "2026-06-22T13:47:21Z",
+    "author": {
+      "login": "elhoim"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 865,
+    "title": "ctx_stats conversation count ignores $CLAUDE_CONFIG_DIR — enumerateAdapterDirs hardcodes ~/.claude",
+    "url": "https://github.com/mksglu/context-mode/issues/865",
+    "state": "CLOSED",
+    "createdAt": "2026-06-22T20:41:40Z",
+    "updatedAt": "2026-11-04T22:05:44Z",
+    "closedAt": "2026-11-04T22:05:44Z",
+    "author": {
+      "login": "halindrome"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 867,
+    "title": "ContentStore self-heals DB corruption only at open-time (lossy recreate) — mid-session SQLITE_CORRUPT on a held handle is never caught",
+    "url": "https://github.com/mksglu/context-mode/issues/867",
+    "state": "CLOSED",
+    "createdAt": "2026-06-22T23:20:26Z",
+    "updatedAt": "2026-11-04T22:05:59Z",
+    "closedAt": "2026-11-04T22:05:59Z",
+    "author": {
+      "login": "boeykokchin1969"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 868,
+    "title": "[Bug]: Very intrusive message do not allow to type",
+    "url": "https://github.com/mksglu/context-mode/issues/868",
+    "state": "CLOSED",
+    "createdAt": "2026-06-22T23:54:25Z",
+    "updatedAt": "2026-06-23T06:44:23Z",
+    "closedAt": "2026-06-23T06:44:23Z",
+    "author": {
+      "login": "carolitascl"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 869,
+    "title": "[Feature]: update zed config",
+    "url": "https://github.com/mksglu/context-mode/issues/869",
+    "state": "CLOSED",
+    "createdAt": "2026-06-23T13:09:35Z",
+    "updatedAt": "2026-06-23T14:57:46Z",
+    "closedAt": "2026-06-23T13:26:08Z",
+    "author": {
+      "login": "kurokirasama"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 873,
+    "title": "[BUG] omp plugin install does not copy SYSTEM.md routing instructions",
+    "url": "https://github.com/mksglu/context-mode/issues/873",
+    "state": "CLOSED",
+    "createdAt": "2026-06-24T00:42:27Z",
+    "updatedAt": "2026-11-04T22:06:17Z",
+    "closedAt": "2026-11-04T22:06:17Z",
+    "author": {
+      "login": "jeffscottward"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 874,
+    "title": "[BUG] OMP plugin tool_result captures metadata but never replaces output — bytes_avoided always 0",
+    "url": "https://github.com/mksglu/context-mode/issues/874",
+    "state": "CLOSED",
+    "createdAt": "2026-06-24T00:42:27Z",
+    "updatedAt": "2026-11-04T22:06:30Z",
+    "closedAt": "2026-11-04T22:06:30Z",
+    "author": {
+      "login": "jeffscottward"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 878,
+    "title": "#chunkMarkdown allows oversized single paragraphs, bypassing MAX_CHUNK_BYTES",
+    "url": "https://github.com/mksglu/context-mode/issues/878",
+    "state": "CLOSED",
+    "createdAt": "2026-06-25T03:06:51Z",
+    "updatedAt": "2026-11-04T22:07:05Z",
+    "closedAt": "2026-11-04T22:07:05Z",
+    "author": {
+      "login": "VVeb1250"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 879,
+    "title": "close",
+    "url": "https://github.com/mksglu/context-mode/issues/879",
+    "state": "CLOSED",
+    "createdAt": "2026-06-25T16:50:48Z",
+    "updatedAt": "2026-06-25T16:54:45Z",
+    "closedAt": "2026-06-25T16:51:59Z",
+    "author": {
+      "login": "woonger"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 880,
+    "title": "[Bug]: cleanupStaleContentDBs race with parallel Pi MCP servers poisons ContentStore singleton (permanent disk I/O error)",
+    "url": "https://github.com/mksglu/context-mode/issues/880",
+    "state": "CLOSED",
+    "createdAt": "2026-06-26T08:20:51Z",
+    "updatedAt": "2026-11-04T22:07:17Z",
+    "closedAt": "2026-11-04T22:07:17Z",
+    "author": {
+      "login": "CatcherITGF"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 882,
+    "title": "Gemini CLI: shipped settings.json hooks out of sync with CLI dispatcher (AfterModel no-op; BeforeAgent not registered)",
+    "url": "https://github.com/mksglu/context-mode/issues/882",
+    "state": "CLOSED",
+    "createdAt": "2026-06-26T13:16:42Z",
+    "updatedAt": "2026-06-26T13:44:59Z",
+    "closedAt": "2026-06-26T13:44:59Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 883,
+    "title": "Cursor: shipped configs/cursor/hooks.json missing sessionStart and afterAgentResponse hooks",
+    "url": "https://github.com/mksglu/context-mode/issues/883",
+    "state": "CLOSED",
+    "createdAt": "2026-06-26T13:16:43Z",
+    "updatedAt": "2026-06-26T13:45:01Z",
+    "closedAt": "2026-06-26T13:45:01Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 885,
+    "title": "docs: adapter install/usage/debugging accuracy (audit vs v1.0.167)",
+    "url": "https://github.com/mksglu/context-mode/issues/885",
+    "state": "CLOSED",
+    "createdAt": "2026-06-26T13:44:57Z",
+    "updatedAt": "2026-06-26T15:11:10Z",
+    "closedAt": "2026-06-26T15:11:10Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  }
+]

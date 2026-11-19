@@ -1,0 +1,1934 @@
+[
+  {
+    "number": 889,
+    "title": "[Bug]: v1.0.168 tarball missing all scripts/*.mjs (postinstall, heal-*, plugin-cache-integrity) — ctx doctor always FAILs \"integrity helper unavailable\"",
+    "url": "https://github.com/mksglu/context-mode/issues/889",
+    "state": "CLOSED",
+    "createdAt": "2026-06-27T13:29:00Z",
+    "updatedAt": "2026-11-04T22:07:56Z",
+    "closedAt": "2026-11-04T22:07:56Z",
+    "author": {
+      "login": "cidoferruco"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 890,
+    "title": "omp plugin install fails: `with { type: \"json\" }` import in pricing.js breaks oh-my-pi extension validator (7 errors building model-prices.json)",
+    "url": "https://github.com/mksglu/context-mode/issues/890",
+    "state": "CLOSED",
+    "createdAt": "2026-06-27T21:09:18Z",
+    "updatedAt": "2026-11-04T22:08:08Z",
+    "closedAt": "2026-11-04T22:08:08Z",
+    "author": {
+      "login": "gardenbaum"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 891,
+    "title": "[Feature]: runtime/executor support for emacs lisp",
+    "url": "https://github.com/mksglu/context-mode/issues/891",
+    "state": "CLOSED",
+    "createdAt": "2026-06-28T18:17:13Z",
+    "updatedAt": "2026-11-04T22:08:17Z",
+    "closedAt": "2026-11-04T22:08:17Z",
+    "author": {
+      "login": "tychoish"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 893,
+    "title": "[Question ]: Confusing/misleading `ctx stats`",
+    "url": "https://github.com/mksglu/context-mode/issues/893",
+    "state": "CLOSED",
+    "createdAt": "2026-06-29T09:57:43Z",
+    "updatedAt": "2026-06-30T09:24:35Z",
+    "closedAt": "2026-06-29T11:35:46Z",
+    "author": {
+      "login": "yairEO"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 894,
+    "title": "[Bug]: statusline stuck on hardcoded \"saves ~98%\" — published 1.0.168 ships without build/, renderer swallows the import error",
+    "url": "https://github.com/mksglu/context-mode/issues/894",
+    "state": "CLOSED",
+    "createdAt": "2026-06-29T15:49:15Z",
+    "updatedAt": "2026-11-04T22:08:41Z",
+    "closedAt": "2026-11-04T22:08:41Z",
+    "author": {
+      "login": "raghu-da"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 895,
+    "title": "ctx_search ranks stale cross-session memory above fresh same-session captures",
+    "url": "https://github.com/mksglu/context-mode/issues/895",
+    "state": "CLOSED",
+    "createdAt": "2026-06-29T18:21:06Z",
+    "updatedAt": "2026-11-04T22:08:54Z",
+    "closedAt": "2026-11-04T22:08:54Z",
+    "author": {
+      "login": "hiddenadhd"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 900,
+    "title": "Bug: \\upgrade\\ only updates one of two parallel install paths; \\doctor\\ reads the other",
+    "url": "https://github.com/mksglu/context-mode/issues/900",
+    "state": "CLOSED",
+    "createdAt": "2026-07-01T15:06:49Z",
+    "updatedAt": "2026-07-01T15:09:28Z",
+    "closedAt": "2026-07-01T15:09:28Z",
+    "author": {
+      "login": "RGalli"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 901,
+    "title": "[Bug]: \\upgrade\\ only updates one of two parallel install trees on Windows; \\doctor\\ reads the other",
+    "url": "https://github.com/mksglu/context-mode/issues/901",
+    "state": "CLOSED",
+    "createdAt": "2026-07-01T15:13:37Z",
+    "updatedAt": "2026-11-04T22:09:43Z",
+    "closedAt": "2026-11-04T22:09:43Z",
+    "author": {
+      "login": "RGalli"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 902,
+    "title": "Resume/PreCompact snapshot serves stale data on long sessions -- priority-based eviction deletes newer events before they're ever read",
+    "url": "https://github.com/mksglu/context-mode/issues/902",
+    "state": "CLOSED",
+    "createdAt": "2026-07-01T23:03:42Z",
+    "updatedAt": "2026-11-04T22:09:55Z",
+    "closedAt": "2026-11-04T22:09:55Z",
+    "author": {
+      "login": "bokar83"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 903,
+    "title": "SessionStart injection truncates UTF-16 surrogate pairs, producing orphan high surrogates that break the host API request",
+    "url": "https://github.com/mksglu/context-mode/issues/903",
+    "state": "CLOSED",
+    "createdAt": "2026-07-02T02:45:59Z",
+    "updatedAt": "2026-11-04T22:10:06Z",
+    "closedAt": "2026-11-04T22:10:06Z",
+    "author": {
+      "login": "mykhailoPavliuk"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 905,
+    "title": "Pi bridge Bun/bun:sqlite same-turn ctx_index -> ctx_search fails with SQLITE_IOERR",
+    "url": "https://github.com/mksglu/context-mode/issues/905",
+    "state": "CLOSED",
+    "createdAt": "2026-07-02T05:58:38Z",
+    "updatedAt": "2026-11-04T22:10:27Z",
+    "closedAt": "2026-11-04T22:10:27Z",
+    "author": {
+      "login": "zolped"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 908,
+    "title": "[Feature]: Configurable redirect exclusions (per-domain fetch passthrough, e.g. claude.ai)",
+    "url": "https://github.com/mksglu/context-mode/issues/908",
+    "state": "CLOSED",
+    "createdAt": "2026-07-02T15:14:06Z",
+    "updatedAt": "2026-11-04T22:11:04Z",
+    "closedAt": "2026-11-04T22:11:04Z",
+    "author": {
+      "login": "asherepenko"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 911,
+    "title": "Injected session_continuity/priority_instructions framing trips Claude Code's auto-mode classifier (Auto-Mode Bypass)",
+    "url": "https://github.com/mksglu/context-mode/issues/911",
+    "state": "CLOSED",
+    "createdAt": "2026-07-03T13:19:31Z",
+    "updatedAt": "2026-11-04T22:11:21Z",
+    "closedAt": "2026-11-04T22:11:21Z",
+    "author": {
+      "login": "nufiko"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 7
+    }
+  },
+  {
+    "number": 914,
+    "title": "Single-file `index --source <label>` stores a bare label (inconsistent with indexDirectory) — is a fix welcome?",
+    "url": "https://github.com/mksglu/context-mode/issues/914",
+    "state": "CLOSED",
+    "createdAt": "2026-07-04T02:59:24Z",
+    "updatedAt": "2026-11-04T22:11:32Z",
+    "closedAt": "2026-11-04T22:11:32Z",
+    "author": {
+      "login": "heybronson"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 915,
+    "title": "runPool: `capped` is true when jobs.length < concurrency (not a real cap)",
+    "url": "https://github.com/mksglu/context-mode/issues/915",
+    "state": "CLOSED",
+    "createdAt": "2026-07-04T06:05:10Z",
+    "updatedAt": "2026-11-04T22:11:39Z",
+    "closedAt": "2026-11-04T22:11:39Z",
+    "author": {
+      "login": "chirag127"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 916,
+    "title": "[Docs]: Clarify that global install + MCP server is only required for Pi, Zed, Antigravity, OMP — not for OpenCode/Kilo/OpenClaw",
+    "url": "https://github.com/mksglu/context-mode/issues/916",
+    "state": "CLOSED",
+    "createdAt": "2026-07-04T06:25:13Z",
+    "updatedAt": "2026-07-04T06:31:15Z",
+    "closedAt": "2026-07-04T06:31:15Z",
+    "author": {
+      "login": "ackalker"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 917,
+    "title": "license: consider relicensing off ELv2 to MIT/Apache-2.0 to unblock OSS adoption",
+    "url": "https://github.com/mksglu/context-mode/issues/917",
+    "state": "CLOSED",
+    "createdAt": "2026-07-04T13:33:33Z",
+    "updatedAt": "2026-07-05T21:43:46Z",
+    "closedAt": "2026-07-05T21:43:46Z",
+    "author": {
+      "login": "chirag127"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 919,
+    "title": "[Feature]: Support for CommandCode CLI",
+    "url": "https://github.com/mksglu/context-mode/issues/919",
+    "state": "CLOSED",
+    "createdAt": "2026-07-05T06:43:02Z",
+    "updatedAt": "2026-11-04T22:12:05Z",
+    "closedAt": "2026-11-04T22:12:05Z",
+    "author": {
+      "login": "nirjandcc"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 923,
+    "title": "start.mjs: process.chdir(__dirname) changes MCP subprocess CWD, breaking gnome-terminal new-tab directory",
+    "url": "https://github.com/mksglu/context-mode/issues/923",
+    "state": "CLOSED",
+    "createdAt": "2026-07-06T00:34:20Z",
+    "updatedAt": "2026-11-04T22:12:55Z",
+    "closedAt": "2026-11-04T22:12:55Z",
+    "author": {
+      "login": "mattst88"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 925,
+    "title": "Shell execution wrapper breaks commands that start with compound shell syntax",
+    "url": "https://github.com/mksglu/context-mode/issues/925",
+    "state": "CLOSED",
+    "createdAt": "2026-07-06T12:29:52Z",
+    "updatedAt": "2026-11-04T22:13:13Z",
+    "closedAt": "2026-11-04T22:13:13Z",
+    "author": {
+      "login": "aaamosh"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 936,
+    "title": "Claude Code stdio ctx_execute can hang indefinitely without server-side timeout",
+    "url": "https://github.com/mksglu/context-mode/issues/936",
+    "state": "CLOSED",
+    "createdAt": "2026-07-09T04:36:55Z",
+    "updatedAt": "2026-11-04T22:14:27Z",
+    "closedAt": "2026-11-04T22:14:27Z",
+    "author": {
+      "login": "stgmt"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 938,
+    "title": "WebFetch PreToolUse redirect has no exception for claude.ai/code/artifact URLs — ctx_fetch_and_index only ever gets the empty unauthenticated SPA shell",
+    "url": "https://github.com/mksglu/context-mode/issues/938",
+    "state": "CLOSED",
+    "createdAt": "2026-07-09T09:04:01Z",
+    "updatedAt": "2026-11-04T22:14:40Z",
+    "closedAt": "2026-11-04T22:14:40Z",
+    "author": {
+      "login": "michael-partoo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 940,
+    "title": "Feature: move OS-specific Codex guidance into an installer-managed OS overlay",
+    "url": "https://github.com/mksglu/context-mode/issues/940",
+    "state": "CLOSED",
+    "createdAt": "2026-07-09T21:00:34Z",
+    "updatedAt": "2026-11-04T22:15:02Z",
+    "closedAt": "2026-11-04T22:15:02Z",
+    "author": {
+      "login": "TyceHerrman"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 941,
+    "title": "Make JavaScript the default, not the only ctx_execute language in Codex guidance",
+    "url": "https://github.com/mksglu/context-mode/issues/941",
+    "state": "CLOSED",
+    "createdAt": "2026-07-09T21:15:38Z",
+    "updatedAt": "2026-11-04T22:15:15Z",
+    "closedAt": "2026-11-04T22:15:15Z",
+    "author": {
+      "login": "TyceHerrman"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 942,
+    "title": "Align Codex AGENTS curl/wget guidance with existing safe file-output routing",
+    "url": "https://github.com/mksglu/context-mode/issues/942",
+    "state": "CLOSED",
+    "createdAt": "2026-07-09T22:01:22Z",
+    "updatedAt": "2026-10-03T03:24:11Z",
+    "closedAt": "2026-10-03T03:24:11Z",
+    "author": {
+      "login": "TyceHerrman"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 943,
+    "title": "Withdrawn",
+    "url": "https://github.com/mksglu/context-mode/issues/943",
+    "state": "CLOSED",
+    "createdAt": "2026-07-10T12:42:15Z",
+    "updatedAt": "2026-07-10T16:51:28Z",
+    "closedAt": "2026-07-10T16:51:28Z",
+    "author": {
+      "login": "roruang"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 944,
+    "title": "[Bug]: Codex external-file check uses ~/.codex/settings.json instead of effective permission profile",
+    "url": "https://github.com/mksglu/context-mode/issues/944",
+    "state": "CLOSED",
+    "createdAt": "2026-07-10T17:21:34Z",
+    "updatedAt": "2026-11-04T22:15:23Z",
+    "closedAt": "2026-11-04T22:15:23Z",
+    "author": {
+      "login": "TyceHerrman"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 946,
+    "title": "Agent-prompt injection gets third-party plugins' subagent dispatches blocked by Claude Code's auto-mode classifier — needs an opt-out",
+    "url": "https://github.com/mksglu/context-mode/issues/946",
+    "state": "CLOSED",
+    "createdAt": "2026-07-10T19:20:50Z",
+    "updatedAt": "2026-11-04T22:15:40Z",
+    "closedAt": "2026-11-04T22:15:40Z",
+    "author": {
+      "login": "JimCline"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 947,
+    "title": "[Bug]: ctx_batch_execute timeout does not bound indexing/search, so Claude Code agents can hang for hours",
+    "url": "https://github.com/mksglu/context-mode/issues/947",
+    "state": "CLOSED",
+    "createdAt": "2026-07-10T19:48:22Z",
+    "updatedAt": "2026-11-04T22:15:47Z",
+    "closedAt": "2026-11-04T22:15:47Z",
+    "author": {
+      "login": "stgmt"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 6
+    }
+  },
+  {
+    "number": 949,
+    "title": "sessions/ directory has no retention — grows unbounded (content/ prunes at 14d, sessions/ never)",
+    "url": "https://github.com/mksglu/context-mode/issues/949",
+    "state": "CLOSED",
+    "createdAt": "2026-07-11T00:42:39Z",
+    "updatedAt": "2026-11-04T22:16:01Z",
+    "closedAt": "2026-11-04T22:16:01Z",
+    "author": {
+      "login": "laj52"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 950,
+    "title": "[Bug]: ctx_stats self-contradicts within one render — per-chat 'kept out' (2.7 MB) exceeds all-projects total (868 KB), and 100% savings reported for a session with zero ctx_execute calls",
+    "url": "https://github.com/mksglu/context-mode/issues/950",
+    "state": "CLOSED",
+    "createdAt": "2026-07-11T03:21:22Z",
+    "updatedAt": "2026-11-04T22:16:09Z",
+    "closedAt": "2026-11-04T22:16:09Z",
+    "author": {
+      "login": "likebear1968"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 6
+    }
+  },
+  {
+    "number": 951,
+    "title": "[Bug] ctx_batch_execute crashes node/npm/npx: stale cm-fs-preload-<pid>.js (NODE_OPTIONS leak) + worker accumulation on reload",
+    "url": "https://github.com/mksglu/context-mode/issues/951",
+    "state": "CLOSED",
+    "createdAt": "2026-07-12T08:46:43Z",
+    "updatedAt": "2026-11-04T22:16:16Z",
+    "closedAt": "2026-11-04T22:16:16Z",
+    "author": {
+      "login": "jodunk"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 953,
+    "title": "[Bug]: Codex Desktop on Windows retains one context-mode MCP server per task; cache cleanup hits os error 32",
+    "url": "https://github.com/mksglu/context-mode/issues/953",
+    "state": "CLOSED",
+    "createdAt": "2026-07-13T14:28:27Z",
+    "updatedAt": "2026-11-04T22:16:32Z",
+    "closedAt": "2026-11-04T22:16:32Z",
+    "author": {
+      "login": "ken-jo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 954,
+    "title": "[Bug]: ctx_execute_file rejects registered external Git worktrees while ctx_batch_execute accepts them as cwd",
+    "url": "https://github.com/mksglu/context-mode/issues/954",
+    "state": "CLOSED",
+    "createdAt": "2026-07-13T18:22:00Z",
+    "updatedAt": "2026-11-04T22:16:39Z",
+    "closedAt": "2026-11-04T22:16:39Z",
+    "author": {
+      "login": "zer09"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 956,
+    "title": "[Feature]: npm warn deprecated prebuild-install@7.1.3: No longer maintained.",
+    "url": "https://github.com/mksglu/context-mode/issues/956",
+    "state": "CLOSED",
+    "createdAt": "2026-07-14T11:50:40Z",
+    "updatedAt": "2026-11-04T22:16:55Z",
+    "closedAt": "2026-11-04T22:16:55Z",
+    "author": {
+      "login": "Sean990"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 959,
+    "title": "Pi adapter: hung ctx_execute cannot be aborted; Esc/Ctrl+C does nothing",
+    "url": "https://github.com/mksglu/context-mode/issues/959",
+    "state": "CLOSED",
+    "createdAt": "2026-07-15T10:31:49Z",
+    "updatedAt": "2026-11-04T22:17:19Z",
+    "closedAt": "2026-11-04T22:17:19Z",
+    "author": {
+      "login": "Blue-B"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 7
+    }
+  },
+  {
+    "number": 960,
+    "title": "PreToolUse `mcp__` matcher routes observe-only MCP tools — add per-tool exclusion",
+    "url": "https://github.com/mksglu/context-mode/issues/960",
+    "state": "CLOSED",
+    "createdAt": "2026-07-15T21:59:57Z",
+    "updatedAt": "2026-11-04T22:17:27Z",
+    "closedAt": "2026-11-04T22:17:27Z",
+    "author": {
+      "login": "mrpicodevsec"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 961,
+    "title": "RFC: add indexed byte/chunk budgets and separate batch display from indexed input",
+    "url": "https://github.com/mksglu/context-mode/issues/961",
+    "state": "CLOSED",
+    "createdAt": "2026-07-16T04:16:36Z",
+    "updatedAt": "2026-11-04T22:17:35Z",
+    "closedAt": "2026-11-04T22:17:35Z",
+    "author": {
+      "login": "Tomodad"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 962,
+    "title": "RFC: bound trigram and vocabulary growth for logs, JSONL, and high-entropy sources",
+    "url": "https://github.com/mksglu/context-mode/issues/962",
+    "state": "CLOSED",
+    "createdAt": "2026-07-16T04:16:58Z",
+    "updatedAt": "2026-11-04T22:17:43Z",
+    "closedAt": "2026-11-04T22:17:43Z",
+    "author": {
+      "login": "Tomodad"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 964,
+    "title": "Feature request: env knob to disable the SessionStart routing-block injection",
+    "url": "https://github.com/mksglu/context-mode/issues/964",
+    "state": "CLOSED",
+    "createdAt": "2026-07-16T14:06:52Z",
+    "updatedAt": "2026-11-04T22:17:59Z",
+    "closedAt": "2026-11-04T22:17:59Z",
+    "author": {
+      "login": "abstralight"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 965,
+    "title": "withdrawn",
+    "url": "https://github.com/mksglu/context-mode/issues/965",
+    "state": "CLOSED",
+    "createdAt": "2026-07-16T20:19:18Z",
+    "updatedAt": "2026-07-16T20:22:34Z",
+    "closedAt": "2026-07-16T20:22:34Z",
+    "author": {
+      "login": "christina-sio"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 967,
+    "title": "Auto-mode permission classifier denies ~40% of subagent spawns due to injected <context_window_protection> block",
+    "url": "https://github.com/mksglu/context-mode/issues/967",
+    "state": "CLOSED",
+    "createdAt": "2026-07-17T16:57:09Z",
+    "updatedAt": "2026-11-04T22:18:06Z",
+    "closedAt": "2026-11-04T22:18:06Z",
+    "author": {
+      "login": "matkatmusic"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 6
+    }
+  },
+  {
+    "number": 976,
+    "title": "Document dependency-aware Python execution for project environments",
+    "url": "https://github.com/mksglu/context-mode/issues/976",
+    "state": "CLOSED",
+    "createdAt": "2026-07-19T20:41:21Z",
+    "updatedAt": "2026-07-19T20:55:23Z",
+    "closedAt": "2026-07-19T20:50:56Z",
+    "author": {
+      "login": "stanley-910"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 977,
+    "title": "Shell examples fail under zsh because runtime honors $SHELL",
+    "url": "https://github.com/mksglu/context-mode/issues/977",
+    "state": "CLOSED",
+    "createdAt": "2026-07-19T20:41:21Z",
+    "updatedAt": "2026-07-19T20:55:23Z",
+    "closedAt": "2026-07-19T20:52:14Z",
+    "author": {
+      "login": "stanley-910"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 978,
+    "title": "File workflow examples write to /tmp outside ctx_execute_file sandbox",
+    "url": "https://github.com/mksglu/context-mode/issues/978",
+    "state": "CLOSED",
+    "createdAt": "2026-07-19T20:41:21Z",
+    "updatedAt": "2026-07-19T20:55:23Z",
+    "closedAt": "2026-07-19T20:52:30Z",
+    "author": {
+      "login": "stanley-910"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 979,
+    "title": "Claude Code headless mode still denied by active PreToolUse formatter",
+    "url": "https://github.com/mksglu/context-mode/issues/979",
+    "state": "CLOSED",
+    "createdAt": "2026-07-20T10:03:18Z",
+    "updatedAt": "2026-11-04T22:19:31Z",
+    "closedAt": "2026-11-04T22:19:31Z",
+    "author": {
+      "login": "movax01h"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 982,
+    "title": "Windows: MCP server child orphans & CPU-spins on session end (parent-death guard is Linux/Bun-only)",
+    "url": "https://github.com/mksglu/context-mode/issues/982",
+    "state": "CLOSED",
+    "createdAt": "2026-07-21T15:38:17Z",
+    "updatedAt": "2026-11-04T22:19:55Z",
+    "closedAt": "2026-11-04T22:19:55Z",
+    "author": {
+      "login": "alove20"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 6
+    }
+  },
+  {
+    "number": 983,
+    "title": "[Bug]: Pi reload leaks foreground MCP helper after sub-context starts",
+    "url": "https://github.com/mksglu/context-mode/issues/983",
+    "state": "CLOSED",
+    "createdAt": "2026-07-21T19:16:35Z",
+    "updatedAt": "2026-11-04T22:20:06Z",
+    "closedAt": "2026-11-04T22:20:06Z",
+    "author": {
+      "login": "Gabrielgvl"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 984,
+    "title": "WebFetch redirect has no exemption for claude.ai/code/artifact URLs, breaks artifact fetches",
+    "url": "https://github.com/mksglu/context-mode/issues/984",
+    "state": "CLOSED",
+    "createdAt": "2026-07-22T00:44:20Z",
+    "updatedAt": "2026-11-04T22:20:17Z",
+    "closedAt": "2026-11-04T22:20:17Z",
+    "author": {
+      "login": "kewtyboi"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 985,
+    "title": "Multi-session contention on shared per-project content DB → busy-wait CPU spin & event-loop hang (Windows)",
+    "url": "https://github.com/mksglu/context-mode/issues/985",
+    "state": "CLOSED",
+    "createdAt": "2026-07-22T02:17:55Z",
+    "updatedAt": "2026-11-04T22:20:26Z",
+    "closedAt": "2026-11-04T22:20:26Z",
+    "author": {
+      "login": "alove20"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 992,
+    "title": "[Bug] Bun: live ContentStore/SessionDB handle wedges to permanent SQLITE_IOERR (disk I/O error) on healthy disk+DB; ctx_doctor stays green",
+    "url": "https://github.com/mksglu/context-mode/issues/992",
+    "state": "CLOSED",
+    "createdAt": "2026-07-23T12:47:53Z",
+    "updatedAt": "2026-11-04T22:21:06Z",
+    "closedAt": "2026-11-04T22:21:06Z",
+    "author": {
+      "login": "halindrome"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 993,
+    "title": "[Bug]: Windows hook commands fail under PowerShell (missing call operator `&`)",
+    "url": "https://github.com/mksglu/context-mode/issues/993",
+    "state": "CLOSED",
+    "createdAt": "2026-07-23T21:23:22Z",
+    "updatedAt": "2026-11-04T22:21:14Z",
+    "closedAt": "2026-11-04T22:21:14Z",
+    "author": {
+      "login": "dyammarcano"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 998,
+    "title": "[withdrawn — filed in error]",
+    "url": "https://github.com/mksglu/context-mode/issues/998",
+    "state": "CLOSED",
+    "createdAt": "2026-07-25T16:33:11Z",
+    "updatedAt": "2026-07-25T16:39:24Z",
+    "closedAt": "2026-07-25T16:39:10Z",
+    "author": {
+      "login": "authorityandbrand"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 999,
+    "title": "MCP sidecar (start.mjs) CPU busy-loop — 23 concurrent instances at 284%+ CPU contributed to host system crash",
+    "url": "https://github.com/mksglu/context-mode/issues/999",
+    "state": "CLOSED",
+    "createdAt": "2026-07-26T03:50:57Z",
+    "updatedAt": "2026-11-04T22:21:38Z",
+    "closedAt": "2026-11-04T22:21:38Z",
+    "author": {
+      "login": "kewtyboi"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1000,
+    "title": "Redundant PreToolUse matchers double-fire on ctx_execute/ctx_execute_file/ctx_batch_execute; no timeout on hot PostToolUse hook",
+    "url": "https://github.com/mksglu/context-mode/issues/1000",
+    "state": "CLOSED",
+    "createdAt": "2026-07-26T10:28:40Z",
+    "updatedAt": "2026-11-04T23:44:56Z",
+    "closedAt": "2026-11-04T22:21:45Z",
+    "author": {
+      "login": "jrsallee"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1003,
+    "title": "PreToolUse denies and nudges are defeated by parallel tool batches; WebFetch deny has no opt-out",
+    "url": "https://github.com/mksglu/context-mode/issues/1003",
+    "state": "CLOSED",
+    "createdAt": "2026-07-27T05:24:03Z",
+    "updatedAt": "2026-11-04T22:22:20Z",
+    "closedAt": "2026-11-04T22:22:20Z",
+    "author": {
+      "login": "rrva"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1004,
+    "title": "buildRulesSection() if/else branches are identical — rule_content bodies inlined verbatim into <session_resume>, duplicating host-injected AGENTS.md",
+    "url": "https://github.com/mksglu/context-mode/issues/1004",
+    "state": "CLOSED",
+    "createdAt": "2026-07-27T06:30:40Z",
+    "updatedAt": "2026-11-04T22:22:33Z",
+    "closedAt": "2026-11-04T22:22:33Z",
+    "author": {
+      "login": "yjtdkj"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1005,
+    "title": "[Bug]: ctx upgrade freezes the NEW version dir's hooks.json onto the OLD version's paths on macOS (bun runtime opens the Windows-only normalization)",
+    "url": "https://github.com/mksglu/context-mode/issues/1005",
+    "state": "CLOSED",
+    "createdAt": "2026-07-27T16:10:39Z",
+    "updatedAt": "2026-11-04T22:22:42Z",
+    "closedAt": "2026-11-04T22:22:42Z",
+    "author": {
+      "login": "ryanstempski-cmyk"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1006,
+    "title": "WebFetch deny is unconditional: claude.ai artifact URLs are unreachable via the suggested ctx_* replacements (breaks Artifact updates)",
+    "url": "https://github.com/mksglu/context-mode/issues/1006",
+    "state": "CLOSED",
+    "createdAt": "2026-07-27T17:39:17Z",
+    "updatedAt": "2026-11-04T22:22:54Z",
+    "closedAt": "2026-11-04T22:22:54Z",
+    "author": {
+      "login": "nwilliams-lucas"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1007,
+    "title": "\"context\" hook injection still breaks prompt cache on active-memory updates — regression of #598's fix intent",
+    "url": "https://github.com/mksglu/context-mode/issues/1007",
+    "state": "CLOSED",
+    "createdAt": "2026-07-28T14:28:02Z",
+    "updatedAt": "2026-07-30T17:52:53Z",
+    "closedAt": "2026-07-30T17:52:53Z",
+    "author": {
+      "login": "Nithin745"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 1014,
+    "title": "No supported way to assert a source is populated: doctor says PASS on an empty index, ctx_stats measures session usage, search can't distinguish empty from no-match",
+    "url": "https://github.com/mksglu/context-mode/issues/1014",
+    "state": "CLOSED",
+    "createdAt": "2026-07-29T17:35:52Z",
+    "updatedAt": "2026-11-04T22:23:17Z",
+    "closedAt": "2026-11-04T22:23:17Z",
+    "author": {
+      "login": "HectorBernstorff"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1015,
+    "title": "ctx_execute/ctx_batch_execute/ctx_execute_file's generic dispatch defeats Claude Code's tool-level permission allowlist",
+    "url": "https://github.com/mksglu/context-mode/issues/1015",
+    "state": "CLOSED",
+    "createdAt": "2026-07-29T18:43:58Z",
+    "updatedAt": "2026-07-29T18:52:39Z",
+    "closedAt": "2026-07-29T18:52:39Z",
+    "author": {
+      "login": "guykisel"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1016,
+    "title": "[Feature]: a clean way to uninstall and remove configs",
+    "url": "https://github.com/mksglu/context-mode/issues/1016",
+    "state": "CLOSED",
+    "createdAt": "2026-07-30T15:23:56Z",
+    "updatedAt": "2026-11-04T22:23:26Z",
+    "closedAt": "2026-11-04T22:23:26Z",
+    "author": {
+      "login": "Omzig"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1017,
+    "title": "[Bug]: Copilot CLI resolves ctx_execute_file project root to plugin install",
+    "url": "https://github.com/mksglu/context-mode/issues/1017",
+    "state": "CLOSED",
+    "createdAt": "2026-07-30T20:09:35Z",
+    "updatedAt": "2026-11-04T22:23:33Z",
+    "closedAt": "2026-11-04T22:23:33Z",
+    "author": {
+      "login": "rjmurillo"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1018,
+    "title": "[Bug]: claude-code tool naming assumes the plugin install, so standalone-MCP sessions get routing guidance naming nonexistent tools",
+    "url": "https://github.com/mksglu/context-mode/issues/1018",
+    "state": "CLOSED",
+    "createdAt": "2026-07-30T21:45:40Z",
+    "updatedAt": "2026-11-04T22:23:41Z",
+    "closedAt": "2026-11-04T22:23:41Z",
+    "author": {
+      "login": "scriventhorpe-cloud"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1020,
+    "title": "Re-sync vs keep porting: the measured case, and what MUST survive either way",
+    "url": "https://github.com/mksglu/context-mode/issues/1020",
+    "state": "CLOSED",
+    "createdAt": "2026-07-31T11:27:53Z",
+    "updatedAt": "2026-07-31T11:29:48Z",
+    "closedAt": "2026-07-31T11:29:48Z",
+    "author": {
+      "login": "doublefx"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 1021,
+    "title": "README table is wrong about Pi's hook support - it's actually Full, not High",
+    "url": "https://github.com/mksglu/context-mode/issues/1021",
+    "state": "CLOSED",
+    "createdAt": "2026-08-01T10:33:53Z",
+    "updatedAt": "2026-11-04T22:23:56Z",
+    "closedAt": "2026-11-04T22:23:56Z",
+    "author": {
+      "login": "unship"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1022,
+    "title": "[Bug]: Resume snapshot ignores byte budget — advertises <2KB, injects ~196KB",
+    "url": "https://github.com/mksglu/context-mode/issues/1022",
+    "state": "CLOSED",
+    "createdAt": "2026-08-01T18:27:10Z",
+    "updatedAt": "2026-11-04T22:24:04Z",
+    "closedAt": "2026-11-04T22:24:04Z",
+    "author": {
+      "login": "EvolveAegis"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1023,
+    "title": "[Bug]: Analytics \"ran Nx longer before /compact\" metric is a byte ratio presented as time",
+    "url": "https://github.com/mksglu/context-mode/issues/1023",
+    "state": "CLOSED",
+    "createdAt": "2026-08-01T19:28:55Z",
+    "updatedAt": "2026-11-04T22:24:12Z",
+    "closedAt": "2026-11-04T22:24:12Z",
+    "author": {
+      "login": "EvolveAegis"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1024,
+    "title": "[Bug]: Stale content DB cleanup deletes live-but-idle sessions (WAL mtime only, no liveness check)",
+    "url": "https://github.com/mksglu/context-mode/issues/1024",
+    "state": "CLOSED",
+    "createdAt": "2026-08-01T19:29:00Z",
+    "updatedAt": "2026-11-04T22:24:21Z",
+    "closedAt": "2026-11-04T22:24:21Z",
+    "author": {
+      "login": "EvolveAegis"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1025,
+    "title": "[Bug]: Returned content bytes double-counted in reduction_pct denominator",
+    "url": "https://github.com/mksglu/context-mode/issues/1025",
+    "state": "CLOSED",
+    "createdAt": "2026-08-01T19:30:32Z",
+    "updatedAt": "2026-11-04T22:24:30Z",
+    "closedAt": "2026-11-04T22:24:30Z",
+    "author": {
+      "login": "EvolveAegis"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1026,
+    "title": "Bash routing nudge is hardcoded once-per-session; external-MCP nudge next to it is periodic + configurable",
+    "url": "https://github.com/mksglu/context-mode/issues/1026",
+    "state": "CLOSED",
+    "createdAt": "2026-08-01T21:57:28Z",
+    "updatedAt": "2026-11-04T22:24:39Z",
+    "closedAt": "2026-11-04T22:24:39Z",
+    "author": {
+      "login": "macblackstuff"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1028,
+    "title": "PreCompact resume snapshot uses bare `ctx_search`, not the platform tool name",
+    "url": "https://github.com/mksglu/context-mode/issues/1028",
+    "state": "CLOSED",
+    "createdAt": "2026-08-02T14:07:37Z",
+    "updatedAt": "2026-11-04T22:24:49Z",
+    "closedAt": "2026-11-04T22:24:49Z",
+    "author": {
+      "login": "EvolveAegis"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1031,
+    "title": "[Feature]: ctx_* tool descriptions are ~80% steering prose — ~6.2K tokens of tool definitions per call on Pi",
+    "url": "https://github.com/mksglu/context-mode/issues/1031",
+    "state": "CLOSED",
+    "createdAt": "2026-08-03T19:11:28Z",
+    "updatedAt": "2026-11-04T22:25:24Z",
+    "closedAt": "2026-11-04T22:25:24Z",
+    "author": {
+      "login": "soft4rchitecture"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1032,
+    "title": "VS Code Remote-WSL project root incorrectly anchored to VS Code install directory",
+    "url": "https://github.com/mksglu/context-mode/issues/1032",
+    "state": "CLOSED",
+    "createdAt": "2026-08-04T12:03:39Z",
+    "updatedAt": "2026-11-04T22:25:39Z",
+    "closedAt": "2026-11-04T22:25:39Z",
+    "author": {
+      "login": "daniel-vincent-veriforce"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1036,
+    "title": "opencode adapter appends cumulative turn cost once per step, over-counting multi-step turns",
+    "url": "https://github.com/mksglu/context-mode/issues/1036",
+    "state": "CLOSED",
+    "createdAt": "2026-08-06T18:27:25Z",
+    "updatedAt": "2026-11-04T22:26:14Z",
+    "closedAt": "2026-11-04T22:26:14Z",
+    "author": {
+      "login": "EvolveAegis"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1037,
+    "title": "PreToolUse routing denies WebFetch/curl for subagents that cannot reach the MCP server",
+    "url": "https://github.com/mksglu/context-mode/issues/1037",
+    "state": "CLOSED",
+    "createdAt": "2026-08-06T19:41:34Z",
+    "updatedAt": "2026-11-04T22:26:21Z",
+    "closedAt": "2026-11-04T22:26:21Z",
+    "author": {
+      "login": "patroc"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1039,
+    "title": "[Bug]: ctx_fetch_and_index silently ignores HTTP_PROXY/HTTPS_PROXY — fetch subprocess strips all proxy env vars",
+    "url": "https://github.com/mksglu/context-mode/issues/1039",
+    "state": "CLOSED",
+    "createdAt": "2026-08-07T07:28:05Z",
+    "updatedAt": "2026-11-04T22:26:28Z",
+    "closedAt": "2026-11-04T22:26:28Z",
+    "author": {
+      "login": "DenisBalan"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1045,
+    "title": "Feature Suggestion: Optional token metering & paid API key support via `neuforge-pay`",
+    "url": "https://github.com/mksglu/context-mode/issues/1045",
+    "state": "CLOSED",
+    "createdAt": "2026-08-11T18:40:40Z",
+    "updatedAt": "2026-11-04T22:27:18Z",
+    "closedAt": "2026-11-04T22:27:18Z",
+    "author": {
+      "login": "sophieamoure2026-ui"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1046,
+    "title": "Possible complementary direction: LongHorizon-Harness for sustained agent tasks",
+    "url": "https://github.com/mksglu/context-mode/issues/1046",
+    "state": "CLOSED",
+    "createdAt": "2026-08-12T03:21:09Z",
+    "updatedAt": "2026-11-04T22:27:28Z",
+    "closedAt": "2026-11-04T22:27:28Z",
+    "author": {
+      "login": "Upper9527"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1047,
+    "title": "[Feature]: Make execution echoes configurable and support compact invocation summaries",
+    "url": "https://github.com/mksglu/context-mode/issues/1047",
+    "state": "CLOSED",
+    "createdAt": "2026-08-12T08:49:19Z",
+    "updatedAt": "2026-11-04T22:27:35Z",
+    "closedAt": "2026-11-04T22:27:35Z",
+    "author": {
+      "login": "jeanmonet"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1048,
+    "title": "Claude Code plan mode blocks ctx_batch_execute: no read-only gather path since the #851 annotations",
+    "url": "https://github.com/mksglu/context-mode/issues/1048",
+    "state": "CLOSED",
+    "createdAt": "2026-08-12T16:30:19Z",
+    "updatedAt": "2026-11-04T22:27:43Z",
+    "closedAt": "2026-11-04T22:27:43Z",
+    "author": {
+      "login": "moonexpr"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1049,
+    "title": "SessionStart cache-heal re-injects a duplicate hook with an absolute path when an existing hook is registered via a wrapper script",
+    "url": "https://github.com/mksglu/context-mode/issues/1049",
+    "state": "CLOSED",
+    "createdAt": "2026-08-12T22:08:57Z",
+    "updatedAt": "2026-11-04T22:27:51Z",
+    "closedAt": "2026-11-04T22:27:51Z",
+    "author": {
+      "login": "MarshalCurrier"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1050,
+    "title": "Feature: zero-gap single-row collapsed rendering for Pi tools",
+    "url": "https://github.com/mksglu/context-mode/issues/1050",
+    "state": "CLOSED",
+    "createdAt": "2026-08-13T15:49:29Z",
+    "updatedAt": "2026-11-04T22:27:58Z",
+    "closedAt": "2026-11-04T22:27:58Z",
+    "author": {
+      "login": "pierre-mgmt"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1051,
+    "title": "[Proposal] Hosted memory for ContextMode users — 97.5% fewer tokens (ViBo Cloud API)",
+    "url": "https://github.com/mksglu/context-mode/issues/1051",
+    "state": "CLOSED",
+    "createdAt": "2026-08-13T18:57:27Z",
+    "updatedAt": "2026-09-15T05:12:55Z",
+    "closedAt": "2026-09-15T05:12:55Z",
+    "author": {
+      "login": "vnbochkarev-netizen"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1052,
+    "title": "[Bug]: OpenCode webfetch alias missing - TOOL_ALIASES maps \"fetch\" but opencode tool is \"webfetch\"",
+    "url": "https://github.com/mksglu/context-mode/issues/1052",
+    "state": "CLOSED",
+    "createdAt": "2026-08-14T15:11:03Z",
+    "updatedAt": "2026-11-04T22:28:06Z",
+    "closedAt": "2026-11-04T22:28:06Z",
+    "author": {
+      "login": "marcusyoung"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1053,
+    "title": "[Bug]: isMCPReady() gate swallows all redirects in plugin-only embedded mode (OpenCode)",
+    "url": "https://github.com/mksglu/context-mode/issues/1053",
+    "state": "CLOSED",
+    "createdAt": "2026-08-14T15:11:14Z",
+    "updatedAt": "2026-11-04T22:28:13Z",
+    "closedAt": "2026-11-04T22:28:13Z",
+    "author": {
+      "login": "marcusyoung"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1055,
+    "title": "isMCPReady() counts sibling sessions' servers: WebFetch/curl denied in concurrent sessions whose own MCP server never started",
+    "url": "https://github.com/mksglu/context-mode/issues/1055",
+    "state": "CLOSED",
+    "createdAt": "2026-08-15T17:29:25Z",
+    "updatedAt": "2026-11-04T22:28:20Z",
+    "closedAt": "2026-11-04T22:28:20Z",
+    "author": {
+      "login": "eli-pritykin"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1058,
+    "title": "Uninstall leaves SessionStart hook, cache dir, and running MCP process behind",
+    "url": "https://github.com/mksglu/context-mode/issues/1058",
+    "state": "CLOSED",
+    "createdAt": "2026-08-17T15:46:35Z",
+    "updatedAt": "2026-11-04T22:28:35Z",
+    "closedAt": "2026-11-04T22:28:35Z",
+    "author": {
+      "login": "Dyad-ITSS"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1063,
+    "title": "[Feature]: 请问这个项目不迭代了吗？是出什么事情了吗",
+    "url": "https://github.com/mksglu/context-mode/issues/1063",
+    "state": "CLOSED",
+    "createdAt": "2026-08-18T12:52:03Z",
+    "updatedAt": "2026-11-04T22:28:43Z",
+    "closedAt": "2026-11-04T22:28:43Z",
+    "author": {
+      "login": "wlchen1102"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "enhancement"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1065,
+    "title": "Insights: D1 too-many-SQL-variables on team/org + owner cannot be assigned to a team",
+    "url": "https://github.com/mksglu/context-mode/issues/1065",
+    "state": "CLOSED",
+    "createdAt": "2026-08-19T05:01:29Z",
+    "updatedAt": "2026-11-04T22:28:51Z",
+    "closedAt": "2026-11-04T22:28:51Z",
+    "author": {
+      "login": "rasatpetabit"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1067,
+    "title": "pi adapter: collapsed tool status line shows the code-echo fence line (```javascript) instead of actual output",
+    "url": "https://github.com/mksglu/context-mode/issues/1067",
+    "state": "CLOSED",
+    "createdAt": "2026-08-19T22:55:49Z",
+    "updatedAt": "2026-11-04T22:29:06Z",
+    "closedAt": "2026-11-04T22:29:06Z",
+    "author": {
+      "login": "chenyn273"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1068,
+    "title": "The cm-fs preload writes its marker to child stderr, and grandchildren inherit it into test assertions",
+    "url": "https://github.com/mksglu/context-mode/issues/1068",
+    "state": "CLOSED",
+    "createdAt": "2026-08-21T08:06:25Z",
+    "updatedAt": "2026-11-04T22:29:13Z",
+    "closedAt": "2026-11-04T22:29:13Z",
+    "author": {
+      "login": "B-EtterDigital"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1069,
+    "title": "Pi adapter does not enforce mandatory context-mode routing for read-only tools",
+    "url": "https://github.com/mksglu/context-mode/issues/1069",
+    "state": "CLOSED",
+    "createdAt": "2026-08-21T10:26:52Z",
+    "updatedAt": "2026-11-04T22:29:20Z",
+    "closedAt": "2026-11-04T22:29:20Z",
+    "author": {
+      "login": "skoch13"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1072,
+    "title": "[Bug]: non-Claude startup creates ~/.claude via Claude-only self-healers",
+    "url": "https://github.com/mksglu/context-mode/issues/1072",
+    "state": "CLOSED",
+    "createdAt": "2026-08-22T03:32:31Z",
+    "updatedAt": "2026-09-19T15:39:55Z",
+    "closedAt": "2026-09-19T15:39:55Z",
+    "author": {
+      "login": "lancy69"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1075,
+    "title": "[Bug]: permission patterns anchored with // or ~/ never match — ctx_execute_file blocks allowed paths and the deny gate fails open",
+    "url": "https://github.com/mksglu/context-mode/issues/1075",
+    "state": "CLOSED",
+    "createdAt": "2026-08-24T10:04:29Z",
+    "updatedAt": "2026-11-04T22:29:35Z",
+    "closedAt": "2026-11-04T22:29:35Z",
+    "author": {
+      "login": "madonoharu"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1077,
+    "title": "[Bug]: Your tool itself offsets token saved by it because of things like this.",
+    "url": "https://github.com/mksglu/context-mode/issues/1077",
+    "state": "CLOSED",
+    "createdAt": "2026-08-24T15:41:25Z",
+    "updatedAt": "2026-11-04T22:29:49Z",
+    "closedAt": "2026-11-04T22:29:49Z",
+    "author": {
+      "login": "koderkashif"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1078,
+    "title": "[Bug]: cache-heal gates on \"context-mode@context-mode\" but the registry key is \"context-mode@claude-context-mode\" — the self-heal never runs",
+    "url": "https://github.com/mksglu/context-mode/issues/1078",
+    "state": "CLOSED",
+    "createdAt": "2026-08-24T16:23:13Z",
+    "updatedAt": "2026-11-04T22:29:57Z",
+    "closedAt": "2026-11-04T22:29:57Z",
+    "author": {
+      "login": "jbelmana"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1079,
+    "title": "cleanupStaleSources(14) expires sources by age alone, even when the file is unchanged — intended?",
+    "url": "https://github.com/mksglu/context-mode/issues/1079",
+    "state": "CLOSED",
+    "createdAt": "2026-08-24T16:42:40Z",
+    "updatedAt": "2026-11-04T22:30:04Z",
+    "closedAt": "2026-11-04T22:30:04Z",
+    "author": {
+      "login": "tonysynetos"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1081,
+    "title": "Execution timeout units are absent from the public tool schema",
+    "url": "https://github.com/mksglu/context-mode/issues/1081",
+    "state": "CLOSED",
+    "createdAt": "2026-08-24T18:38:35Z",
+    "updatedAt": "2026-11-04T22:30:12Z",
+    "closedAt": "2026-11-04T22:30:12Z",
+    "author": {
+      "login": "aktanazat"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  }
+]

@@ -1,0 +1,2491 @@
+[
+  {
+    "number": 1311,
+    "title": "Subagents without ctx_* tools still get WebFetch/curl denied in 2.1.0 (built-in claude-code-guide)",
+    "url": "https://github.com/mksglu/context-mode/issues/1311",
+    "state": "CLOSED",
+    "createdAt": "2026-11-05T03:03:42Z",
+    "updatedAt": "2026-11-05T14:31:09Z",
+    "closedAt": "2026-11-05T14:31:09Z",
+    "author": {
+      "login": "EarthChen"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 7
+    }
+  },
+  {
+    "number": 1312,
+    "title": "[Bug]: Pi - the in-agent doctor reports a wrong host config and a cwd mismatch on every working install",
+    "url": "https://github.com/mksglu/context-mode/issues/1312",
+    "state": "CLOSED",
+    "createdAt": "2026-11-05T07:11:34Z",
+    "updatedAt": "2026-11-05T13:11:11Z",
+    "closedAt": "2026-11-05T13:11:11Z",
+    "author": {
+      "login": "armingx"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 5
+    }
+  },
+  {
+    "number": 1313,
+    "title": "Node v22 support",
+    "url": "https://github.com/mksglu/context-mode/issues/1313",
+    "state": "CLOSED",
+    "createdAt": "2026-11-05T08:16:26Z",
+    "updatedAt": "2026-11-05T13:18:03Z",
+    "closedAt": "2026-11-05T09:35:52Z",
+    "author": {
+      "login": "suntimental"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "maintainer-ack"
+        },
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1314,
+    "title": "Read with offset/limit over 4 KB comes back as a 96 B ctx_search pointer (REPLACE_TRIGGER_BYTES)",
+    "url": "https://github.com/mksglu/context-mode/issues/1314",
+    "state": "CLOSED",
+    "createdAt": "2026-11-05T09:30:31Z",
+    "updatedAt": "2026-11-05T15:35:35Z",
+    "closedAt": "2026-11-05T15:35:35Z",
+    "author": {
+      "login": "joucarvalho"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1315,
+    "title": "ctx_doctor pi: D3 host config, D7 project and worktree FAIL",
+    "url": "https://github.com/mksglu/context-mode/issues/1315",
+    "state": "CLOSED",
+    "createdAt": "2026-11-05T11:16:29Z",
+    "updatedAt": "2026-11-05T14:19:08Z",
+    "closedAt": "2026-11-05T13:11:20Z",
+    "author": {
+      "login": "peperonid"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1316,
+    "title": "is 2.xxx planning to add agy-cli to the list of agents?",
+    "url": "https://github.com/mksglu/context-mode/issues/1316",
+    "state": "CLOSED",
+    "createdAt": "2026-11-05T12:03:15Z",
+    "updatedAt": "2026-11-05T13:12:39Z",
+    "closedAt": "2026-11-05T12:46:44Z",
+    "author": {
+      "login": "kurokirasama"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1317,
+    "title": "Muse Code",
+    "url": "https://github.com/mksglu/context-mode/issues/1317",
+    "state": "CLOSED",
+    "createdAt": "2026-11-05T14:31:44Z",
+    "updatedAt": "2026-11-05T14:41:20Z",
+    "closedAt": "2026-11-05T14:41:20Z",
+    "author": {
+      "login": "roosoars"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1318,
+    "title": "Allow configuring the data directory (keep separate Claude Code profiles separate)",
+    "url": "https://github.com/mksglu/context-mode/issues/1318",
+    "state": "CLOSED",
+    "createdAt": "2026-11-05T18:30:59Z",
+    "updatedAt": "2026-11-06T00:41:53Z",
+    "closedAt": "2026-11-05T22:09:17Z",
+    "author": {
+      "login": "PSalant726"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1319,
+    "title": "Agent PreToolUse hook is not idempotent; blocks all subagents in Claude Code auto mode",
+    "url": "https://github.com/mksglu/context-mode/issues/1319",
+    "state": "CLOSED",
+    "createdAt": "2026-11-05T20:48:04Z",
+    "updatedAt": "2026-11-05T21:03:22Z",
+    "closedAt": "2026-11-05T21:03:21Z",
+    "author": {
+      "login": "lukeszym"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1320,
+    "title": "node_gyp_bins symlink in cache node_modules breaks Codex CLI plugin fingerprinting (\"unsupported plugin entry type\" on every hook run)",
+    "url": "https://github.com/mksglu/context-mode/issues/1320",
+    "state": "CLOSED",
+    "createdAt": "2026-11-06T00:23:08Z",
+    "updatedAt": "2026-11-06T10:16:22Z",
+    "closedAt": "2026-11-06T10:16:22Z",
+    "author": {
+      "login": "Terryli246"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 0
+    }
+  },
+  {
+    "number": 1321,
+    "title": "[claude-code] Read deny over OUTPUT_CAP blocks images and PDFs, and the suggested ctx_execute call can't return them",
+    "url": "https://github.com/mksglu/context-mode/issues/1321",
+    "state": "CLOSED",
+    "createdAt": "2026-11-06T00:31:50Z",
+    "updatedAt": "2026-11-06T15:46:29Z",
+    "closedAt": "2026-11-06T15:46:29Z",
+    "author": {
+      "login": "Aston77"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1322,
+    "title": "Codex doctor reports a legacy entry when `codex plugin list` exceeds 1 MiB",
+    "url": "https://github.com/mksglu/context-mode/issues/1322",
+    "state": "CLOSED",
+    "createdAt": "2026-11-06T01:22:13Z",
+    "updatedAt": "2026-11-06T15:46:39Z",
+    "closedAt": "2026-11-06T15:46:39Z",
+    "author": {
+      "login": "m2dw"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1323,
+    "title": "Codex Stop hook fails to decode in context-mode 2.1.4",
+    "url": "https://github.com/mksglu/context-mode/issues/1323",
+    "state": "CLOSED",
+    "createdAt": "2026-11-06T02:06:15Z",
+    "updatedAt": "2026-11-06T15:46:35Z",
+    "closedAt": "2026-11-06T15:46:35Z",
+    "author": {
+      "login": "friedrichwong"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1324,
+    "title": "Pi: `read` on image files >50 KB is blocked (\"over the one-read limit\"), making it impossible for the model to view images",
+    "url": "https://github.com/mksglu/context-mode/issues/1324",
+    "state": "CLOSED",
+    "createdAt": "2026-11-06T03:08:58Z",
+    "updatedAt": "2026-11-06T15:46:32Z",
+    "closedAt": "2026-11-06T15:46:32Z",
+    "author": {
+      "login": "hoho51"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1325,
+    "title": "Feature request: return a stored source in full (`ctx_get`)",
+    "url": "https://github.com/mksglu/context-mode/issues/1325",
+    "state": "OPEN",
+    "createdAt": "2026-11-06T08:07:39Z",
+    "updatedAt": "2026-11-06T15:46:41Z",
+    "closedAt": null,
+    "author": {
+      "login": "mkaring"
+    },
+    "labels": {
+      "totalCount": 3,
+      "nodes": [
+        {
+          "name": "enhancement"
+        },
+        {
+          "name": "help wanted"
+        },
+        {
+          "name": "priority: low"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1326,
+    "title": "[claude-code] 2.x: skill references and rule files under ~/.claude no longer load in full; the Read deny points to ctx_execute(file=…), which refuses them (OUTSIDE_ROOT)",
+    "url": "https://github.com/mksglu/context-mode/issues/1326",
+    "state": "CLOSED",
+    "createdAt": "2026-11-06T14:10:05Z",
+    "updatedAt": "2026-11-08T01:09:07Z",
+    "closedAt": "2026-11-08T01:08:21Z",
+    "author": {
+      "login": "suntimental"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1327,
+    "title": "ctx_doctor D3 fails in Codex Desktop because MCP server does not receive CODEX_HOME",
+    "url": "https://github.com/mksglu/context-mode/issues/1327",
+    "state": "CLOSED",
+    "createdAt": "2026-11-06T18:47:23Z",
+    "updatedAt": "2026-11-08T01:08:43Z",
+    "closedAt": "2026-11-08T01:08:43Z",
+    "author": {
+      "login": "wwcxbc"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1328,
+    "title": "setup FAIL: codex (2e26442450f2)",
+    "url": "https://github.com/mksglu/context-mode/issues/1328",
+    "state": "CLOSED",
+    "createdAt": "2026-11-06T22:11:00Z",
+    "updatedAt": "2026-11-08T01:08:37Z",
+    "closedAt": "2026-11-08T01:08:37Z",
+    "author": {
+      "login": "lisandroprada"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1329,
+    "title": "setup FAIL: codex (2e26442450f2)",
+    "url": "https://github.com/mksglu/context-mode/issues/1329",
+    "state": "CLOSED",
+    "createdAt": "2026-11-06T22:11:11Z",
+    "updatedAt": "2026-11-08T01:08:49Z",
+    "closedAt": "2026-11-08T01:08:49Z",
+    "author": {
+      "login": "lisandroprada"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "duplicate"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1330,
+    "title": "[Bug]: After a compaction, UserPromptSubmit recall appends the session's first prompt to every query, so a long first prompt makes every later prompt exceed the 5 s hook timeout",
+    "url": "https://github.com/mksglu/context-mode/issues/1330",
+    "state": "CLOSED",
+    "createdAt": "2026-11-07T02:54:46Z",
+    "updatedAt": "2026-11-08T01:08:15Z",
+    "closedAt": "2026-11-08T01:08:15Z",
+    "author": {
+      "login": "Lcstyle"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 6
+    }
+  },
+  {
+    "number": 1331,
+    "title": "[Bug]: OpenCode 2.x ctx_* tools never check OpenCode permissions",
+    "url": "https://github.com/mksglu/context-mode/issues/1331",
+    "state": "CLOSED",
+    "createdAt": "2026-11-07T04:51:38Z",
+    "updatedAt": "2026-11-08T01:08:26Z",
+    "closedAt": "2026-11-08T01:08:26Z",
+    "author": {
+      "login": "Project579"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1332,
+    "title": "OMP Pi extension: before_agent_start replaces array systemPrompt, dropping base prompt and other extensions' sections",
+    "url": "https://github.com/mksglu/context-mode/issues/1332",
+    "state": "CLOSED",
+    "createdAt": "2026-11-07T05:49:31Z",
+    "updatedAt": "2026-11-14T15:57:23Z",
+    "closedAt": "2026-11-12T07:59:08Z",
+    "author": {
+      "login": "tejasach06"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 10
+    }
+  },
+  {
+    "number": 1333,
+    "title": "ZCode: Read of images/PDF over 16 KB is denied (READ_MEDIA_BY_AGENT.zcode is empty)",
+    "url": "https://github.com/mksglu/context-mode/issues/1333",
+    "state": "CLOSED",
+    "createdAt": "2026-11-07T06:49:29Z",
+    "updatedAt": "2026-11-08T01:08:32Z",
+    "closedAt": "2026-11-08T01:08:32Z",
+    "author": {
+      "login": "feiyulike"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1334,
+    "title": "Feature request: stateless shared daemon mode (one process per machine, Streamable HTTP) so RAM stops scaling with session count",
+    "url": "https://github.com/mksglu/context-mode/issues/1334",
+    "state": "OPEN",
+    "createdAt": "2026-11-07T08:10:58Z",
+    "updatedAt": "2026-11-08T01:08:51Z",
+    "closedAt": null,
+    "author": {
+      "login": "kaovilai"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "enhancement"
+        },
+        {
+          "name": "priority: low"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1335,
+    "title": "setup FAIL: claude-code (34b1f06befc5)",
+    "url": "https://github.com/mksglu/context-mode/issues/1335",
+    "state": "CLOSED",
+    "createdAt": "2026-11-07T23:17:03Z",
+    "updatedAt": "2026-11-12T15:19:41Z",
+    "closedAt": "2026-11-12T11:47:42Z",
+    "author": {
+      "login": "dukefong8"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 10
+    }
+  },
+  {
+    "number": 1336,
+    "title": "A setting to turn off the WebFetch hint/deny",
+    "url": "https://github.com/mksglu/context-mode/issues/1336",
+    "state": "OPEN",
+    "createdAt": "2026-11-08T00:32:26Z",
+    "updatedAt": "2026-11-08T15:03:49Z",
+    "closedAt": null,
+    "author": {
+      "login": "zdraveski"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "enhancement"
+        },
+        {
+          "name": "priority: low"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1337,
+    "title": "ctx_execute never settles when a background process keeps stdout open (close-only settle); killTree's sync taskkill freezes the host",
+    "url": "https://github.com/mksglu/context-mode/issues/1337",
+    "state": "CLOSED",
+    "createdAt": "2026-11-08T02:26:56Z",
+    "updatedAt": "2026-11-08T15:03:36Z",
+    "closedAt": "2026-11-08T15:03:35Z",
+    "author": {
+      "login": "spimm"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1338,
+    "title": "setup FAIL: claude-code (9cf48b7d65d3)",
+    "url": "https://github.com/mksglu/context-mode/issues/1338",
+    "state": "CLOSED",
+    "createdAt": "2026-11-08T04:27:02Z",
+    "updatedAt": "2026-11-08T15:03:38Z",
+    "closedAt": "2026-11-08T14:27:24Z",
+    "author": {
+      "login": "su69ar"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1339,
+    "title": "ctx_doctor opencode: D1 version, D3 host config FAIL",
+    "url": "https://github.com/mksglu/context-mode/issues/1339",
+    "state": "CLOSED",
+    "createdAt": "2026-11-08T06:41:40Z",
+    "updatedAt": "2026-11-08T15:03:42Z",
+    "closedAt": "2026-11-08T15:03:42Z",
+    "author": {
+      "login": "raidexter"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1340,
+    "title": "ctx_doctor gemini: D3 host config FAIL on Antigravity plugin install (false positive)",
+    "url": "https://github.com/mksglu/context-mode/issues/1340",
+    "state": "CLOSED",
+    "createdAt": "2026-11-08T06:47:09Z",
+    "updatedAt": "2026-11-08T15:03:45Z",
+    "closedAt": "2026-11-08T15:03:45Z",
+    "author": {
+      "login": "raihan0x1"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1341,
+    "title": "Agent hook rewrites every subagent prompt, so Claude Code auto mode gives no verdict and denies the call",
+    "url": "https://github.com/mksglu/context-mode/issues/1341",
+    "state": "CLOSED",
+    "createdAt": "2026-11-08T13:47:44Z",
+    "updatedAt": "2026-11-08T14:31:13Z",
+    "closedAt": "2026-11-08T14:31:13Z",
+    "author": {
+      "login": "esuveyke"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1342,
+    "title": "Claude Code subagents: PostToolUse replace gives an uncallable ctx_search pointer, and built-in and synced-plugin agents are never resolved (2.1.7)",
+    "url": "https://github.com/mksglu/context-mode/issues/1342",
+    "state": "CLOSED",
+    "createdAt": "2026-11-08T23:39:33Z",
+    "updatedAt": "2026-11-12T11:47:15Z",
+    "closedAt": "2026-11-12T11:47:15Z",
+    "author": {
+      "login": "folotp"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1343,
+    "title": "Claude Code subagent sources all labelled subagent:<tool>:0, so ctx_search results collide across calls (2.1.7)",
+    "url": "https://github.com/mksglu/context-mode/issues/1343",
+    "state": "CLOSED",
+    "createdAt": "2026-11-08T23:39:34Z",
+    "updatedAt": "2026-11-12T11:47:19Z",
+    "closedAt": "2026-11-12T11:47:19Z",
+    "author": {
+      "login": "folotp"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1344,
+    "title": "doctor FAIL: opencode (a7317eec7999): terminal doctor ignores OpenCode 2.x native \"plugins\" entry",
+    "url": "https://github.com/mksglu/context-mode/issues/1344",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T06:00:16Z",
+    "updatedAt": "2026-11-12T07:59:12Z",
+    "closedAt": "2026-11-12T07:59:12Z",
+    "author": {
+      "login": "Mahmoud-Shereif"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1345,
+    "title": "[claude-code] Skill reference files are not exempt from output replacement when the skill dir is a symlink (follow-up to #1326)",
+    "url": "https://github.com/mksglu/context-mode/issues/1345",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T06:01:17Z",
+    "updatedAt": "2026-11-12T07:59:17Z",
+    "closedAt": "2026-11-12T07:59:17Z",
+    "author": {
+      "login": "EarthChen"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1346,
+    "title": "cursor cannot use this?",
+    "url": "https://github.com/mksglu/context-mode/issues/1346",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T06:11:29Z",
+    "updatedAt": "2026-11-11T12:07:13Z",
+    "closedAt": "2026-11-11T12:07:13Z",
+    "author": {
+      "login": "kibear"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1347,
+    "title": "OpenCode 2: large tool results are never replaced, though execute.after can replace them",
+    "url": "https://github.com/mksglu/context-mode/issues/1347",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T07:10:20Z",
+    "updatedAt": "2026-11-12T07:59:21Z",
+    "closedAt": "2026-11-12T07:59:21Z",
+    "author": {
+      "login": "onlyonec"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1348,
+    "title": "OpenCode 2: denies point to ctx_* tools the agent's permissions deny (#1311 on OpenCode)",
+    "url": "https://github.com/mksglu/context-mode/issues/1348",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T07:10:22Z",
+    "updatedAt": "2026-11-12T07:59:25Z",
+    "closedAt": "2026-11-12T07:59:25Z",
+    "author": {
+      "login": "onlyonec"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1349,
+    "title": "OpenCode 2: terminal doctor says \"not set up\" for a plugin loaded from the plugins directory",
+    "url": "https://github.com/mksglu/context-mode/issues/1349",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T07:20:52Z",
+    "updatedAt": "2026-11-12T07:59:32Z",
+    "closedAt": "2026-11-12T07:59:31Z",
+    "author": {
+      "login": "onlyonec"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1350,
+    "title": "ctx_doctor opencode: D5 hook round trip FAIL",
+    "url": "https://github.com/mksglu/context-mode/issues/1350",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T08:55:49Z",
+    "updatedAt": "2026-11-12T15:42:43Z",
+    "closedAt": "2026-11-12T13:56:32Z",
+    "author": {
+      "login": "emngny"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 5
+    }
+  },
+  {
+    "number": 1351,
+    "title": "setup FAIL: opencode (dacad15eae59)",
+    "url": "https://github.com/mksglu/context-mode/issues/1351",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T12:04:57Z",
+    "updatedAt": "2026-11-12T07:59:42Z",
+    "closedAt": "2026-11-12T07:59:42Z",
+    "author": {
+      "login": "aamkye"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1352,
+    "title": "[pi] Large extension results lose continuation metadata; allow per-tool replacement opt-out",
+    "url": "https://github.com/mksglu/context-mode/issues/1352",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T12:06:13Z",
+    "updatedAt": "2026-11-12T07:59:46Z",
+    "closedAt": "2026-11-12T07:59:46Z",
+    "author": {
+      "login": "xz-dev"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1353,
+    "title": "ctx_resume with a blank session field returns \"no session id\" inside a live session (2.1.7)",
+    "url": "https://github.com/mksglu/context-mode/issues/1353",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T12:32:37Z",
+    "updatedAt": "2026-11-12T07:59:51Z",
+    "closedAt": "2026-11-12T07:59:51Z",
+    "author": {
+      "login": "dantetemplar"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1354,
+    "title": "ctx_search rejects an explicit offset: 0 / after: 0 as invalid paging (2.1.7)",
+    "url": "https://github.com/mksglu/context-mode/issues/1354",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T12:39:04Z",
+    "updatedAt": "2026-11-12T07:59:55Z",
+    "closedAt": "2026-11-12T07:59:55Z",
+    "author": {
+      "login": "dantetemplar"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1355,
+    "title": "Routing block can't be turned off, and session guide gets re-injected on every resume",
+    "url": "https://github.com/mksglu/context-mode/issues/1355",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T16:30:09Z",
+    "updatedAt": "2026-11-12T13:32:47Z",
+    "closedAt": "2026-11-12T08:00:00Z",
+    "author": {
+      "login": "Arny80Hexa"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1356,
+    "title": "Add support for Claude Cowork agent",
+    "url": "https://github.com/mksglu/context-mode/issues/1356",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T16:46:38Z",
+    "updatedAt": "2026-11-11T12:06:48Z",
+    "closedAt": "2026-11-11T12:06:48Z",
+    "author": {
+      "login": "CombySoti"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1357,
+    "title": "Agent PreToolUse hook is not idempotent: routing block is appended on every retry",
+    "url": "https://github.com/mksglu/context-mode/issues/1357",
+    "state": "CLOSED",
+    "createdAt": "2026-11-09T20:33:40Z",
+    "updatedAt": "2026-11-12T08:00:04Z",
+    "closedAt": "2026-11-12T08:00:04Z",
+    "author": {
+      "login": "sirgrimorum"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1358,
+    "title": "[claude-code] PostToolUse replace leaves an uncallable ctx_search pointer in main sessions whose MCP server never started (desktop spare sessions)",
+    "url": "https://github.com/mksglu/context-mode/issues/1358",
+    "state": "CLOSED",
+    "createdAt": "2026-11-10T07:02:57Z",
+    "updatedAt": "2026-11-12T11:47:22Z",
+    "closedAt": "2026-11-12T11:47:22Z",
+    "author": {
+      "login": "D4lD4r"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1359,
+    "title": "D4 treats valid Codex tool approval tables as legacy configuration",
+    "url": "https://github.com/mksglu/context-mode/issues/1359",
+    "state": "CLOSED",
+    "createdAt": "2026-11-10T07:43:13Z",
+    "updatedAt": "2026-11-17T19:31:37Z",
+    "closedAt": "2026-11-12T06:47:03Z",
+    "author": {
+      "login": "HengYangDS"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1360,
+    "title": "setup FAIL: copilot-cli (30287daa84ee)",
+    "url": "https://github.com/mksglu/context-mode/issues/1360",
+    "state": "CLOSED",
+    "createdAt": "2026-11-10T11:40:28Z",
+    "updatedAt": "2026-11-12T08:00:09Z",
+    "closedAt": "2026-11-12T08:00:09Z",
+    "author": {
+      "login": "sante8jairo"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1361,
+    "title": "setup FAIL: copilot-cli (30287daa84ee)",
+    "url": "https://github.com/mksglu/context-mode/issues/1361",
+    "state": "CLOSED",
+    "createdAt": "2026-11-10T11:48:49Z",
+    "updatedAt": "2026-11-12T08:00:15Z",
+    "closedAt": "2026-11-12T08:00:15Z",
+    "author": {
+      "login": "sante8jairo"
+    },
+    "labels": {
+      "totalCount": 3,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "duplicate"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1362,
+    "title": "setup FAIL: opencode (fee42458702b)",
+    "url": "https://github.com/mksglu/context-mode/issues/1362",
+    "state": "CLOSED",
+    "createdAt": "2026-11-10T13:04:16Z",
+    "updatedAt": "2026-11-12T08:00:19Z",
+    "closedAt": "2026-11-12T08:00:19Z",
+    "author": {
+      "login": "Mehji2324"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1363,
+    "title": "[Bug]: 1.x `context-mode upgrade` leaves a hybrid install — package.json says 2.1.7 while executables stay 1.0.169, and re-running says \"Already on latest\"",
+    "url": "https://github.com/mksglu/context-mode/issues/1363",
+    "state": "CLOSED",
+    "createdAt": "2026-11-10T13:55:12Z",
+    "updatedAt": "2026-11-12T08:00:23Z",
+    "closedAt": "2026-11-12T08:00:23Z",
+    "author": {
+      "login": "FrankXuL"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1364,
+    "title": "D4 old entries: ctx_upgrade removes user Codex hooks under any hooks/codex/ folder",
+    "url": "https://github.com/mksglu/context-mode/issues/1364",
+    "state": "CLOSED",
+    "createdAt": "2026-11-10T20:21:39Z",
+    "updatedAt": "2026-11-12T08:00:28Z",
+    "closedAt": "2026-11-12T08:00:28Z",
+    "author": {
+      "login": "Korayem"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1365,
+    "title": "[Bug]: ctx_stats v2.1.7 still reports per-chat \"kept out\" above the all-time total, and 100% savings with zero calls (regression of #950)",
+    "url": "https://github.com/mksglu/context-mode/issues/1365",
+    "state": "CLOSED",
+    "createdAt": "2026-11-11T08:07:44Z",
+    "updatedAt": "2026-11-12T08:00:30Z",
+    "closedAt": "2026-11-12T08:00:32Z",
+    "author": {
+      "login": "enminc"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1366,
+    "title": "setup FAIL: gemini (a05aff719248)",
+    "url": "https://github.com/mksglu/context-mode/issues/1366",
+    "state": "CLOSED",
+    "createdAt": "2026-11-11T11:23:00Z",
+    "updatedAt": "2026-11-12T08:00:37Z",
+    "closedAt": "2026-11-12T08:00:37Z",
+    "author": {
+      "login": "Realba92"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1367,
+    "title": "Pi: exact recovery tool output is replaced with another ctx_search pointer",
+    "url": "https://github.com/mksglu/context-mode/issues/1367",
+    "state": "CLOSED",
+    "createdAt": "2026-11-11T13:36:07Z",
+    "updatedAt": "2026-11-12T11:47:27Z",
+    "closedAt": "2026-11-12T11:47:27Z",
+    "author": {
+      "login": "worldofgeese"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1368,
+    "title": "setup FAIL: run (9752eb62a684)",
+    "url": "https://github.com/mksglu/context-mode/issues/1368",
+    "state": "CLOSED",
+    "createdAt": "2026-11-11T22:06:42Z",
+    "updatedAt": "2026-11-12T11:47:31Z",
+    "closedAt": "2026-11-12T11:47:31Z",
+    "author": {
+      "login": "Keayoub"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1369,
+    "title": "OpenCode 2: system payload is injected only in the \"context\" hook, so session warming always misses the prompt cache",
+    "url": "https://github.com/mksglu/context-mode/issues/1369",
+    "state": "CLOSED",
+    "createdAt": "2026-11-11T22:42:39Z",
+    "updatedAt": "2026-11-12T11:47:34Z",
+    "closedAt": "2026-11-12T11:47:34Z",
+    "author": {
+      "login": "aaeabdo"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1370,
+    "title": "PreToolUse hook denies native tools when it fails itself (NODE_TOO_OLD), leaving no usable tools",
+    "url": "https://github.com/mksglu/context-mode/issues/1370",
+    "state": "CLOSED",
+    "createdAt": "2026-11-11T22:44:03Z",
+    "updatedAt": "2026-11-12T11:47:38Z",
+    "closedAt": "2026-11-12T11:47:38Z",
+    "author": {
+      "login": "amagana-wq"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1371,
+    "title": "Windows/OpenCode: findRuntime reads only env.PATH (no env.Path fallback) — D11 \"Git Bash not found\" and every ctx_execute language fails when the env block spells it \"Path\"",
+    "url": "https://github.com/mksglu/context-mode/issues/1371",
+    "state": "CLOSED",
+    "createdAt": "2026-11-12T08:12:11Z",
+    "updatedAt": "2026-11-12T11:50:30Z",
+    "closedAt": "2026-11-12T11:50:30Z",
+    "author": {
+      "login": "alexlqs"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1372,
+    "title": "Feature request: per-tool opt-out for output replacement",
+    "url": "https://github.com/mksglu/context-mode/issues/1372",
+    "state": "OPEN",
+    "createdAt": "2026-11-12T09:57:34Z",
+    "updatedAt": "2026-11-12T17:38:41Z",
+    "closedAt": null,
+    "author": {
+      "login": "limekiln"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "enhancement"
+        },
+        {
+          "name": "priority: low"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1373,
+    "title": "[Bug]: ctx_execute with language: \"python\" returns \"Internal error\" on Windows when the Microsoft Store python alias is first on PATH (statSync throws EACCES)",
+    "url": "https://github.com/mksglu/context-mode/issues/1373",
+    "state": "CLOSED",
+    "createdAt": "2026-11-12T13:29:52Z",
+    "updatedAt": "2026-11-16T08:32:46Z",
+    "closedAt": "2026-11-14T15:55:10Z",
+    "author": {
+      "login": "inferno7291"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 5
+    }
+  },
+  {
+    "number": 1374,
+    "title": "Claude Code subagent with tools: mcp__plugin_context-mode_context-mode__* resolves as having no ctx tools (pickSubagentCase ignores wildcard)",
+    "url": "https://github.com/mksglu/context-mode/issues/1374",
+    "state": "CLOSED",
+    "createdAt": "2026-11-12T17:38:33Z",
+    "updatedAt": "2026-11-14T15:57:15Z",
+    "closedAt": "2026-11-14T15:55:06Z",
+    "author": {
+      "login": "samelie"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1375,
+    "title": "`setup` generates a PowerShell hook command that fails to parse (two adjacent quoted paths)",
+    "url": "https://github.com/mksglu/context-mode/issues/1375",
+    "state": "CLOSED",
+    "createdAt": "2026-11-12T19:51:10Z",
+    "updatedAt": "2026-11-14T15:57:17Z",
+    "closedAt": "2026-11-14T15:55:02Z",
+    "author": {
+      "login": "thibaudmerlin"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1376,
+    "title": "Codex: setup pins plugin version dir in config.toml/hooks.json; Codex plugin auto-update deletes it and hooks break",
+    "url": "https://github.com/mksglu/context-mode/issues/1376",
+    "state": "CLOSED",
+    "createdAt": "2026-11-13T02:12:40Z",
+    "updatedAt": "2026-11-14T15:57:18Z",
+    "closedAt": "2026-11-14T15:54:59Z",
+    "author": {
+      "login": "jwater000"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1377,
+    "title": "Claude Code always ask for permissions while in Plan mode",
+    "url": "https://github.com/mksglu/context-mode/issues/1377",
+    "state": "CLOSED",
+    "createdAt": "2026-11-13T09:39:24Z",
+    "updatedAt": "2026-11-13T18:22:47Z",
+    "closedAt": "2026-11-13T18:22:47Z",
+    "author": {
+      "login": "hungvuong142"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1378,
+    "title": "doctor FAIL: gemini extensions list requires auth/API key in non-interactive subprocess",
+    "url": "https://github.com/mksglu/context-mode/issues/1378",
+    "state": "CLOSED",
+    "createdAt": "2026-11-13T16:50:50Z",
+    "updatedAt": "2026-11-14T15:57:20Z",
+    "closedAt": "2026-11-14T15:54:55Z",
+    "author": {
+      "login": "igortchucao"
+    },
+    "labels": {
+      "totalCount": 0,
+      "nodes": []
+    },
+    "comments": {
+      "totalCount": 5
+    }
+  },
+  {
+    "number": 1379,
+    "title": "v2 cutoff creates more friction and drastically increases round trips",
+    "url": "https://github.com/mksglu/context-mode/issues/1379",
+    "state": "CLOSED",
+    "createdAt": "2026-11-14T01:49:28Z",
+    "updatedAt": "2026-11-14T15:25:30Z",
+    "closedAt": "2026-11-14T15:25:30Z",
+    "author": {
+      "login": "Ticki84"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1380,
+    "title": "`ctx_index` fetch sends no User-Agent: sites like Wikipedia return 403, and WebFetch deny leaves no fallback",
+    "url": "https://github.com/mksglu/context-mode/issues/1380",
+    "state": "CLOSED",
+    "createdAt": "2026-11-14T06:48:52Z",
+    "updatedAt": "2026-11-16T05:09:14Z",
+    "closedAt": "2026-11-14T15:54:51Z",
+    "author": {
+      "login": "abhirup-dev"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1381,
+    "title": "Feature request: per-model replace trigger (CTX_REPLACE_TRIGGER_BYTES by model)",
+    "url": "https://github.com/mksglu/context-mode/issues/1381",
+    "state": "OPEN",
+    "createdAt": "2026-11-14T21:57:08Z",
+    "updatedAt": "2026-11-14T21:57:26Z",
+    "closedAt": null,
+    "author": {
+      "login": "chchaffin"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "enhancement"
+        },
+        {
+          "name": "priority: low"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1382,
+    "title": "Claude Code subagents context-mode cannot resolve (claude-code-guide, web-fetch, claude) get a replace with nothing they can call (2.2.0)",
+    "url": "https://github.com/mksglu/context-mode/issues/1382",
+    "state": "CLOSED",
+    "createdAt": "2026-11-14T22:12:47Z",
+    "updatedAt": "2026-11-17T17:16:11Z",
+    "closedAt": "2026-11-17T17:12:47Z",
+    "author": {
+      "login": "ToastyWriter"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1383,
+    "title": "doctor reports FAIL for legacy data directory that setup does not remove",
+    "url": "https://github.com/mksglu/context-mode/issues/1383",
+    "state": "CLOSED",
+    "createdAt": "2026-11-15T10:26:11Z",
+    "updatedAt": "2026-11-17T17:16:13Z",
+    "closedAt": "2026-11-17T17:12:43Z",
+    "author": {
+      "login": "avkghost"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1384,
+    "title": "D5 hook round trip: Pi before_agent_start returns systemPrompt, freezing prompt and dropping <mcp_servers> section in Pi >= 1.5",
+    "url": "https://github.com/mksglu/context-mode/issues/1384",
+    "state": "CLOSED",
+    "createdAt": "2026-11-15T10:41:53Z",
+    "updatedAt": "2026-11-17T17:16:14Z",
+    "closedAt": "2026-11-17T17:12:40Z",
+    "author": {
+      "login": "yunmo-yunmo"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1385,
+    "title": "ctx_doctor opencode: D5 hook round trip FAIL — linkSync EACCES on Android/f2fs (hard links denied)",
+    "url": "https://github.com/mksglu/context-mode/issues/1385",
+    "state": "CLOSED",
+    "createdAt": "2026-11-15T11:56:37Z",
+    "updatedAt": "2026-11-17T17:16:15Z",
+    "closedAt": "2026-11-17T17:12:35Z",
+    "author": {
+      "login": "Davinci198"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1386,
+    "title": "setup FAIL: opencode (34e0d4ae2981)",
+    "url": "https://github.com/mksglu/context-mode/issues/1386",
+    "state": "CLOSED",
+    "createdAt": "2026-11-15T19:22:22Z",
+    "updatedAt": "2026-11-17T17:16:17Z",
+    "closedAt": "2026-11-17T17:12:31Z",
+    "author": {
+      "login": "feedinddev"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1387,
+    "title": "setup FAIL: opencode (34e0d4ae2981)",
+    "url": "https://github.com/mksglu/context-mode/issues/1387",
+    "state": "CLOSED",
+    "createdAt": "2026-11-15T19:24:24Z",
+    "updatedAt": "2026-11-15T22:15:09Z",
+    "closedAt": "2026-11-15T22:15:09Z",
+    "author": {
+      "login": "feedinddev"
+    },
+    "labels": {
+      "totalCount": 3,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "duplicate"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1388,
+    "title": "Codex PreToolUse allows a full large-file read through rtk proxy",
+    "url": "https://github.com/mksglu/context-mode/issues/1388",
+    "state": "CLOSED",
+    "createdAt": "2026-11-15T20:23:56Z",
+    "updatedAt": "2026-11-17T17:16:18Z",
+    "closedAt": "2026-11-17T17:12:27Z",
+    "author": {
+      "login": "pnpwin"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1389,
+    "title": "[Feature request] Offer a native Codex marketplace option that runs on Bun",
+    "url": "https://github.com/mksglu/context-mode/issues/1389",
+    "state": "OPEN",
+    "createdAt": "2026-11-15T20:24:02Z",
+    "updatedAt": "2026-11-15T20:33:14Z",
+    "closedAt": null,
+    "author": {
+      "login": "pnpwin"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "enhancement"
+        },
+        {
+          "name": "priority: low"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1390,
+    "title": "ctx_search returns success with zero hits for an unknown explicit source selector",
+    "url": "https://github.com/mksglu/context-mode/issues/1390",
+    "state": "OPEN",
+    "createdAt": "2026-11-15T23:58:40Z",
+    "updatedAt": "2026-11-18T14:23:42Z",
+    "closedAt": null,
+    "author": {
+      "login": "avkghost"
+    },
+    "labels": {
+      "totalCount": 3,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        },
+        {
+          "name": "fixed-on-main"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 6
+    }
+  },
+  {
+    "number": 1391,
+    "title": "Your plugin ranked #30 on the AI plugin leaderboard",
+    "url": "https://github.com/mksglu/context-mode/issues/1391",
+    "state": "CLOSED",
+    "createdAt": "2026-11-16T06:49:25Z",
+    "updatedAt": "2026-11-16T06:54:01Z",
+    "closedAt": "2026-11-16T06:54:01Z",
+    "author": {
+      "login": "ohalo"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1392,
+    "title": "OMP: ranged read (path:50-120) is cut; boundedRead knows only offset/limit/view_range",
+    "url": "https://github.com/mksglu/context-mode/issues/1392",
+    "state": "CLOSED",
+    "createdAt": "2026-11-16T20:01:28Z",
+    "updatedAt": "2026-11-17T17:16:21Z",
+    "closedAt": "2026-11-17T17:12:19Z",
+    "author": {
+      "login": "Sephyz"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "bug"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 4
+    }
+  },
+  {
+    "number": 1393,
+    "title": "PreToolUse hook on Agent rewrites subagent prompts, which breaks Claude Code auto mode",
+    "url": "https://github.com/mksglu/context-mode/issues/1393",
+    "state": "CLOSED",
+    "createdAt": "2026-11-16T20:32:51Z",
+    "updatedAt": "2026-11-16T20:38:54Z",
+    "closedAt": "2026-11-16T20:38:54Z",
+    "author": {
+      "login": "Gifilta"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1394,
+    "title": "recall: UserPromptSubmit recall injects journal rows created after the last compaction",
+    "url": "https://github.com/mksglu/context-mode/issues/1394",
+    "state": "CLOSED",
+    "createdAt": "2026-11-17T06:39:54Z",
+    "updatedAt": "2026-11-17T17:16:22Z",
+    "closedAt": "2026-11-17T17:12:14Z",
+    "author": {
+      "login": "MaurUppi"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1395,
+    "title": "Feature: setting to turn off or narrow UserPromptSubmit recall",
+    "url": "https://github.com/mksglu/context-mode/issues/1395",
+    "state": "OPEN",
+    "createdAt": "2026-11-17T06:39:56Z",
+    "updatedAt": "2026-11-17T06:40:14Z",
+    "closedAt": null,
+    "author": {
+      "login": "MaurUppi"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "enhancement"
+        },
+        {
+          "name": "priority: low"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1396,
+    "title": "SessionStart(compact): context_mode_state is sent only at the first compaction of a session",
+    "url": "https://github.com/mksglu/context-mode/issues/1396",
+    "state": "CLOSED",
+    "createdAt": "2026-11-17T06:39:59Z",
+    "updatedAt": "2026-11-17T17:16:24Z",
+    "closedAt": "2026-11-17T17:12:10Z",
+    "author": {
+      "login": "MaurUppi"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 3
+    }
+  },
+  {
+    "number": 1397,
+    "title": "[Feature] ECA (Editor Code Assistant) as an agent: --agent eca",
+    "url": "https://github.com/mksglu/context-mode/issues/1397",
+    "state": "OPEN",
+    "createdAt": "2026-11-17T07:42:46Z",
+    "updatedAt": "2026-11-17T07:43:17Z",
+    "closedAt": null,
+    "author": {
+      "login": "ovistoica"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "enhancement"
+        },
+        {
+          "name": "priority: low"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1398,
+    "title": "Don't limit ctx_index to a project's primary folder... or really, at all. (both Claude and Codex)",
+    "url": "https://github.com/mksglu/context-mode/issues/1398",
+    "state": "OPEN",
+    "createdAt": "2026-11-17T20:02:07Z",
+    "updatedAt": "2026-11-17T20:02:25Z",
+    "closedAt": null,
+    "author": {
+      "login": "CygnusIgnis"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "enhancement"
+        },
+        {
+          "name": "priority: low"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1399,
+    "title": "Context Mode MCP is listed on MCP ServerList",
+    "url": "https://github.com/mksglu/context-mode/issues/1399",
+    "state": "CLOSED",
+    "createdAt": "2026-11-18T00:20:04Z",
+    "updatedAt": "2026-11-18T07:40:15Z",
+    "closedAt": "2026-11-18T07:40:15Z",
+    "author": {
+      "login": "tonylate520"
+    },
+    "labels": {
+      "totalCount": 1,
+      "nodes": [
+        {
+          "name": "needs-info"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1400,
+    "title": "SessionStart(compact) state block: \"now:\" line is empty when the latest prompt starts with a blank line",
+    "url": "https://github.com/mksglu/context-mode/issues/1400",
+    "state": "OPEN",
+    "createdAt": "2026-11-18T02:08:11Z",
+    "updatedAt": "2026-11-18T14:37:48Z",
+    "closedAt": null,
+    "author": {
+      "login": "MaurUppi"
+    },
+    "labels": {
+      "totalCount": 3,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        },
+        {
+          "name": "fixed-on-main"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1401,
+    "title": "Hook times out (5 s) when another session holds the project DB lock: detached writes run in the hook process",
+    "url": "https://github.com/mksglu/context-mode/issues/1401",
+    "state": "OPEN",
+    "createdAt": "2026-11-18T07:45:37Z",
+    "updatedAt": "2026-11-18T21:59:21Z",
+    "closedAt": null,
+    "author": {
+      "login": "ryanleecode"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "fixed-on-main"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1402,
+    "title": "PostToolUse replaces MCP output of plugin-originated $.mcp.call (toolu_plugin_*), breaking mods that parse JSON",
+    "url": "https://github.com/mksglu/context-mode/issues/1402",
+    "state": "OPEN",
+    "createdAt": "2026-11-18T08:33:48Z",
+    "updatedAt": "2026-11-18T17:53:08Z",
+    "closedAt": null,
+    "author": {
+      "login": "maschenborn"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "fixed-on-main"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1403,
+    "title": "context-mode v2 needs ability to configure allowed private targets (for use inside e.g. docker sbx)",
+    "url": "https://github.com/mksglu/context-mode/issues/1403",
+    "state": "OPEN",
+    "createdAt": "2026-11-18T11:45:10Z",
+    "updatedAt": "2026-11-18T14:29:26Z",
+    "closedAt": null,
+    "author": {
+      "login": "bbmarkus"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "fixed-on-main"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1404,
+    "title": "[opencode] skill over 4 KB comes back as a ctx_search pointer, so skills never load in full",
+    "url": "https://github.com/mksglu/context-mode/issues/1404",
+    "state": "OPEN",
+    "createdAt": "2026-11-18T12:18:26Z",
+    "updatedAt": "2026-11-18T14:43:06Z",
+    "closedAt": null,
+    "author": {
+      "login": "AlexanderNord"
+    },
+    "labels": {
+      "totalCount": 3,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        },
+        {
+          "name": "fixed-on-main"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1405,
+    "title": "setup FAIL: copilot-cli (ab53d809879e)",
+    "url": "https://github.com/mksglu/context-mode/issues/1405",
+    "state": "CLOSED",
+    "createdAt": "2026-11-18T14:55:48Z",
+    "updatedAt": "2026-11-18T15:32:15Z",
+    "closedAt": "2026-11-18T15:31:35Z",
+    "author": {
+      "login": "CosmicChrisTech"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 2
+    }
+  },
+  {
+    "number": 1406,
+    "title": "[claude-code] PostToolUse Bash replace drops persistedOutputPath, so the pointer never names the file that holds the whole output",
+    "url": "https://github.com/mksglu/context-mode/issues/1406",
+    "state": "OPEN",
+    "createdAt": "2026-11-18T16:40:00Z",
+    "updatedAt": "2026-11-18T17:52:20Z",
+    "closedAt": null,
+    "author": {
+      "login": "brandonwie"
+    },
+    "labels": {
+      "totalCount": 3,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        },
+        {
+          "name": "fixed-on-main"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1407,
+    "title": "Stale @latest plugin cache: old context-mode snapshot fails to load on OpenCode 2.3.2",
+    "url": "https://github.com/mksglu/context-mode/issues/1407",
+    "state": "CLOSED",
+    "createdAt": "2026-11-19T11:50:44Z",
+    "updatedAt": "2026-11-19T12:35:29Z",
+    "closedAt": "2026-11-19T12:35:29Z",
+    "author": {
+      "login": "miberecz"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  },
+  {
+    "number": 1408,
+    "title": "Claude Code adapter: tool failures, Glob/Agent/Skill/Task*, git events and free-text decisions aren't journalled",
+    "url": "https://github.com/mksglu/context-mode/issues/1408",
+    "state": "OPEN",
+    "createdAt": "2026-11-19T12:03:35Z",
+    "updatedAt": "2026-11-19T12:08:02Z",
+    "closedAt": null,
+    "author": {
+      "login": "shutupandsmile"
+    },
+    "labels": {
+      "totalCount": 2,
+      "nodes": [
+        {
+          "name": "bug"
+        },
+        {
+          "name": "repro-ready"
+        }
+      ]
+    },
+    "comments": {
+      "totalCount": 1
+    }
+  }
+]
